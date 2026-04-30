@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Autonomous Formation Flight Control of Large-Sized Flapping-Wing Flying Robots Based on Leader-Follower Strategy</title>
+    <meta name="keywords" content="formation flight, leader-follower, flapping-wing robot, ornithopter, large-scale FWFR, HIT-Phoenix, outdoor experiment, periodic flight characteristics, consensus control">
+    <meta name="paper-authors" content="Hui Xu, Yuanpeng Wang, Erzhen Pan, Wenfu Xu, Dong Xue">
+    <meta name="paper-journal" content="Journal of Bionic Engineering, Vol. 20, 2023, pp. 2542-2558 · DOI: 10.1007/s42235-023-00402-5">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$',  right: '$',  display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Noto Sans KR', 'Arial', sans-serif;
+            margin: 0; padding: 0;
+            background: #f5f5f5;
+            color: #333;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+        }
+        .slide {
+            width: min(1680px, 98vw);
+            height: 96vh;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            overflow: hidden;
+        }
+        .header {
+            background: #005b96;
+            color: white;
+            padding: 26px 38px;
+        }
+        .title { font-size: 32px; font-weight: bold; margin-bottom: 10px; line-height: 1.3; }
+        .authors { font-size: 17px; margin-bottom: 5px; }
+        .journal { font-size: 15px; opacity: 0.9; }
+
+        .summary-container {
+            background: #f0f5fa;
+            padding: 18px 38px;
+            border-bottom: 1px solid #e1e5e8;
+        }
+        .summary-title {
+            font-size: 19px; font-weight: bold; margin-bottom: 8px; color: #005b96;
+        }
+        .summary { font-size: 17px; line-height: 1.65; }
+        .keywords {
+            margin-top: 10px;
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .keyword-chip {
+            font-size: 12px;
+            padding: 3px 10px;
+            background: white;
+            color: #005b96;
+            border: 1px solid #c6dbed;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 14px;
+            padding: 14px 18px;
+            overflow: hidden;
+        }
+        .section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,91,150,0.18);
+            border-color: #005b96;
+        }
+        .section-title {
+            color: #005b96;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 9px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #005b96;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .click-hint {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+        .section-summary {
+            font-size: 15px;
+            line-height: 1.6;
+            flex: 1;
+            overflow: hidden;
+        }
+        .term { font-weight: bold; color: #005b96; }
+        .eng { color: #666; font-style: italic; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            justify-content: center; align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.18s ease-out;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: white;
+            width: min(1100px, 90vw);
+            height: min(800px, 88vh);
+            border-radius: 10px;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .modal-header {
+            background: #005b96;
+            color: white;
+            padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 22px; font-weight: bold; }
+        .modal-close {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px; line-height: 1;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.2); }
+        .modal-body {
+            padding: 24px 32px;
+            overflow-y: auto;
+            font-size: 15.5px;
+            line-height: 1.75;
+        }
+        .modal-body .bullet {
+            margin-bottom: 10px;
+            padding-left: 18px;
+            text-indent: -18px;
+        }
+        .modal-body .bullet:before {
+            content: "▸ ";
+            color: #005b96;
+            font-weight: bold;
+        }
+        .modal-body .formula-block {
+            background: #f8f9fb;
+            border-left: 4px solid #005b96;
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 4px;
+        }
+        .modal-body .formula-label {
+            font-size: 12px;
+            color: #005b96;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .modal-body .formula-desc {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+        .modal-body h4 {
+            color: #005b96;
+            margin-top: 22px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="header">
+            <div class="title">Autonomous Formation Flight Control of Large-Sized Flapping-Wing Flying Robots Based on Leader-Follower Strategy</div>
+            <div class="authors">Hui Xu, Yuanpeng Wang, Erzhen Pan, Wenfu Xu, Dong Xue</div>
+            <div class="journal">Journal of Bionic Engineering, Vol. 20, 2023, pp. 2542-2558 · DOI: 10.1007/s42235-023-00402-5</div>
+        </div>
+
+        <div class="summary-container">
+            <div class="summary-title">논문 요약</div>
+            <div class="summary">이 논문은 대형 ornithopter (<span class="eng">Large-Sized Flapping-Wing Flying Robot, LFWFR</span>) 의 자율 편대비행을 <span class="term">leader–follower 전략</span>으로 구현한 첫 야외 검증 사례다. HIT-Phoenix (날개폭 <span class="term">2.3 m</span>, 이륙 무게 675 g, 비행속도 5 m/s) 플랫폼에서 직선·원형·전환 formation 모드를 모두 시뮬레이션과 실외 비행 양쪽에서 검증했다. 핵심 기여는 <span class="term">날갯짓 주기 (3~5 Hz)</span> 에 의한 fuselage 의 height·pitch 주기 변동을 명시적으로 보정하는 <span class="term">Hall sensor + flapping-cycle 평균 navigation</span> — 이것이 기존 leader–follower 알고리즘의 trajectory divergence 문제를 해결한다. 기존 FWFR formation 연구가 실내·시뮬·이론 중심이었던 한계를 깨고, 실제 outdoor multi-LFWFR formation 비행을 보여준 점이 가장 큰 의의.</div>
+            <div class="keywords"><span class="keyword-chip">formation flight</span><span class="keyword-chip">leader-follower</span><span class="keyword-chip">flapping-wing robot</span><span class="keyword-chip">ornithopter</span><span class="keyword-chip">large-scale FWFR</span><span class="keyword-chip">HIT-Phoenix</span><span class="keyword-chip">outdoor experiment</span><span class="keyword-chip">periodic flight characteristics</span><span class="keyword-chip">consensus control</span></div>
+        </div>
+
+        <div class="content">
+            <div class="section" onclick="openModal('introduction')">
+                <div class="section-title">Introduction: 연구 동기 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">자연의 새들이 formation flight 로 에너지 절감과 비행 효율을 얻는다는 점에서 영감을 받아, LFWFR 에서도 formation 이 탐색·구조 임무에 유용. 그러나 LFWFR 는 fixed-wing/rotor 와 달리 <span class="term">날갯짓 주기에 따라 질량중심·자세가 cyclic 변동</span>하며, 낮은 flapping frequency (&lt;5 Hz) 와 무거운 wing 으로 인해 fuselage 진동이 무시할 수 없는 크기다. 기존 FWFR formation 연구는 실내 또는 이론·시뮬 위주라 실외 검증이 부재 — 본 연구가 이 갭을 메운다.</div>
+            </div>
+            <div class="section" onclick="openModal('related_works')">
+                <div class="section-title">Related Works: 관련 연구 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">FWFR 프로토타입 개발은 활발했으나 (RoboBee · DelFly · Robo Raven 등) 대부분 wingspan &lt; 1 m. Formation 제어는 fixed-wing/rotor 영역의 알고리즘들 (leader–follower, virtual structure, potential field, behavior-based) 이 표준이지만 정밀 tracking 가정 때문에 LFWFR 적용 불가. 기존 FWFR formation 연구 (Kim, Tay, Ramananarivo, Ghommem) 는 모두 실내·이론·시뮬 — 본 연구가 실외 + large-scale + 실제 비행이라는 빈 영역을 채운다.</div>
+            </div>
+            <div class="section" onclick="openModal('method')">
+                <div class="section-title">Method: 새로운 접근 방법 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">방법은 세 부분으로 구성. (1) <span class="term">LFWFR 키네매틱 모델</span> — geodetic·body 좌표계, 상대 거리 ρ_ij·상대 위상각 γ_ij·상대 yaw 의 동역학 식 도출. (2) <span class="term">Leader–Follower formation 전략</span> — adjacency matrix 기반 communication topology + yaw·velocity·height 의 consistency control + 식 (15) 의 통합 formation control law. (3) <span class="term">Flight controller</span> — STM32F405 + AS14B-TTL wireless + Hall sensor 기반 flapping-cycle 평균 navigation 으로 주기 진동 보정.</div>
+            </div>
+            <div class="section" onclick="openModal('experiment')">
+                <div class="section-title">Experiment: 실험 방법과 결과 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">검증은 두 단계 — <span class="term">3가지 formation 모드 시뮬레이션</span> (직선·원형·전환) 과 <span class="term">2대 HIT-Phoenix outdoor 실험</span>. 시뮬레이션에서는 모두 5초 내 desired formation 으로 수렴하고 ±1 m 이내 trajectory error. 실외에서는 거리 10 m / phase 3π/4 로 leader–follower 비행 시현 — Hall sensor navigation 으로 pitch fluctuation 감소를 정량 확인. 한계: GPS 정확도, wireless 손실/지연, flapping-frequency vs 속도 비선형성, tail roll-pitch 커플링.</div>
+            </div>
+            <div class="section" onclick="openModal('discussion')">
+                <div class="section-title">Discussion: 결과의 해석 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">주요 통찰: <span class="term">fuselage 진동 보정</span>이 LFWFR formation 성공의 결정적 요인 — Hall sensor + flapping-cycle 평균 navigation 이 control freq 를 12배 낮춰도 안정성 더 좋게 만든다. <span class="term">Leader–follower 의 단순함이 강점</span> — follower 끼리 통신 불필요로 robust. 한계: GPS·wireless 정확도, flapping–velocity 비선형, tail 커플링. 향후: 3D altitude 정밀 제어, ultra-multiple LFWFR 확장, 다양한 airflow 검증.</div>
+            </div>
+            <div class="section" onclick="openModal('conclusion')">
+                <div class="section-title">Conclusion: 최종 요약 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary"><span class="term">Leader–follower 기반 LFWFR formation 제어 방법</span>을 제안하고, fuselage 진동 보정을 알고리즘에 명시 통합. 시뮬에서 직선·원형·전환 formation 모두 검증, 실외 2대 outdoor 실험으로도 작동 확인. <span class="term">Large-scale FWFR (날개폭 2.3 m) 의 outdoor multi-agent formation</span>의 첫 실증 사례. 향후: altitude 정밀도 향상, 3D 환경 다양 airflow 대응, ultra-multiple LFWFR 확장.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title"></div>
+                <button class="modal-close" onclick="closeModal()" aria-label="닫기">×</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const SECTION_TITLES = {
+            introduction: "Introduction — 연구 동기",
+            related_works: "Related Works — 관련 연구",
+            method: "Method — 새로운 접근 방법",
+            experiment: "Experiment — 실험 방법과 결과",
+            discussion: "Discussion — 결과의 해석",
+            conclusion: "Conclusion — 최종 요약"
+        };
+
+        const SECTION_DETAIL = {"introduction": {"content": [{"type": "bullet", "text": "<span class=\"term\">자연의 새 formation 비행</span>은 에너지 소비를 줄이고 효율을 높이는 것으로 알려져 있어, 이를 모방한 LFWFR formation 은 탐색·재난 구조 등의 임무에서 비행 범위와 효율을 동시에 향상시킬 잠재력이 크다."}, {"type": "bullet", "text": "단일 LFWFR 로는 <span class=\"term\">광범위·장시간·고신뢰</span> 임무 요구를 모두 만족하기 어렵다. Formation 은 자동화를 촉진하고 에너지 절감을 가능케 하므로, LFWFR formation 제어는 항공 지능 로봇 분야의 핵심 과제로 부상."}, {"type": "bullet", "text": "LFWFR 의 운동 제어는 fixed-wing/rotor-wing 보다 본질적으로 더 복잡하다. <span class=\"term\">날개를 칠 때마다 질량중심의 위치·자세가 주기적으로 변동</span>하므로, 정적 평형 가정이 깨진다."}, {"type": "bullet", "text": "낮은 flapping frequency (<span class=\"term\">3~5 Hz</span>) 와 wing 의 큰 질량 (전체의 10%↑) 으로 인해 한 flapping cycle 당 height 와 pitch 의 변동이 무시할 수 없는 크기 (실측 pitch 2~5°). 이 진동을 raw 로 받으면 attitude 추정이 잘못되어 stall 까지 이어질 수 있다."}, {"type": "bullet", "text": "FWFR 프로토타입 자체는 많이 발전 (RoboBee, DelFly, Robo Raven, Dove, FMAV, USTBird, HIT-Phoenix) 했으나 <span class=\"term\">대부분 wingspan &lt; 1 m</span> 의 소형 — payload·endurance·outdoor 비행 능력 부족."}, {"type": "bullet", "text": "기존 fixed-wing/rotor 용 formation 알고리즘 (leader–follower, virtual structure, potential field, behavior-based) 은 모두 <span class=\"term\">정확한 trajectory tracking 또는 position control 가정</span>이 전제 — 주기 진동이 큰 LFWFR 에 그대로 적용 시 trajectory 가 발산하거나 큰 error 발생."}, {"type": "bullet", "text": "기존 FWFR formation 연구의 두 가지 패턴: (1) 프로토타입 개발에 집중하여 자율비행 능력 자체가 약함, (2) formation 제어는 이론 분석·시뮬레이션 위주로 <span class=\"term\">실험 검증이 부재</span>. 본 논문은 이 두 갭을 동시에 메운다."}, {"type": "bullet", "text": "본 연구의 도전과제 — (1) wing 의 큰 질량으로 인한 aerodynamic center 의 동적 변동, (2) 한 flapping cycle 안에서의 height·pitch 변화, (3) 결과적으로 fixed-wing 알고리즘의 직접 이식 불가."}, {"type": "bullet", "text": "본 논문의 핵심 아이디어 — 주기적 fuselage 진동을 <span class=\"term\">명시적으로 알고리즘에 반영</span>하여 navigation 실패를 막고, leader–follower 전략과 결합."}, {"type": "bullet", "text": "본 논문의 contribution: (1) 직선 / 원형 / 전환 formation mode 를 모두 시뮬레이션·실외 비행 양쪽에서 검증, (2) HIT-Phoenix (wingspan 2.3 m) 라는 large-scale 플랫폼에서 동작, (3) 2대 LFWFR 의 outdoor leader–follower 실험 첫 사례."}]}, "related_works": {"content": [{"type": "bullet", "text": "<span class=\"term\">FWFR 프로토타입 종합</span>: RoboBee (Harvard, [4]), DelFly (TU Delft, [5]), Robo Raven (Maryland, [6]), Dove (NPU, [7,8]), FMAV (SJTU, [9]), USTBird (USTB, [10,11]), HIT-Phoenix (HIT, [12]) — 다수 그룹이 다양한 사이즈·메커니즘으로 개발."}, {"type": "bullet", "text": "그러나 대부분의 FWFR <span class=\"term\">wingspan &lt; 1 m</span> 으로 제한 — 결과적으로 payload 부족, endurance 짧음, outdoor 비행 능력 약함. 본 연구의 HIT-Phoenix 는 2.3 m 로 large-scale 영역."}, {"type": "bullet", "text": "<span class=\"term\">고전 formation 알고리즘 4종</span> ([13–20]): (a) leader–follower [13–15], (b) virtual structure [16], (c) artificial potential field [17,18], (d) behavior-based [19,20]. 본 연구는 (a) leader–follower 를 채택."}, {"type": "bullet", "text": "위 4종 모두 <span class=\"term\">정확한 trajectory tracking 또는 position control</span> 을 가정하므로 주기 진동이 큰 LFWFR 에 그대로 사용 시 algorithm divergence 우려 — 본 연구가 이를 fuselage 진동 보정으로 해결."}, {"type": "bullet", "text": "<span class=\"term\">FWFR formation 의 기존 연구</span>: Kim et al. [21] 이 indoor 에서 FWFR 원형 formation 실험 — 실내 환경 한정으로 실외 적용성 미검증."}, {"type": "bullet", "text": "Tay et al. [22] 는 FWFR V-formation / linear formation 의 <span class=\"term\">aerodynamic efficiency 분석</span> — 비행 효율 측면 분석 위주로, 실시간 제어는 다루지 않음."}, {"type": "bullet", "text": "Ramananarivo et al. [23] 는 어류·조류 formation 의 <span class=\"term\">vortex coupling 분석</span>, Ghommem et al. [24] 는 <span class=\"eng\">unsteady vortex lattice method</span> 로 FWFR formation 시뮬 — 모두 유체역학 modeling 측면, 제어 알고리즘이 아님."}, {"type": "bullet", "text": "기존 FWFR formation 연구의 공통 한계: <span class=\"term\">실험 검증 부재</span>. 시뮬·이론 위주이며 실제 다중 FWFR 의 outdoor 비행 사례가 거의 없음."}, {"type": "bullet", "text": "<span class=\"term\">본 연구의 위치</span>: 위 갭을 메우는 첫 사례 — large-scale FWFR (2.3 m wingspan) + leader–follower 알고리즘 + outdoor 실제 비행 실험. 단순한 leader–follower 가 아니라 LFWFR 의 주기 진동 특성을 알고리즘에 반영한 변형."}]}, "method": {"content": [{"type": "bullet", "text": "<span class=\"term\">좌표계</span>: $O_e\\text{-}x_e y_e z_e$ (geodetic) 와 $O_b\\text{-}x_b y_b z_b$ (body). Euler 각 시퀀스 yaw–pitch–roll ($\\psi\\text{-}\\theta\\text{-}\\varphi$) 으로 자세 표현. Aerodynamic force $F_L$ (z_b 축 lift), $F_T$ (x_b 축 thrust) 는 state-space airload theory ([12]) 로 산출."}, {"type": "bullet", "text": "<span class=\"term\">Formation description matrix $C$</span>: $n$ 대의 follower 에 대해 leader 와의 상대거리 $\\rho_n$ 과 상대 phase angle $\\gamma_n$ 을 행으로 가지는 행렬 (식 1). Diagonal · triangular formation 등 desired geometry 를 이 행렬 한 번으로 명세."}, {"type": "formula", "label": "식 (1) — Formation description matrix", "latex": "C = \\begin{bmatrix} \\rho_1 & \\gamma_1 \\\\ \\vdots & \\vdots \\\\ \\rho_n & \\gamma_n \\end{bmatrix}", "description": "$\\rho_k$ 는 follower $k$ 와 leader 사이의 상대 거리, $\\gamma_k$ 는 leader 의 비행 방향과 $\\rho_k$ 방향 사이의 상대 phase angle. 이 한 행렬이 desired formation geometry (diagonal, triangular 등) 를 모두 표현. 예시로 diagonal formation 은 $C_1 = [[5, \\pi], [5, 5\\pi/4]]^T$, triangular 는 $C_2 = [[10, 5\\pi/6], [10, 7\\pi/6]]^T$."}, {"type": "bullet", "text": "<span class=\"term\">상대 거리·상대 phase angle 정의</span> (식 4, 5): $i$ 번째와 $j$ 번째 LFWFR 사이의 평면 상 거리 $\\rho_{ij}$ 와 leader 비행 방향 기준 phase angle $\\gamma_{ij}$. 좌표 $(x_i, y_i)$ 와 yaw $\\psi_i$ 로부터 계산."}, {"type": "formula", "label": "식 (4, 5) — 상대 거리와 상대 위상각", "latex": "\\rho_{ij} = \\sqrt{(x_i - x_j)^2 + (y_i - y_j)^2}, \\quad \\gamma_{ij} = \\frac{\\pi}{2} - \\tan^{-1}\\!\\left(\\frac{y_i - y_j}{x_i - x_j}\\right) + \\pi - \\psi_i", "description": "$\\rho_{ij}$ 는 두 LFWFR 의 수평면 상 유클리드 거리. $\\gamma_{ij}$ 는 $i$ 번째 LFWFR 의 yaw 방향을 기준으로 한 $j$ 와의 상대 phase angle — 이 두 양은 형상 (formation geometry) 을 정의하는 핵심 변수."}, {"type": "bullet", "text": "<span class=\"term\">상대 운동 키네매틱 (식 7)</span>: 위 $\\rho_{ij}, \\gamma_{ij}, \\psi_{ij}$ 를 시간 미분하면 $i, j$ 의 속도·yaw rate 와의 관계가 나온다. 이 동역학이 formation control law 의 출발점."}, {"type": "formula", "label": "식 (7) — Formation 키네매틱 방정식", "latex": "\\begin{cases} \\dot{\\rho}_{ij} = -v_i \\cos\\gamma_{ij} + v_j \\cos(\\gamma_{ij} + \\psi_{ij}) \\\\ \\dot{\\gamma}_{ij} = \\frac{1}{\\rho_{ij}}\\left[v_i \\sin\\gamma_{ij} - v_j \\sin(\\gamma_{ij} + \\psi_{ij})\\right] - \\dot{\\psi}_i \\\\ \\dot{\\psi}_{ij} = \\dot{\\psi}_i - \\dot{\\psi}_j \\end{cases}", "description": "두 LFWFR 사이의 상대 거리·위상각·yaw 차이의 시간 변화율. $v_i, v_j$ 는 각 기체의 속도. 이 식이 follower 의 제어 입력 $v^c, \\psi^c$ 가 어떻게 상대 형상을 변화시키는지 결정."}, {"type": "bullet", "text": "<span class=\"term\">Communication topology — adjacency matrix $\\mathbf{A}$</span> (식 8): 1번 노드를 leader, 2·3번을 follower 로 설정. Follower 는 leader 의 상태만 받고 follower 끼리는 통신 안 함 — 단순하고 robust 한 star topology."}, {"type": "bullet", "text": "<span class=\"term\">Consistency control 3종</span>: yaw 일치 (식 9, 10), velocity 일치 (식 11, 12), height 일치 (식 13, 14). 각각 follower 의 제어 명령을 leader 의 상태 + offset 으로 정의 — consensus building 의 일반 framework 안에서 통일."}, {"type": "bullet", "text": "<span class=\"term\">통합 formation control law (식 15)</span>: yaw·velocity 의 consistency 항에 <span class=\"term\">formation interval 항</span> 을 추가 — 현재 상대 거리·위상과 desired 거리·위상의 차이를 보정. 이것이 \"단순 leader-follow\" 와 \"formation 유지\" 를 구분하는 핵심."}, {"type": "formula", "label": "식 (15) — 통합 formation control law", "latex": "\\begin{cases} v_i^c = v_L - k_{vi}(v_i - v_L) - k_{fi}\\sum_{j=1}^{n} a_{ij}\\bigl(\\rho_{ij}\\cos\\gamma_{ij} - \\rho_{ij}^d \\cos\\gamma_{ij}^d\\bigr) \\\\ \\psi_i^c = \\psi_i - k_{\\psi i}(\\psi_i - \\psi_L) - k_{gi}\\sum_{j=1}^{n} a_{ij}\\bigl(\\rho_{ij}\\sin\\gamma_{ij} - \\rho_{ij}^d \\sin\\gamma_{ij}^d\\bigr) \\end{cases}", "description": "follower $i$ 의 속도·yaw 명령. 첫 항은 leader 와의 일치, 둘째 항은 self-correction, 셋째 항이 formation interval — 현재 상대거리·위상과 desired 값 ($\\rho_{ij}^d, \\gamma_{ij}^d$) 의 차이를 $a_{ij}$ (adjacency) 가중으로 보정. $k_{fi}, k_{gi}$ 는 formation spacing 비례 게인."}, {"type": "bullet", "text": "<span class=\"term\">Hardware</span>: 메인 컴퓨터 STM32F405 (ARM Cortex-M4 + FPU, 168 MHz). 센서: accelerometer, gyroscope, magnetometer, GPS, barometer. Wireless: AS14B-TTL 모듈 (Ad-hoc, transparent transmission). Actuator: brushless 모터 1 (flapping freq) + servo 2 (tail roll·pitch)."}, {"type": "bullet", "text": "<span class=\"term\">Software 3-layer 구조</span> on FreeRTOS: (a) Application layer — autonomous flight, trajectory tracking, formation flight, (b) Function layer — attitude algorithm/control, navigation, position control, communication, logging, (c) Drive layer — sensor 드라이버, IIC/SPI/UART/SDIO + FATFS."}, {"type": "bullet", "text": "<span class=\"term\">Communication protocol</span>: 31-byte fixed-length frame (SOH 1B + roll/pitch/yaw 12B + lon/lat/alt 12B + velocity 4B + check 1B + EOT 1B). DMA 로 전송하여 CPU 부담 최소화."}, {"type": "bullet", "text": "<span class=\"term\">Hall sensor + flapping-cycle 평균 navigation</span>: 변속 메커니즘에 Hall sensor 를 추가해 real-time flapping cycle 측정, <span class=\"term\">3 cycle 평균</span>의 attitude·velocity 를 한 control cycle 의 입력으로 사용. 결과적으로 control freq 가 4/3 Hz 로 떨어지지만 pitch fluctuation 이 크게 감소 → stall 위험 감소."}]}, "experiment": {"content": [{"type": "bullet", "text": "<span class=\"term\">실험 플랫폼 — HIT-Phoenix</span>: 이륙 무게 675 g, payload 100 g, 날개폭 <span class=\"term\">2.3 m</span>, flapping 3~5 Hz, cruise 5 m/s, battery 3S 800 mAh, endurance 8 분. Large-scale FWFR 영역."}, {"type": "bullet", "text": "<span class=\"term\">시뮬레이션 1 — 직선 trajectory formation</span>: leader 가 (1,1) 에서 yaw π/4 로 직진, follower 2대가 (-20, 0) 에서 출발. 각각 거리 20 m, 위상 7π/6 와 5π/6 로 desired formation 설정. <span class=\"term\">5초 내</span> leader 의 yaw 와 속도에 수렴, x/y trajectory error ±1 m 이내."}, {"type": "bullet", "text": "<span class=\"term\">시뮬레이션 2 — 원형 trajectory formation</span>: leader 가 (0,0) 에서 원형 비행, follower 가 다른 위치에서 출발. Triangular formation 유지. 작은 반경 follower 는 느린 속도, 큰 반경 follower 는 빠른 속도 — formation control law 가 자동 조정."}, {"type": "bullet", "text": "<span class=\"term\">시뮬레이션 3 — formation switching</span>: 처음 직선 → 10~30초 turnaround (원형) → 30초 후 diagonal formation 으로 전환. 전환 직후 error 가 일시 증가하나 5초 내 다시 수렴. <span class=\"term\">동적 formation 변경 시현.</span>"}, {"type": "bullet", "text": "<span class=\"term\">Outdoor 실험 — Hall sensor navigation 효과</span>: 동일 HIT-Phoenix 로 직진 비행 2회. (a) Hall sensor 사용 (control 4/3 Hz) — pitch fluctuation 폭 감소, (b) 미사용 (control 50 Hz) — pitch 2~5° 진동. 결과: <span class=\"term\">control freq 가 12배 낮아도 navigation 보정으로 stall 위험 더 낮음.</span>"}, {"type": "bullet", "text": "<span class=\"term\">Outdoor 실험 — 2대 leader–follower formation</span>: 안전·운영 고려로 2대 사용, 거리 10 m, 위상 3π/4. 안전 고도 도달 후 leader–follower 모드 전환. 시퀀셜 이미지로 follow 동작 확인."}, {"type": "bullet", "text": "<span class=\"term\">실측 trajectory</span>: leader 의 위·경도 정보가 wireless 로 follower 에 전달. Leader trajectory 가 다소 twisty 하지만 (data loss 영향) overall follow 성공."}, {"type": "bullet", "text": "<span class=\"term\">상대 거리 변화</span>: 비행 중 거리가 일정하게 유지되지 않고 turnaround 시 줄어드는 경향. 실외 환경의 wind gust + 건물·나무 영향 확인."}, {"type": "bullet", "text": "<span class=\"term\">상대 phase angle 변화</span>: 처음 5π/6 유지, leader turnaround 후 일시 감소했다가 desired 3π/4 로 점진 수렴."}, {"type": "bullet", "text": "<span class=\"term\">실측 한계 1</span>: GPS 정확도 부족 + wireless 전송 손실/지연 → leader 위치 정보에 error. 추후 더 정밀한 navigation 필요."}, {"type": "bullet", "text": "<span class=\"term\">실측 한계 2</span>: flapping frequency vs 비행 속도가 단순 선형이 아님 → follower 가 뒤처졌을 때 단순히 flapping 속도를 올려도 빠르게 추격 불가."}, {"type": "bullet", "text": "<span class=\"term\">실측 한계 3</span>: tail 의 roll-pitch coupling — yaw 제어를 위해 roll 을 쓰면 의도치 않은 pitch 변동 발생. 이를 회피하려고 roll 폭을 제한하면 turning 능력이 제약됨."}]}, "discussion": {"content": [{"type": "bullet", "text": "<span class=\"term\">진동 보정의 결정성</span>: 본 연구의 가장 중요한 통찰은 단순 leader–follower 가 아닌 \"<span class=\"term\">LFWFR 의 주기 진동을 명시적으로 알고리즘에 반영</span>\" 이라는 점. Hall sensor 로 flapping 주기를 측정하고 3-cycle 평균을 사용하면 control freq 가 50 → 4/3 Hz 로 낮아져도 pitch fluctuation 이 더 작아진다 — counterintuitive 한 결과."}, {"type": "bullet", "text": "<span class=\"term\">Leader–follower 의 단순함이 강점</span>: follower 끼리 통신 안 함 → 통신 부하 작음, robust to single-follower failure. 단점은 leader 가 단일 실패점이지만, 본 연구의 outdoor 환경에서 충분히 작동."}, {"type": "bullet", "text": "<span class=\"term\">시뮬-실험 갭</span>: 시뮬에서는 5초 내 ±1 m 수렴이 깔끔하게 나타나지만, 실외에서는 wind gust·GPS error·wireless loss 가 모두 영향을 미쳐 거리 변동이 크다. 시뮬레이션 결과만으로는 outdoor 성능을 예측하기 어렵다는 점이 강조됨."}, {"type": "bullet", "text": "<span class=\"term\">GPS·wireless 가 실외 정확도 bottleneck</span>: 본 연구에서 trajectory error 의 큰 부분이 GPS 정확도 부족 + AS14B-TTL 의 데이터 손실/지연에서 옴. 더 정밀한 navigation (RTK GPS, 시각 odometry 등) + 더 안정적인 통신이 다음 단계 핵심."}, {"type": "bullet", "text": "<span class=\"term\">Flapping-frequency vs 속도의 비선형성</span>: 단순히 flapping 속도를 올려도 비행 속도가 비례 증가하지 않음 — flapping 운동은 양력·추력·drag 의 복합 결과이고 비선형. Follower 가 뒤처졌을 때 빠른 추격이 어려운 본질적 이유."}, {"type": "bullet", "text": "<span class=\"term\">Tail roll–pitch coupling</span>: under-actuated 시스템 (1 motor + 2 servo) 의 본질적 한계. yaw 를 위해 roll 을 쓰면 pitch 가 흔들리고, 이를 막으려고 roll 을 제한하면 turning radius 가 커진다. 이는 더 많은 actuator 또는 morphological 변화 (예: 분리된 tail surface) 로만 해결 가능."}, {"type": "bullet", "text": "<span class=\"term\">Altitude 제어 정밀도</span>: 본 시스템은 height consistency (식 13, 14) 를 적용하지만 실외에서 altitude error 가 크다 — barometer 정확도와 air density 변동이 원인. 3D space 에서 정밀 formation 을 위해서는 추가 센서·알고리즘 필요."}, {"type": "bullet", "text": "<span class=\"term\">Conservative 실험 규모</span>: 안전·운영성 고려로 2대만 실험. 시뮬에서는 3대 이상 가능했지만 실외 검증은 2대로 제한 — 실외 multi-LFWFR 운영의 실질적 어려움을 시사."}, {"type": "bullet", "text": "<span class=\"term\">Application 확장성</span>: 직선·원형·전환 formation 모두 지원하므로 탐색 (sweep), 영역 커버리지 (분산 formation), 추격 (V-formation) 등의 임무에 응용 가능. 단 정밀 협동 작업 (예: 협동 grasping) 에는 현재 정확도 부족."}, {"type": "bullet", "text": "<span class=\"term\">검증 플랫폼 의존성</span>: 모든 게인 ($k_v, k_\\psi, k_z, k_{fi}, k_{gi}$) 이 HIT-Phoenix 의 동역학에 맞춰 튜닝됨. 다른 LFWFR 로 transfer 하려면 모델 식별과 게인 재튜닝 필요."}]}, "conclusion": {"content": [{"type": "bullet", "text": "<span class=\"term\">Leader–follower 전략 + 주기 진동 보정</span>의 결합으로 LFWFR formation 제어 방법을 제안하고 검증."}, {"type": "bullet", "text": "<span class=\"term\">Fuselage 진동 (height·pitch) 의 명시적 반영</span>이 핵심 — Hall sensor 로 flapping 주기 측정, 3-cycle 평균 navigation 으로 sensor delay 와 진동에 의한 trajectory divergence 극복."}, {"type": "bullet", "text": "<span class=\"term\">3종 formation mode</span> (직선·원형·전환) 모두 시뮬레이션과 outdoor 비행에서 동작 — 정적 formation 뿐 아니라 동적 mode 전환도 가능함을 입증."}, {"type": "bullet", "text": "<span class=\"term\">Outdoor 2대 leader–follower 실험</span>이 본 연구의 가장 큰 차별점. 거리 10 m, phase 3π/4 의 desired formation 을 outdoor 에서 실증 — large-scale FWFR formation 의 첫 사례."}, {"type": "bullet", "text": "<span class=\"term\">통합 formation control law (식 15)</span>: yaw·velocity consistency 에 formation interval 항 추가로 \"leader 따라가기\" 와 \"formation 유지\" 를 동시 달성."}, {"type": "bullet", "text": "<span class=\"term\">Hardware-software 통합</span>: STM32F405 + AS14B-TTL wireless + 5종 센서 + 3-layer software (FreeRTOS) — large-scale FWFR 자율비행에 필요한 onboard 시스템의 완전 사례 제시."}, {"type": "bullet", "text": "<span class=\"term\">Future work — altitude 정밀 제어</span>: 본 시스템은 altitude error 가 큼. 3D space formation 을 위해서는 더 정밀한 height 제어 필요 (barometer + GPS + 시각 sensor 융합)."}, {"type": "bullet", "text": "<span class=\"term\">Future work — 다양한 airflow</span>: wind gust, thermal current 등 다양한 환경 조건에서의 robust 성 검증이 다음 단계."}, {"type": "bullet", "text": "<span class=\"term\">Future work — ultra-multiple LFWFR</span>: 현재 2~3대 규모를 넘어 10대 이상의 large-scale formation 으로 확장. communication topology, scalability, distributed computation 등이 새 도전과제."}, {"type": "bullet", "text": "<span class=\"term\">Application 잠재력</span>: 광범위 영역 탐색·재난 구조에서 단일 LFWFR 의 한계를 극복할 수 있는 실용적 솔루션의 첫 단추."}]}};
+
+        function openModal(key) {
+            const detail = SECTION_DETAIL[key];
+            if (!detail) return;
+            document.getElementById('modal-title').innerText = SECTION_TITLES[key] || key;
+
+            let html = '';
+            html += (detail.content || []).map(item => {
+                if (item.type === 'bullet') {
+                    return `<div class="bullet">${item.text}</div>`;
+                } else if (item.type === 'formula') {
+                    return `<div class="formula-block">
+                        <div class="formula-label">${item.label}</div>
+                        <div class="formula-latex">$$${item.latex}$$</div>
+                        <div class="formula-desc">${item.description}</div>
+                    </div>`;
+                }
+                return '';
+            }).join('');
+
+            const body = document.getElementById('modal-body');
+            body.innerHTML = html;
+            body.scrollTop = 0;
+            document.getElementById('modal-overlay').classList.add('active');
+
+            // Re-render KaTeX in the new content
+            if (window.renderMathInElement) {
+                renderMathInElement(body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$',  right: '$',  display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
