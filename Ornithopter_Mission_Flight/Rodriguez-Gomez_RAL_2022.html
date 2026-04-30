@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Free as a Bird: Event-Based Dynamic Sense-and-Avoid for Ornithopter Robot Flight</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$',  right: '$',  display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Noto Sans KR', 'Arial', sans-serif;
+            margin: 0; padding: 0;
+            background: #f5f5f5;
+            color: #333;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+        }
+        .slide {
+            width: min(1680px, 98vw);
+            height: 96vh;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            overflow: hidden;
+        }
+        .header {
+            background: #005b96;
+            color: white;
+            padding: 26px 38px;
+        }
+        .title { font-size: 32px; font-weight: bold; margin-bottom: 10px; line-height: 1.3; }
+        .authors { font-size: 17px; margin-bottom: 5px; }
+        .journal { font-size: 15px; opacity: 0.9; }
+
+        .summary-container {
+            background: #f0f5fa;
+            padding: 18px 38px;
+            border-bottom: 1px solid #e1e5e8;
+        }
+        .summary-title {
+            font-size: 19px; font-weight: bold; margin-bottom: 8px; color: #005b96;
+        }
+        .summary { font-size: 17px; line-height: 1.65; }
+
+        .content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 14px;
+            padding: 14px 18px;
+            overflow: hidden;
+        }
+        .section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,91,150,0.18);
+            border-color: #005b96;
+        }
+        .section-title {
+            color: #005b96;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 9px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #005b96;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .click-hint {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+        .section-summary {
+            font-size: 15px;
+            line-height: 1.6;
+            flex: 1;
+            overflow: hidden;
+        }
+        .term { font-weight: bold; color: #005b96; }
+        .eng { color: #666; font-style: italic; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            justify-content: center; align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.18s ease-out;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: white;
+            width: min(1100px, 90vw);
+            height: min(800px, 88vh);
+            border-radius: 10px;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .modal-header {
+            background: #005b96;
+            color: white;
+            padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 22px; font-weight: bold; }
+        .modal-close {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px; line-height: 1;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.2); }
+        .modal-body {
+            padding: 24px 32px;
+            overflow-y: auto;
+            font-size: 15.5px;
+            line-height: 1.75;
+        }
+        .modal-body .bullet {
+            margin-bottom: 10px;
+            padding-left: 18px;
+            text-indent: -18px;
+        }
+        .modal-body .bullet:before {
+            content: "▸ ";
+            color: #005b96;
+            font-weight: bold;
+        }
+        .modal-body .formula-block {
+            background: #f8f9fb;
+            border-left: 4px solid #005b96;
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 4px;
+        }
+        .modal-body .formula-label {
+            font-size: 12px;
+            color: #005b96;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .modal-body .formula-desc {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+        .modal-body h4 {
+            color: #005b96;
+            margin-top: 22px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="header">
+            <div class="title">Free as a Bird: Event-Based Dynamic Sense-and-Avoid for Ornithopter Robot Flight</div>
+            <div class="authors">Juan Pablo Rodríguez-Gómez, Raul Tapia, Maria del Mar Guzmán Garcia, Jose Ramiro Martínez-de Dios, Anibal Ollero</div>
+            <div class="journal">IEEE Robotics and Automation Letters, Vol. 7, No. 2, April 2022, pp. 5413–5420 · DOI: 10.1109/LRA.2022.3153904</div>
+        </div>
+
+        <div class="summary-container">
+            <div class="summary-title">논문 요약</div>
+            <div class="summary">이 논문은 대형 ornithopter (날갯짓 비행체) 의 동적 장애물 회피를 위한 <span class="term">세계 최초 event camera 기반 sense-and-avoid 시스템</span>을 제안한다. 온보드 자원 제약이 큰 ornithopter 의 특성 (날갯짓 진동·낮은 페이로드·중속비행 3~6 m/s) 을 고려하여 <span class="term">event-by-event 처리</span> 방식으로 <span class="term">250 Hz</span> 응답을 달성한다. Time filter · corner detector · optical flow · clustering 으로 동적 객체를 추적하고, geometry 기반 collision risk 평가 후 tail deflection 으로 회피 기동을 수행한다. GRVC E-Flap (날개폭 1.5 m, 510 g) 에서 indoor/outdoor 검증 — 평균 회피 성공률 <span class="term">89.7%</span>, 검출 정확도 <span class="term">91.7%</span> 로 quadrotor 용 기존 방법으로 해결 불가했던 ornithopter 고유 문제를 처음으로 해결했다.</div>
+        </div>
+
+        <div class="content">
+            <div class="section" onclick="openModal('introduction')">
+                <div class="section-title">Introduction: 연구 동기 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">Ornithopter 는 멀티로터 대비 안전성·에너지 효율 등 장점이 있어 R&D 가 늘고 있으나, <span class="term">flapping vibration</span> 과 strict payload 제약 때문에 onboard perception 이 매우 어렵다. 특히 동적 장애물 회피는 빠른 onboard 검출이 필수인데, 기존 ornithopter 연구는 대부분 <span class="eng">offboard · motion-capture</span> 기반이라 이 문제를 풀지 못했다. 본 논문은 event camera 의 μs 분해능·HDR·낮은 무게 특성을 활용해 단일 onboard camera 만으로 dynamic obstacle 회피를 구현한 첫 시도이다.</div>
+            </div>
+            <div class="section" onclick="openModal('related_works')">
+                <div class="section-title">Related Works: 관련 연구 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">Reactive obstacle avoidance 는 <span class="eng">map-based / map-less</span> 로 나뉘며 본 연구는 map-less 흐름. 기존 ornithopter perception 연구 ([15]–[17]) 는 단안·스테레오 카메라를 활용했으나 ground-station 처리 또는 hovering 으로 한정되었다. Event-based dynamic avoidance 는 <span class="term">quadrotor 용 ([8]–[10])</span> 만 존재하며, dual camera + 강력한 컴퓨터 + hovering~1.5 m/s 저속에 한정 — ornithopter 에 직접 적용 불가능. 본 연구가 이 갭을 메운다.</div>
+            </div>
+            <div class="section" onclick="openModal('method')">
+                <div class="section-title">Method: 새로운 접근 방법 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">본 시스템은 두 모듈로 구성된다. (1) <span class="term">Dynamic Object Motion Estimation</span> — Time Filter (SAE 기반) → Corner Detector → Optical Flow (ABMOF) → Clustering 의 <span class="term">event-by-event 파이프라인</span>. (2) <span class="term">Collision Risk Evaluation + Tail Control</span> — geometric safety volume 으로 충돌 임계각 산출 후 tail deflection 으로 회피. <span class="term">ASAP packaging</span> 으로 communication overflow 없이 250 Hz 응답을 보장한다.</div>
+            </div>
+            <div class="section" onclick="openModal('experiment')">
+                <div class="section-title">Experiment: 실험 방법과 결과 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary"><span class="term">GRVC E-Flap</span> (날개폭 1.5 m, 510 g) 에 DAVIS346 event camera + Khadas VIM3 컴퓨터로 검증. 3종 객체 (Small Box, Stuffed Toy, FitBall) 를 0.5~6 m 거리에서 투척. <span class="term">검출 정확도 91.7%</span>, 회피 성공률 indoor 90.7% / outdoor 92.0% (regular 조명) / 85.3% (dark). 작은 객체·multi-obstacle 에서 일부 성능 저하.</div>
+            </div>
+            <div class="section" onclick="openModal('discussion')">
+                <div class="section-title">Discussion: 결과의 해석 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">Event camera 의 우월성 입증 — 진동이 큰 ornithopter 환경에서 frame-based 보다 낫다. <span class="term">Event-by-event 처리</span>가 latency 단축에 결정적. 단일 camera + 단일 컴퓨터 접근으로 페이로드 제약 충족. 한계: tail control 의 <span class="eng">underactuated</span> 특성, multi-obstacle cluster merge, dark 조명 noise, static obstacle 미통합.</div>
+            </div>
+            <div class="section" onclick="openModal('conclusion')">
+                <div class="section-title">Conclusion: 최종 요약 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary"><span class="term">세계 최초 event-based obstacle avoidance for large-scale flapping-wing robots</span>. Indoor/outdoor 검증, 평균 회피 성공률 <span class="term">89.7%</span>, single camera + single computer + 250 Hz 처리 달성. 향후 다른 agile robot 검증 + static obstacle 통합 sense-and-avoid 시스템 개발이 future work 로 제시된다.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title"></div>
+                <button class="modal-close" onclick="closeModal()" aria-label="닫기">×</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const SECTION_TITLES = {
+            introduction: "Introduction — 연구 동기",
+            related_works: "Related Works — 관련 연구",
+            method: "Method — 새로운 접근 방법",
+            experiment: "Experiment — 실험 방법과 결과",
+            discussion: "Discussion — 결과의 해석",
+            conclusion: "Conclusion — 최종 요약"
+        };
+
+        const SECTION_DETAIL = {"introduction": {"content": [{"type": "bullet", "text": "<span class=\"term\">Ornithopter (날갯짓 비행체)</span> 는 최근 R&D 관심이 급증하고 있는 플랫폼으로, agile maneuver 가 가능하고 flapping–gliding 모드를 결합해 에너지 소비를 줄일 수 있다. 또한 soft material 로 만들어져 멀티로터 대비 충돌 시 사람이나 장비에 가하는 위험이 적어 인간 인접 환경에서의 활용 가능성이 크다."}, {"type": "bullet", "text": "그러나 flapping flight 는 멀티로터에는 없는 perception challenge 를 가진다. 날갯짓 stroke 가 lift/thrust 를 만드는 동시에 기체에 강한 <span class=\"term\">mechanical vibration</span> 과 abrupt motion 을 유발하여 onboard 카메라·센서의 안정적 인지를 방해한다. 즉 같은 카메라라도 ornithopter 위에서는 멀티로터 위와 다른 noise profile 을 가진다."}, {"type": "bullet", "text": "<span class=\"term\">Strict payload · energy limitation</span> 때문에 무거운 센서나 강력한 컴퓨터를 탑재하기 어렵다. 본 논문에서 사용하는 E-Flap (510 g) 의 페이로드 한계 (520 g) 안에서 카메라·INS·컴퓨터·배터리·통신을 모두 수용해야 하므로, 가용 onboard processing capacity 가 매우 제한된다."}, {"type": "bullet", "text": "이런 제약으로 인해 기존 ornithopter perception · control 연구 ([5], [6]) 는 거의 모두 <span class=\"term\">offboard 처리</span> + <span class=\"term\">motion-capture 기반 외부 센싱</span> 에 의존해 왔다. 즉 실험실 안에서만 동작하는 '자율' 이며 진정한 야외 자율 비행은 어렵다."}, {"type": "bullet", "text": "Static obstacle 회피는 trajectory planning 이나 LiDAR 추가 센서로 어느 정도 해결 가능하지만, <span class=\"term\">dynamic obstacle (동적 장애물)</span> 은 사전 지도에 없고 빠르게 움직이므로 빠른 onboard 검출 + 즉각 회피가 필수다. 본 연구의 핵심 표적은 바로 이 동적 장애물에 대한 onboard 처리 가능한 sense-and-avoid 다."}, {"type": "bullet", "text": "<span class=\"term\">Event camera</span> 는 ornithopter 의 특수 환경에 매우 적합한 센서다. μs 단위 시간 분해능, ~120 dB high dynamic range, motion blur 에 대한 robustness, 그리고 일반 카메라보다 가벼운 무게 + 적은 전력 소비를 갖춰 페이로드 제약을 충족한다."}, {"type": "bullet", "text": "Event camera 는 픽셀 단위 illumination 변화만 비동기로 트리거하므로 <span class=\"term\">동적 객체의 정보를 직접 제공</span>한다. 즉 frame-based 카메라처럼 background subtraction 등 사전 처리 없이도 움직이는 물체를 자연스럽게 강조한다 — dynamic obstacle detection 에 본질적으로 적합한 센서."}, {"type": "bullet", "text": "Event-based processing 은 매우 높은 rate 의 추정이 가능하여 본 연구는 250 Hz 의 control loop 를 달성한다. Ornithopter 는 hovering 이 불가능하고 minimum flight speed 가 약 3 m/s 라는 점을 감안하면, 6 m 거리 obstacle 을 검출했을 때 1초 안에 회피해야 한다 — 250 Hz 응답성은 이 시간 예산 안에 충분한 reaction 을 보장한다."}, {"type": "bullet", "text": "본 논문의 핵심 기여는 <span class=\"term\">단일 onboard event camera 만</span>으로 dynamic obstacle 을 빠르게 감지하고 trajectory 를 변경하는 첫 ornithopter 시스템 구현이다. 기존 quadrotor 용 event-based 회피 시스템 ([8]–[10]) 들은 dual camera 와 강력한 컴퓨터를 요구해서 ornithopter 에 그대로 적용할 수 없었다."}, {"type": "bullet", "text": "방법론적 핵심 아이디어는 spatio-temporal event 정보로 객체 segmentation, optical flow 로 motion direction 추정, 그리고 reactive evasive maneuver 로 회피 — 이 모든 단계가 <span class=\"term\">resource-constrained hardware</span> 에서 online 으로 실행 가능하도록 설계된다."}]}, "related_works": {"content": [{"type": "bullet", "text": "<span class=\"term\">Reactive obstacle avoidance 의 분류 ([11])</span>: Hrabar 의 연구는 회피 방식을 <span class=\"eng\">map-based</span> (지역 지도 구축 후 obstacle-free trajectory 계산) 와 <span class=\"eng\">map-less</span> (지도 없이 직접 회피 동작) 로 구분한다. Map-less 가 처리 자원이 제한된 플랫폼에 더 적합하며, 본 연구도 이 흐름을 따라 직접적인 reactive 회피를 채택한다."}, {"type": "bullet", "text": "<span class=\"term\">High-speed sense-and-avoid 의 latency 분석 ([13] Falanga)</span>: quadrotor 가 고속에서 obstacle 을 회피할 때 perception latency 가 회피 성공의 결정적 변수임을 보였다. 그러나 quadrotor 의 hovering 가능성·rotor 응답성을 가정하므로 minimum flight speed 가 있는 ornithopter 에는 그대로 적용 불가."}, {"type": "bullet", "text": "<span class=\"term\">Saliency-based RL UAV obstacle avoidance ([14])</span>: 강화학습으로 비행 장애물을 회피하는 접근. Frame-based 카메라 입력에 RL 정책을 학습하지만, 학습된 정책의 일반화와 onboard 실행 부담이 본 연구의 hard real-time 요구와 거리가 있다."}, {"type": "bullet", "text": "<span class=\"term\">Optical flow on flapping-wing MAV ([15] Bermudez & Fearing)</span>: 작은 flapping-wing MAV 에서 image sub-sampling + motion detection 알고리즘으로 onboard optical flow 를 계산했다. 그러나 frame-based 처리의 한계로 진동·motion blur 에 약하고 정밀한 obstacle avoidance 까지 확장되지 못했다."}, {"type": "bullet", "text": "<span class=\"term\">Appearance variation cue ([16] de Croon)</span>·<span class=\"term\">Stereo-vision droplet strategy ([17] Tijmons)</span>: 단안 카메라로 객체 외관 변화·optical flow 를 활용하거나, 소형 ornithopter 에 stereo 카메라로 sparse disparity map 을 만들고 obstacle-free droplet 영역을 정의해 회피한다. 두 방법 모두 처리를 ground station 으로 옮기거나 (페이로드 한계로) 소형기에만 적용 가능했다."}, {"type": "bullet", "text": "<span class=\"term\">Event camera 종합 review ([7] Gallego et al.)</span>: μs 시간 분해능, ~120 dB high dynamic range, motion blur robustness 등 event 비전의 advantages 를 정리한 survey. 이 특성들이 항공 robotics 의 perception challenge 에 매우 매력적임을 동기로 제시."}, {"type": "bullet", "text": "<span class=\"term\">기타 event-based aerial perception 응용</span>: 자율 착륙 ([18] Hordijk), 빠른 line tracking ([19] Eguíluz), drone racing 데이터셋 ([20]), 침입자 감시 ([22]) 등 다양한 사례가 누적되며 event-based 비전의 항공 응용 가능성이 입증되어 왔다."}, {"type": "bullet", "text": "<span class=\"term\">Quadrotor 용 event-based dynamic avoidance — 핵심 비교군</span>: [8] Mueggler 는 stereo event camera 로 obstacle trajectory 를 시간으로 propagate, [9] Sanket EVDodgeNet 은 deep learning 으로 image deblur·odometry·object segmentation 을 통합, [10] Falanga 는 event motion compensation 으로 동적 obstacle 만 분리한 후 potential field 회피를 수행한다."}, {"type": "bullet", "text": "<span class=\"term\">차별점 (Table I)</span>: 위 세 방법은 모두 quadrotor 전용이며 hovering 또는 1.5 m/s 저속에서만 검증되었다. 모두 두 개의 event camera + 강력한 embedded computer + flight board + autopilot 을 요구해 ornithopter 의 페이로드·전력 예산을 초과한다."}, {"type": "bullet", "text": "<span class=\"term\">본 연구의 위치</span>: 본 시스템은 ornithopter (3 m/s 이상 minimum flight speed 의 중속 비행체) 에서 <span class=\"term\">단일 event camera + 단일 저전력 onboard computer</span> 만으로 250 Hz 응답을 달성한다. 즉 quadrotor 영역의 event-based 회피 기술을 ornithopter 의 자원 제약과 동역학 특성에 맞게 재설계한 최초의 사례."}]}, "method": {"content": [{"type": "bullet", "text": "<span class=\"term\">이벤트 정의 및 비동기 처리 원칙</span>: 각 이벤트는 $e = (x, ts, p)$ tuple — 픽셀 좌표 $x = (u, v)$, 타임스탬프 $ts$, polarity $p$ (양/음 illumination 변화). 본 시스템의 모든 처리는 <span class=\"term\">event-by-event</span> 비동기 방식으로, 이벤트가 발생하는 즉시 처리되어 frame 누적 지연이 없다. 이는 ornithopter 의 빠른 비행 속도에서 결정적 장점."}, {"type": "bullet", "text": "<span class=\"term\">Time Filter — Surface of Active Events (SAE)</span>: 2D 배열 $S \\in \\mathbb{R}^2$ 가 각 픽셀 위치의 가장 최근 이벤트 timestamp 를 저장. 새 이벤트 $e_k$ 가 들어왔을 때 동일 픽셀의 이전 timestamp 와의 차 $\\Delta ts$ 가 임계 $\\tau$ 보다 작으면 동적 객체 이벤트로 분류, 그 외는 background 로 폐기. 이 단순한 시간 비교만으로 진동·정적 객체에서 발생한 noise 이벤트를 효과적으로 거른다."}, {"type": "bullet", "text": "<span class=\"term\">$\\tau$ 의 동적 조정</span>: 임계 $\\tau$ 는 고정값이 아니라 로봇의 현재 상태 — 전진속도 $v_z$ 와 pitch angular velocity $\\omega_x$ — 에 따라 동적으로 결정된다 (식 1). 로봇이 빠르면 background event 가 늘어나므로 $\\tau$ 를 짧게, 천천히 움직이면 길게. 실험에서 $\\alpha = 0.8$ (전진 운동의 기여를 dominant 로) 로 설정."}, {"type": "formula", "label": "식 (1) — 동적 시간 임계값 τ", "latex": "\\tau = \\alpha \\, \\tau_{v_z} + (1 - \\alpha)\\, \\tau_{\\omega_x}, \\quad \\alpha \\in [0, 1]", "description": "Time Filter 의 임계 시간차 $\\tau$ 를 로봇의 전진속도 $v_z$ 와 pitch angular velocity $\\omega_x$ 의 가중합으로 동적 결정. $\\alpha$ 는 두 속도 성분의 기여도. 로봇이 빠를수록 background event 발생률이 높아지므로 $\\tau$ 를 짧게 잡아 정적 이벤트를 더 강하게 거른다."}, {"type": "formula", "label": "식 (1) 보충 — τ_v_z, τ_ω_x 정의", "latex": "\\tau_{v_z} = \\tau_H - (\\tau_H - \\tau_L)\\,\\frac{v_z - v_L}{v_H - v_L}, \\quad \\tau_{\\omega_x} = \\tau_H - (\\tau_H - \\tau_L)\\,\\frac{\\omega_x - \\omega_L}{\\omega_H - \\omega_L}", "description": "$[v_L, v_H]$ 와 $[\\omega_L, \\omega_H]$ 는 로봇 비행의 전형적 속도 범위. $[\\tau_L, \\tau_H]$ 는 임계값 범위 — 실험에서 $\\tau_L = 15$ ms, $\\tau_H = 25$ ms 로 설정 (6 m 검출 거리 ↔ 82% 정적 이벤트 필터링의 trade-off 로 결정). 속도가 클수록 $\\tau$ 가 작아져 더 엄격한 필터링."}, {"type": "bullet", "text": "<span class=\"term\">Corner Detector — *eFast event corner detector ([29])</span>: 동적 이벤트들 중에서도 의미있는 feature (corner) 만 추출. Frame-based corner detector 와 달리 이벤트 단위로 비동기 동작하며, fast response 와 low False Positive Rate 의 두 특성을 모두 가진다. 이 단계로 <span class=\"term\">처리 비용을 25% 이상 절감</span>한다."}, {"type": "bullet", "text": "<span class=\"term\">Optical Flow — ABMOF [28] 변형</span>: corner event 만 입력받아 block matching 으로 motion direction 을 추정하는 적응형 알고리즘. 원래 ABMOF 는 모든 이벤트를 처리하지만 본 연구는 corner event 만 입력해 stream 의 32% 미만만 처리한다. 추가로 ABMOF 의 adaptive accumulation time $d$ 제어 전략을 그대로 활용해 event 생성률 변화에 적응한다."}, {"type": "bullet", "text": "<span class=\"term\">Clustering — [30] 변형 + 평균 flow 갱신</span>: spatio-temporal continuity 를 가진 optical flow 들을 클러스터로 묶어 객체별 평균 flow $\\bar{v}$ 를 추정한다. 새 측정이 들어올 때 식 (2) 로 running average 갱신, lifetime $\\tau_c$ 가 지난 오래된 샘플은 식 (3) 으로 평균에서 제거. $\\tau_c$ 는 초기 5 ms 로 시작해 ABMOF feedback 으로 동적 조정된다."}, {"type": "formula", "label": "식 (2) — 클러스터 평균 optical flow 갱신 (추가)", "latex": "\\bar{v} := \\frac{\\eta}{\\eta+1}\\,\\bar{v} + \\frac{1}{\\eta+1}\\, v", "description": "새 optical flow 측정 $v$ 가 클러스터에 들어올 때 클러스터의 running average $\\bar{v}$ 를 업데이트. $\\eta$ 는 현재 클러스터에 할당된 tuple 수. 표준적 incremental mean 갱신식과 동일하지만 event-by-event 비동기 환경에 적용된다는 점이 핵심."}, {"type": "formula", "label": "식 (3) — 클러스터 평균 optical flow 갱신 (제거)", "latex": "\\bar{v} := \\frac{\\eta}{\\eta-1}\\,\\bar{v} - \\frac{1}{\\eta-1}\\, v^{\\dagger}", "description": "Cluster lifetime $\\tau_c$ 가 지난 오래된 샘플 $v^{\\dagger}$ (timestamp $&lt; \\tau_c$) 의 영향을 평균에서 제거. 이로써 $\\bar{v}$ 가 최근 motion 만 반영하여 추적되는 객체의 가속·방향 전환을 신속히 따라간다. $\\tau_c$ 자체도 ABMOF feedback 으로 동적 조정 (초기 5 ms)."}, {"type": "bullet", "text": "<span class=\"term\">ASAP packaging ([26])</span>: 이상적으로는 event-by-event 처리이지만 실제 event camera driver 는 수신 효율을 위해 package 단위로 이벤트를 전달한다. ASAP 은 onboard 컴퓨터의 처리 여력에 맞춰 동적으로 package 크기를 조정해 communication overflow 를 방지하면서 250 Hz 의 control loop closing 을 보장한다."}, {"type": "bullet", "text": "<span class=\"term\">Collision Risk Evaluation — geometric 근사</span>: ornithopter 를 $2W \\times 2H$ 의 직육면체 safety volume, 장애물을 반경 $R' = R + b$ 의 sphere 로 근사 ($b$ = Safety Distance, motion estimation 오차 11.2° RMSE 를 흡수). 충돌 임계각 $\\psi^{*}, \\theta^{*}$ 는 식 (4) 로 계산하며 obstacle depth $z(t)$ 와 크기 $R$ 에 의존한다."}, {"type": "formula", "label": "식 (4) — 충돌 위험 임계각 ψ*, θ*", "latex": "\\psi^{*}(t) = \\arctan\\!\\left(\\frac{W + 2R'}{z(t) - 2R'}\\right), \\quad \\theta^{*}(t) = \\arctan\\!\\left(\\frac{H + 2R'}{z(t) - 2R'}\\right)", "description": "Robot safety volume $2W \\times 2H$, 장애물 sphere 반경 $R' = R + b$ ($b$ = Safety Distance, motion estimation 오차 흡수용). $z(t)$ 는 카메라 기준 obstacle depth. 두 임계각 $\\psi^{*}, \\theta^{*}$ 는 충돌이 일어나지 않을 최대 각도. $|\\psi(t_1)| \\le |\\psi^{*}(t_1)|$ 와 $|\\theta(t_1)| \\le |\\theta^{*}(t_1)|$ 이 동시에 만족되면 $t \\ge t_1$ 에 충돌 가능 — evasive maneuver 활성화."}, {"type": "bullet", "text": "<span class=\"term\">Depth 추정 — 3 케이스</span>: (i) ToF 등으로 $z(t)$ 직접 측정 가능하면 식 (4) 직접 적용; (ii) $R$ 만 알 때는 $z(t) = \\lambda R / L(t)$ — 여기서 $\\lambda$ 는 카메라 focal length, $L(t)$ 는 클러스터를 둘러싸는 사각형의 가장 긴 변; (iii) 둘 다 모르면 안전 우선 — 모든 검출에 evasive maneuver. 본 논문 실험은 (ii) 를 검증."}, {"type": "bullet", "text": "<span class=\"term\">Tail Control — Reactive + Model-based 보완</span>: 1차 제어는 식 (5) 의 단순 반응형 — obstacle 평균 flow $\\bar{v}$ 와 정확히 반대 방향으로 tail deflection. 그러나 이 접근은 ornithopter 의 underactuated 동역학을 무시하므로, 추가로 flapping-wing linearized model ([31]) 로 robot acceleration 을 최대화하는 $\\Delta u_{\\text{model}}$ 을 [-10°, +10°] 범위에서 grid search. 최종 명령은 $u = u_{\\text{react}} + \\Delta u_{\\text{model}}$ 이며 stall 회피 제약 ([32]) 도 같이 적용된다."}, {"type": "formula", "label": "식 (5) — 반응형 tail 제어 법칙", "latex": "u_{\\text{react}} = -(\\kappa_0 + \\kappa_1 \\,\\|\\bar{v}\\|) \\,\\circ\\, \\bar{v}", "description": "$\\circ$ 는 Hadamard product (element-wise 곱). $u_{\\text{react}} = [\\delta_e^{\\text{react}}, \\delta_r^{\\text{react}}]^T$ 는 longitudinal/lateral tail deflection 명령. $\\kappa_0$ 는 기본 응답 게인, $\\kappa_1 \\|\\bar{v}\\|$ 는 obstacle 속도 크기에 비례한 응답 강화 — 빠른 obstacle 일수록 강한 tail 동작. 핵심 아이디어: obstacle 의 평균 optical flow $\\bar{v}$ 와 정확히 반대 방향으로 회피하되, obstacle 이 빠를수록 더 강하게 회피한다."}]}, "experiment": {"content": [{"type": "bullet", "text": "<span class=\"term\">실험 플랫폼 — GRVC E-Flap</span>: 길이 95 cm, 날개폭 1.5 m, 무게 510 g, 최대 페이로드 520 g 의 large-scale ornithopter. 페이로드 한계 안에서 onboard 컴퓨터 + 카메라 + INS 를 모두 수용해야 하므로 본 시스템 설계의 자원 제약을 명확히 정의해주는 플랫폼."}, {"type": "bullet", "text": "<span class=\"term\">Onboard hardware</span>: 저비용 Khadas VIM3 컴퓨터로 perception · control 모두 처리. 자세 추정용으로 VectorNav VN-200 INS 가 body frame velocity 를 제공. 카메라는 DAVIS346 event camera (FoV 68° × 53.5°) 인데 IR-cut filter + 렌즈 경량화로 무게를 1/3 수준으로 줄여 페이로드를 충족. C++ + ROS 로 구현."}, {"type": "bullet", "text": "<span class=\"term\">테스트 환경 — Indoor/Outdoor</span>: GRVC Testbed (15 × 21 × 8 m, OptiTrack 24 카메라가 mm 정확도 ground truth 제공) 실내 + Soccer Field (48 × 54 m) 야외. 실내에서는 정밀 ground truth, 야외에서는 일반 환경 robust 성을 검증."}, {"type": "bullet", "text": "<span class=\"term\">검출 실험 셋업</span>: 3 종의 크기·형태가 다른 객체를 사용 — Small Box 220 × 200 × 150 mm, Stuffed Toy 400 × 450 × 400 mm, FitBall ⌀ 750 mm. 각 객체를 0.5~6 m 거리 범위에서 ornithopter FoV 안으로 투척, 객체당 45 회 (총 135 회) 실험."}, {"type": "bullet", "text": "<span class=\"term\">검출 성능 결과</span>: 전체 accuracy <span class=\"term\">91.7%</span>, FPR 4.2%, Precision 95.1%, TPR 88.5% — 매우 양호. 거리별로 보면 2~4 m 에서 94.7% 이상으로 가장 안정적이며, 4 m 이상에서는 작은 객체의 트리거 이벤트가 부족해 정확도가 떨어지는 경향. 즉 객체 크기가 검출 거리의 effective limit 을 결정."}, {"type": "bullet", "text": "<span class=\"term\">Multi-obstacle 실험</span>: 3 객체를 비슷한 시간에 다른 방향에서 투척. Accuracy 가 74.2% 로 단일 객체 대비 크게 하락 — 이미지 평면에서 객체 영역이 겹치면 클러스터들이 병합되어 개별 검출이 실패한다. 이 cluster merging 이 본 시스템의 명백한 한계."}, {"type": "bullet", "text": "<span class=\"term\">Motion estimation 정확도</span>: 30 회 실험에서 RMSE 11.2°, mean error 6.97°, max instantaneous 19.54° — obstacle motion 방향을 추정하는 능력이 회피 maneuver 의 quality 를 결정한다. 이 오차는 collision risk evaluation 의 Safety Distance $b$ 로 보상된다."}, {"type": "bullet", "text": "<span class=\"term\">Sense-and-avoid 실험 — ISV 발생 케이스</span>: 25 회 × 3 객체, Intersection of Safety Volumes (ISV — robot safety volume 과 obstacle sphere 의 교집합) 가 발생했어야 하는 trajectory 들. 평균 회피 성공률 <span class=\"term\">90.7%</span> 로 측정 — FitBall 이 가장 높음 (큰 크기로 조기 검출 가능)."}, {"type": "bullet", "text": "<span class=\"term\">Dark illumination (&lt;15 lx) 평가</span>: 어두운 조명에서 noisy event 가 증가하여 false positive evasion 이 증가하는 경향이 있으나, success rate 는 여전히 양호한 수준 — event camera 의 HDR 특성이 이 환경에서도 작동함을 입증한다."}, {"type": "bullet", "text": "<span class=\"term\">Outdoor 실험</span>: 야외에서 25 회 × 3 객체 진행. Light 조명에서 92.0%, dark 조명에서 85.3% 성공률. Motion capture 가 없으므로 collision 여부는 시각적으로 평가됨."}, {"type": "bullet", "text": "<span class=\"term\">False Positive 분석</span>: ISV 가 발생하지 않은 20 회 의 baseline 비행 중 15% 에서 불필요한 evasive maneuver 가 발생했다. 이는 보수적으로 큰 $R'$ 를 잡은 결과로, robot body 에 대한 안전 마진을 늘리는 대신 flight efficiency 가 약간 희생되는 trade-off."}]}, "discussion": {"content": [{"type": "bullet", "text": "<span class=\"term\">Event camera 의 우월성 입증</span>: 본 실험은 ornithopter 의 강한 flapping vibration 환경에서 event camera 가 frame-based 카메라보다 본질적으로 유리함을 보여주었다. μs 시간 분해능은 진동에 의한 빠른 변화도 놓치지 않으며, ~120 dB high dynamic range 와 motion blur robustness 는 변화하는 조명·빠른 movement 에서도 안정적 검출을 가능케 한다."}, {"type": "bullet", "text": "<span class=\"term\">Event-by-event 처리의 가치</span>: event image 를 누적해 처리하는 방식 ([10] Falanga 등) 은 누적 시간만큼 inherent latency 가 발생한다. 본 연구의 event-by-event 처리는 이 누적 지연 자체를 없애며, 250 Hz 의 control loop closing 으로 ornithopter 의 중속 비행 속도에 충분한 reaction time 을 확보한다."}, {"type": "bullet", "text": "<span class=\"term\">Single camera + single computer 접근의 검증</span>: 기존 quadrotor 용 방법 ([8]–[10]) 들이 dual event camera + 강력한 embedded 컴퓨터를 요구한 반면, 본 연구는 단일 event camera + 저전력 Khadas VIM3 만으로 동등 수준의 검출·회피 성능을 달성. 이는 ornithopter 의 페이로드·전력 예산 안에서 sense-and-avoid 가 실용적으로 구현 가능함을 보여준다."}, {"type": "bullet", "text": "<span class=\"term\">Tail control 의 한계</span>: 모델 기반 보정을 추가했음에도 ornithopter 의 <span class=\"eng\">underactuated · non-holonomic</span> 동역학으로 인해 정밀한 trajectory 추종은 여전히 어렵다. 본 시스템은 정확한 회피 trajectory 가 아닌 \"위험을 회피하는 방향으로 충분히 큰 deflection\" 을 빠르게 명령하는 reactive 전략을 택했고, 이는 본질적 trade-off 다."}, {"type": "bullet", "text": "<span class=\"term\">Detection 거리의 trade-off</span>: $\\tau$ 값이 정적 이벤트 필터링 강도와 검출 가능 거리 사이의 trade-off 를 결정한다. $\\tau$ 가 크면 더 먼 obstacle 까지 검출 가능하지만 정적 객체가 dynamic 으로 오인될 위험 증가. 실험에서 도달한 6 m 검출 한계는 이 trade-off 의 실질적 상한."}, {"type": "bullet", "text": "<span class=\"term\">Multi-obstacle 한계와 향후 개선</span>: 두 개 이상의 obstacle 이 이미지 평면에서 겹치면 클러스터들이 병합되어 개별 검출이 실패한다. 향후에는 별도의 separation 알고리즘 (예: 색상·motion direction 기반 군집 분리) 또는 multi-hypothesis tracking 도입이 필요."}, {"type": "bullet", "text": "<span class=\"term\">조명 조건의 영향</span>: dark 환경 (15 lx 미만) 에서는 event camera 가 noise 를 더 많이 트리거해 false positive 가 증가했다. IR-cut filter 적용과 $\\tau$ 의 환경 적응형 조정으로 어느 정도 보완되지만, 매우 어두운 환경 (예: 야간 outdoor) 에서는 추가 IR 조명이나 복합 센서 융합이 필요할 수 있다."}, {"type": "bullet", "text": "<span class=\"term\">Conservative safety volume 의 trade-off</span>: $R' = R + b$ 의 $b$ 를 보수적으로 크게 잡으면 motion estimation 오차에 robust 해지지만, 동시에 false positive evasion (실제로는 충돌 위험이 없는 상황에서의 회피) 빈도가 증가한다 (실험에서 15%). 사용자의 risk tolerance 에 따라 $b$ 를 조정 가능하도록 설계한 점이 실용적."}, {"type": "bullet", "text": "<span class=\"term\">Static obstacle 미통합</span>: 본 시스템은 동적 obstacle 만 처리한다. 실제 임무 비행에서는 정적 obstacle (벽·기둥·나무) 도 있으므로, map-based 정적 회피 (예: trajectory planning + LiDAR) 와 본 동적 회피를 통합한 system-level 통합이 다음 단계의 핵심 과제."}, {"type": "bullet", "text": "<span class=\"term\">검증 플랫폼 의존성</span>: 본 시스템의 모든 parameter ($\\tau, \\alpha, \\kappa_0, \\kappa_1$) 는 E-Flap 의 동역학과 비행 속도 범위에 맞춰 튜닝되었다. 다른 ornithopter (예: 다른 wingspan 이나 다른 weight) 로 transfer 하려면 기본 모델 식별과 parameter 재튜닝이 필요하다."}]}, "conclusion": {"content": [{"type": "bullet", "text": "<span class=\"term\">세계 최초 event-based obstacle avoidance for large-scale flapping-wing robots</span> 를 구현·검증했다. Quadrotor 영역에서 발달한 event-based 회피 기술을 ornithopter 의 자원·동역학 특성에 맞춰 재설계한 첫 사례."}, {"type": "bullet", "text": "<span class=\"term\">Event-based vision 의 핵심 장점</span> — μs 분해능, HDR, motion blur robustness — 을 활용해 dynamic obstacle 검출과 evasion maneuver 를 통합한 onboard 시스템을 구축. 기존 frame-based 방식이 풀지 못했던 ornithopter 의 진동 환경 perception 문제를 해결."}, {"type": "bullet", "text": "<span class=\"term\">광범위한 검증</span>: indoor (motion capture 환경) 와 outdoor (soccer field) 에서 다양한 객체 크기와 illumination 조건 (15~760 lx) 으로 실험. 평균 회피 성공률 <span class=\"term\">89.7%</span> — 단일 event camera 기반의 onboard 처리로는 매우 양호한 결과."}, {"type": "bullet", "text": "<span class=\"term\">Event-by-event processing</span> 으로 low-capacity hardware 에서 250 Hz 의 빠른 onboard 추정 달성. 누적 지연이 없어 ornithopter 의 중속 비행에서 충분한 reaction time 확보. 이는 본 연구가 강조하는 핵심 기술적 차별점."}, {"type": "bullet", "text": "<span class=\"term\">Robust 성 입증</span>: 다양한 크기·형태의 동적 장애물 (Small Box · Stuffed Toy · FitBall) 모두에서 일관된 성능. 즉 시스템이 특정 객체 형태에 특화되지 않고 generic dynamic detection 을 수행함을 보여줌."}, {"type": "bullet", "text": "<span class=\"term\">단일 event camera + 단일 lightweight computer</span> 만으로 ornithopter payload 제약 (페이로드 한계 520 g) 을 만족하면서 자율 회피를 달성. 기존 quadrotor 방법들이 요구한 dual camera + 강력한 컴퓨터 조합 없이도 동등 수준의 성능 가능함을 입증."}, {"type": "bullet", "text": "<span class=\"term\">ASAP packaging</span> 으로 communication overflow 없이 250 Hz 의 control loop closing 을 보장. 이는 event driver 가 package 단위로만 데이터를 전달하는 실제 환경에서 event-by-event 처리를 가능하게 하는 enabling 기술."}, {"type": "bullet", "text": "<span class=\"term\">Tail control 의 robust + simple 설계</span>: 단순 반응형 제어식 (식 5) 에 model-based correction 을 결합하여 robustness 와 dynamic constraint 반영을 동시에 달성. 단순한 구조 덕분에 onboard 실시간 실행이 보장된다."}, {"type": "bullet", "text": "<span class=\"term\">Future work — 다른 agile robot 으로 확장</span>: 본 방법론을 ornithopter 외 다른 agile aerial robot (예: tail-sitter, hybrid VTOL) 에 적용해 generalizability 를 검증할 계획. 각 플랫폼의 동역학에 맞춰 tail control 모듈만 교체하면 충분할 것으로 기대."}, {"type": "bullet", "text": "<span class=\"term\">Future work — static + dynamic 통합 sense-and-avoid</span>: 본 시스템의 dynamic-only 한계를 보완하기 위해 map-based static obstacle 회피와 통합 예정. 두 모듈이 같은 onboard 자원 안에서 협조하는 system-level 설계가 다음 도전."}]}};
+
+        function openModal(key) {
+            const detail = SECTION_DETAIL[key];
+            if (!detail) return;
+            document.getElementById('modal-title').innerText = SECTION_TITLES[key] || key;
+
+            let html = '';
+            html += (detail.content || []).map(item => {
+                if (item.type === 'bullet') {
+                    return `<div class="bullet">${item.text}</div>`;
+                } else if (item.type === 'formula') {
+                    return `<div class="formula-block">
+                        <div class="formula-label">${item.label}</div>
+                        <div class="formula-latex">$$${item.latex}$$</div>
+                        <div class="formula-desc">${item.description}</div>
+                    </div>`;
+                }
+                return '';
+            }).join('');
+
+            const body = document.getElementById('modal-body');
+            body.innerHTML = html;
+            body.scrollTop = 0;
+            document.getElementById('modal-overlay').classList.add('active');
+
+            // Re-render KaTeX in the new content
+            if (window.renderMathInElement) {
+                renderMathInElement(body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$',  right: '$',  display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
