@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Cooperative Control and Modeling for Narrow Passage Traversal with an Ornithopter MAV and Lightweight Ground Station</title>
+    <meta name="keywords" content="cooperative control, ornithopter MAV, H2Bird, visual servoing, particle filter, narrow passage traversal, ground station, quaternion control, system identification, millirobotic">
+    <meta name="paper-authors" content="Ryan C. Julian, Cameron J. Rose, Humphrey Hu, Ronald S. Fearing">
+    <meta name="paper-journal" content="Proc. of the 12th International Conference on Autonomous Agents and Multiagent Systems (AAMAS 2013), May 6–10, 2013, Saint Paul, MN, USA">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$',  right: '$',  display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Noto Sans KR', 'Arial', sans-serif;
+            margin: 0; padding: 0;
+            background: #f5f5f5;
+            color: #333;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+        }
+        .slide {
+            width: min(1680px, 98vw);
+            height: 96vh;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            overflow: hidden;
+        }
+        .header {
+            background: #005b96;
+            color: white;
+            padding: 26px 38px;
+        }
+        .title { font-size: 32px; font-weight: bold; margin-bottom: 10px; line-height: 1.3; }
+        .authors { font-size: 17px; margin-bottom: 5px; }
+        .journal { font-size: 15px; opacity: 0.9; }
+
+        .summary-container {
+            background: #f0f5fa;
+            padding: 18px 38px;
+            border-bottom: 1px solid #e1e5e8;
+        }
+        .summary-title {
+            font-size: 19px; font-weight: bold; margin-bottom: 8px; color: #005b96;
+        }
+        .summary { font-size: 17px; line-height: 1.65; }
+        .keywords {
+            margin-top: 10px;
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .keyword-chip {
+            font-size: 12px;
+            padding: 3px 10px;
+            background: white;
+            color: #005b96;
+            border: 1px solid #c6dbed;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 14px;
+            padding: 14px 18px;
+            overflow: hidden;
+        }
+        .section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,91,150,0.18);
+            border-color: #005b96;
+        }
+        .section-title {
+            color: #005b96;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 9px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #005b96;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .click-hint {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+        .section-summary {
+            font-size: 15px;
+            line-height: 1.6;
+            flex: 1;
+            overflow: hidden;
+        }
+        .term { font-weight: bold; color: #005b96; }
+        .eng { color: #666; font-style: italic; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            justify-content: center; align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.18s ease-out;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: white;
+            width: min(1100px, 90vw);
+            height: min(800px, 88vh);
+            border-radius: 10px;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .modal-header {
+            background: #005b96;
+            color: white;
+            padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 22px; font-weight: bold; }
+        .modal-close {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px; line-height: 1;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.2); }
+        .modal-body {
+            padding: 24px 32px;
+            overflow-y: auto;
+            font-size: 15.5px;
+            line-height: 1.75;
+        }
+        .modal-body .bullet {
+            margin-bottom: 10px;
+            padding-left: 18px;
+            text-indent: -18px;
+        }
+        .modal-body .bullet:before {
+            content: "▸ ";
+            color: #005b96;
+            font-weight: bold;
+        }
+        .modal-body .formula-block {
+            background: #f8f9fb;
+            border-left: 4px solid #005b96;
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 4px;
+        }
+        .modal-body .formula-label {
+            font-size: 12px;
+            color: #005b96;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .modal-body .formula-desc {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+        .modal-body h4 {
+            color: #005b96;
+            margin-top: 22px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="header">
+            <div class="title">Cooperative Control and Modeling for Narrow Passage Traversal with an Ornithopter MAV and Lightweight Ground Station</div>
+            <div class="authors">Ryan C. Julian, Cameron J. Rose, Humphrey Hu, Ronald S. Fearing</div>
+            <div class="journal">Proc. of the 12th International Conference on Autonomous Agents and Multiagent Systems (AAMAS 2013), May 6–10, 2013, Saint Paul, MN, USA</div>
+        </div>
+
+        <div class="summary-container">
+            <div class="summary-title">논문 요약</div>
+            <div class="summary">이 논문은 <span class="term">13 g ornithopter MAV (H2Bird)</span> 와 <span class="term">lightweight ground station</span> 간 <span class="term">cooperative visual servoing</span> 을 통한 좁은 통로 통과 시연을 보고. H2Bird 는 26.5 cm wingspan, clap-fling wing, tail rotor + elevator 로 yaw/pitch 제어, onboard IMU + quaternion PID 로 자세 안정화. Ground station 은 BeagleBoard (1 W) + USB 카메라로 <span class="term">particle filter 기반 실시간 2D pose estimation</span> 수행, 추정 위치로부터 PID heading command 를 radio 전송. <span class="term">Dubin's car + 1차 yaw 동역학</span>으로 시스템 모델링, Monte Carlo 시뮬레이션으로 backwards-reachable set 예측 → 실험 결과 <span class="term">중앙부 80%, 가장자리 50% 성공률</span>로 모델 정합. <span class="eng">FWAV cooperative guidance 의 초기 실증 사례</span>로, sub-20 g 급 flapping-wing 의 외부 센서 의존 cooperative navigation 의 가능성과 한계를 정량적으로 제시.</div>
+            <div class="keywords"><span class="keyword-chip">cooperative control</span><span class="keyword-chip">ornithopter MAV</span><span class="keyword-chip">H2Bird</span><span class="keyword-chip">visual servoing</span><span class="keyword-chip">particle filter</span><span class="keyword-chip">narrow passage traversal</span><span class="keyword-chip">ground station</span><span class="keyword-chip">quaternion control</span><span class="keyword-chip">system identification</span><span class="keyword-chip">millirobotic</span></div>
+        </div>
+
+        <div class="content">
+            <div class="section" onclick="openModal('introduction')">
+                <div class="section-title">Introduction: 연구 동기 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">10 g 급 MAV 의 전력·크기·중량 제약이 onboard sensing·computation 을 심각히 제한하여, flapping-wing MAV 는 payload 감소로 더 엄격한 제약을 받음. 지상 차량은 이동성은 낮지만 크기 제약이 완화되어 더 많은 computing power 보유 → <span class="term">이종 로봇 간 협업</span>의 기회. 기존 연구는 고수준 플래닝·큰 vehicle·GPS/motion capture 의존에 국한. 본 연구는 <span class="term">13 g ornithopter + 경량 ground station</span> 의 cooperative visual servoing 으로 좁은 통로 통과를 시연하며, millirobotic 규모에서 협업의 가치를 실증.</div>
+            </div>
+            <div class="section" onclick="openModal('related_works')">
+                <div class="section-title">Related Works: 관련 연구 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">관련 연구는 3 흐름: (1) <span class="term">Flapping-wing MAV 제어/모델링</span> — 비선형 동역학 단순화 (주기 평균, 선형 저차원 모델), DelFly 고성능 플랫폼, Baek 의 자율 target seeking. (2) <span class="term">MAV guidance/navigation</span> — 외부 카메라 고도 제어, onboard 카메라 장애물 회피, GPS/motion capture 의존 fixed-/rotary-wing. (3) <span class="term">Cooperative control</span> — UGV 간 visual servoing (Hyams, Jung, Nebot), UAV-UGV 분석적 모델 (Luo, Mehta), 대형 UAV-UGV 협업 (Rudol), 쿼드로터 군집 항법 (Stirling). 모두 <span class="term">kg 급 이상 vehicle 또는 분석적 탐색</span>에 국한 — sub-20 g flapping-wing + 경량 ground station 의 cooperative guidance 는 본 연구가 첫 사례.</div>
+            </div>
+            <div class="section" onclick="openModal('method')">
+                <div class="section-title">Method: 새로운 접근 방법 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">시스템은 <span class="term">H2Bird ornithopter (13 g, 26.5 cm wingspan)</span> + <span class="term">BeagleBoard 기반 ground station (1 W)</span>의 2-agent 구성. H2Bird 는 Silverlit i-Bird 파워트레인 + clap-fling wing + tail rotor/elevator + ImageProc 2.4 (40 MIPS MCU, 6-DOF IMU, 802.15.4 radio, VGA camera), onboard <span class="term">quaternion PID 자세 제어</span> (300 Hz 내부 루프). Ground station 은 USB 카메라 + <span class="term">particle filter 기반 2D pose estimation</span> (Gaussian transition + ε-random uniform + na&iuml;ve background subtraction), heading command 를 10 Hz 외부 루프로 radio 전송. 시스템 모델은 <span class="term">1차 yaw 동역학 + Dubin's car</span> 로 구성, system identification 으로 파라미터 결정.</div>
+            </div>
+            <div class="section" onclick="openModal('experiment')">
+                <div class="section-title">Experiment: 실험 방법과 결과 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary"><span class="term">3 단계 검증</span>: (1) <span class="term">System identification</span> — 90° step input 응답으로 yaw model 파라미터 결정 (K=0.95, R=0.62, rise time 1.4초), 최소 회전 반경 1.07 m 산출. 카메라 latency 40 ms, pose estimation 12.5 ms, radio 25 ms 측정. (2) <span class="term">Monte Carlo 시뮬레이션</span> — 카메라 시야 내 10 cm 격자 × 40 trial/점, backwards-reachable set 예측. 중앙부 100% 성공 영역 존재, 시야 삼각형 가장자리에서 성공률 감소. (3) <span class="term">실험 80 trial</span> — 시야 평면 가장자리 60 trial + 중앙 20 trial. <span class="term">중앙부 80%, 가장자리 50% 성공률</span> — Monte Carlo 예측과 정합.</div>
+            </div>
+            <div class="section" onclick="openModal('discussion')">
+                <div class="section-title">Discussion: 결과의 해석 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">본 연구의 핵심 의의는 <span class="term">sub-20 g flapping-wing MAV 의 cooperative guidance 를 처음 실험적으로 시연</span>한 점. 단순 모델 (1차 yaw + Dubin's car) + particle filter 의 조합이 경량 하드웨어 (1 W BeagleBoard) 에서도 실효성 있는 협업 항법을 가능하게 함. 그러나 <span class="term">2D 추적 (깊이 정보 부재), na&iuml;ve background subtraction 의 취약성, 10 Hz 외부 루프의 latency, 수동 발사</span> 등이 성능 상한을 제한. FWAV cooperative control 의 초기 baseline 으로서 역사적 가치가 있으며, 이후 연구 (DelFly 자율, E-Flap cooperative) 의 방향을 제시.</div>
+            </div>
+            <div class="section" onclick="openModal('conclusion')">
+                <div class="section-title">Conclusion: 최종 요약 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">본 연구는 <span class="term">13 g ornithopter MAV (H2Bird) + 경량 ground station (1 W BeagleBoard)</span> 의 cooperative visual servoing 으로 좁은 통로 통과를 시연. System identification 기반 단순 모델 (1차 yaw + Dubin's car) 이 Monte Carlo 시뮬레이션과 실험에서 정합하여 <span class="term">cooperative 시스템 성능의 저비용 예측 가능</span>을 입증. 향후 millirobotic ground vehicle (OctoRoACH) 에 ground station 배포, 더 복잡한 multi-agent 시스템으로 확장을 계획.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title"></div>
+                <button class="modal-close" onclick="closeModal()" aria-label="닫기">×</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const SECTION_TITLES = {
+            introduction: "Introduction — 연구 동기",
+            related_works: "Related Works — 관련 연구",
+            method: "Method — 새로운 접근 방법",
+            experiment: "Experiment — 실험 방법과 결과",
+            discussion: "Discussion — 결과의 해석",
+            conclusion: "Conclusion — 최종 요약"
+        };
+
+        const SECTION_DETAIL = {"introduction": {"content": [{"type": "bullet", "text": "<span class=\"term\">MAV 의 본질적 제약</span>: 10 g 급 MAV 는 전력·크기·중량 한계로 onboard sensing 과 computation 이 극도로 제한. 저복잡도 제어·상태 추정만 실시간 실행 가능. <span class=\"term\">Flapping-wing MAV 는 안전성·소음 우위</span>에도 payload 감소로 제약이 더 심각."}, {"type": "bullet", "text": "<span class=\"term\">Flapping-wing 비행의 모델링 난제</span>: 비선형 동역학으로 제어·모델링이 까다로움. 주기 평균 [4][25], 선형 저차원 모델 [26] 등으로 단순화하는 접근이 일반적. DelFly [5] 같은 고성능 플랫폼 개발로 이어짐."}, {"type": "bullet", "text": "<span class=\"term\">기존 제어의 한계</span>: periodic forcing 등 정교한 제어법 [7][15][19] 은 강력한 onboard computing 이 필요하여 millirobotic 에 부적합. 본 연구는 <span class=\"term\">외부 센서 협업을 통해 계산 부담을 ground station 으로 이전</span>하는 단순하고 효율적 접근."}, {"type": "bullet", "text": "<span class=\"term\">Flapping-wing guidance/navigation 의 부족</span>: Baek [2] 이 외부 카메라로 고도 제어, de Croon [6] 이 onboard 카메라 + offboard processing 으로 장애물 회피, Baek [3] 이 sub-20 g 급 최초 자율 target seeking. 그러나 <span class=\"term\">cooperative navigation 은 전무</span>."}, {"type": "bullet", "text": "<span class=\"term\">기존 cooperative 연구의 한계</span>: 고정익·회전익 MAV 의 guidance/control 은 GPS·motion capture 의존 [14][16]. 실내에서 GPS 불안정, motion capture 는 환경 변형 필요. cooperative 연구 (Hyams [11], Jung [13], Rudol [24]) 는 <span class=\"term\">훨씬 크고 무거운 vehicle</span> 대상으로, 경량 시스템 적용 불가."}, {"type": "bullet", "text": "<span class=\"term\">경량 이종 로봇 협업의 이점</span>: 소형·전문화 로봇 그룹은 큰 monolithic vehicle 이 불가능한 도전적 지형 항법·환경 상호작용 가능. 그러나 대형 로봇의 sensing·computation 능력을 집단적으로 匹敵하려면 <span class=\"term\">전문화 능력의 공유를 위한 상호작용</span>이 필수."}, {"type": "bullet", "text": "<span class=\"term\">본 연구의 기여</span>: (1) 13 g H2Bird ornithopter 신규 개발, (2) 경량 ground station 기반 cooperative visual servoing 시연, (3) system identification 으로 cooperative 시스템 모델링, (4) Monte Carlo 시뮬레이션 + 실험으로 모델 검증 — <span class=\"term\">narrow passage traversal 의 backwards-reachable set 예측</span>."}]}, "related_works": {"content": [{"type": "bullet", "text": "<span class=\"term\">Flapping-wing 동역학 단순화 접근</span>: Cheng·Deng [4] 의 hovering 안정성 분석 (translational/rotational damping), Faruque [12] 의 dipteran insect lateral-directional 모델. Wing-beat 주기 평균 [4][25] 과 선형 저차원 모델 [26] 이 비행 행동 예측의 표준 접근."}, {"type": "bullet", "text": "<span class=\"term\">DelFly — 고성능 flapping-wing 사례</span>: de Croon [5] 의 sub-15 g DelFly 가 설계·공기역학·vision 제어를 통합한 대표 플랫폼. 본 연구의 H2Bird 와 유사 크기 범위이나 cooperative control 미적용."}, {"type": "bullet", "text": "<span class=\"term\">Flapping-wing guidance — Baek 의 연구 [2][3]</span>: Baek [2] 이 12 g i-Bird 로 외부 카메라 기반 고도 제어, Baek [3] 이 13 g ornithopter 로 <span class=\"term\">sub-20 g 급 첫 자율 target seeking</span> 시연. 본 연구의 H2Bird 가 i-Bird 파워트레인 기반."}, {"type": "bullet", "text": "<span class=\"term\">de Croon 의 장애물 회피 [6]</span>: onboard 카메라 + offboard processing 으로 appearance variation cue 기반 장애물 회피 시연. <span class=\"term\">Onboard 카메라 사용이지만 처리는 외부</span> — 순수 onboard 자율과 외부 센서 협업의 중간 형태."}, {"type": "bullet", "text": "<span class=\"term\">GPS/Motion capture 의존 고정익·회전익 연구</span>: Kanade [14] 의 실시간 3D 비전 (소형 MAV), Kingston·Beard [16] 의 저가 센서 자세/위치 추정. <span class=\"term\">실내에서 GPS 불안정, motion capture 는 정적 환경 변형 필요</span> → 이동 가능 경량 시스템에 부적합."}, {"type": "bullet", "text": "<span class=\"term\">UGV 간 cooperative visual servoing</span>: Hyams [11] — color segmentation 기반 micro-rover 협업 항법, Jung [13] — 시각 서보잉 range/pose 추정, Nebot [22] — 이종 이동 로봇 협업 사례. 모두 <span class=\"term\">지상 로봇 간 협업으로 MAV 미포함</span>."}, {"type": "bullet", "text": "<span class=\"term\">UAV-UGV 협업 — 분석적·대형 vehicle</span>: Luo [20] — 공지(air-ground) multi-agent 조율, Mehta [21] — 이동 항공 카메라의 adaptive vision 기반 UGV 추적. Rudol [24] — 유사 cooperative visual servoing 시스템이나 <span class=\"term\">본 연구 대비 수 배 큰 vehicle</span>, 고성능 프로세서·전문 카메라 활용."}, {"type": "bullet", "text": "<span class=\"term\">Stirling 의 쿼드로터 군집 항법 [27]</span>: 정지 MAV 가 항법용 외부 센싱 제공, 탐사 MAV 가 미발견 영역 센싱으로 네트워크 확장. 로컬 센싱만 사용하나 <span class=\"term\">시간 제약 미고려</span> — H2Bird 는 최소 전진 속도·회전 반경 제약이 있어 시간이 핵심 변수."}, {"type": "bullet", "text": "<span class=\"term\">본 연구의 위치</span>: sub-20 g flapping-wing MAV + millirobotic 급 ground station 의 cooperative visual servoing 은 <span class=\"term\">기존 연구에 전무</span>. 시스템 모델링 + 실험 검증의 조합으로 millirobotic 협업의 성능 경계를 처음 정량화."}]}, "method": {"content": [{"type": "bullet", "text": "<span class=\"term\">H2Bird 하드웨어</span>: Silverlit i-Bird RC 파워트레인 + clap-fling wing 기반 재설계. 26.5 cm wingspan, 비행 중량 13 g, 2.8 g payload. Carbon fiber airframe, tail propeller (yaw 제어), servo-controlled tail elevator (pitch 제어). 평균 지상속도 1.2 m/s, 비행시간 약 10분."}, {"type": "bullet", "text": "<span class=\"term\">ImageProc 2.4 onboard controller</span>: 40 MIPS 마이크로프로세서 + 6-DOF IMU + IEEE 802.15.4 radio + VGA camera + motor driver, 90 mAh LiPo 전원. IMU 적분으로 자세 추정, quaternion PID 로 자세 제어 (300 Hz). Euler angle 의 high pitch singularity 를 회피."}, {"type": "bullet", "text": "<span class=\"term\">Quaternion 기반 자세 제어</span>: 참조 자세 q_r 로부터 오차 quaternion q_e 계산, angle-axis 변환 후 PID 입력. Trigonometric lookup table 로 onboard 실시간 성능 보장."}, {"type": "formula", "label": "식 (1)-(3) — Quaternion 오차 + Angle-axis 변환", "latex": "q_e = q' \\cdot q_r, \\quad Q_e = \\alpha \\cdot q_e / \\sin(\\alpha/2), \\quad \\alpha = 2\\arccos(q_{e,w})", "description": "$q_r$ 는 참조 자세 quaternion, $q'$ 는 현재 자세의 켤레, $q_e$ 가 오차 quaternion. $\\alpha$ 는 오차 각도, $Q_e$ 의 각 성분이 PID controller 의 축별 입력. Euler angle 대비 high pitch (flapping-wing 에서 일상적) 에서 singularity 없음."}, {"type": "bullet", "text": "<span class=\"term\">Ground station 하드웨어</span>: ARM 기반 BeagleBoard (1 W 소비) + USB 웹 카메라 (소비자용, 640×480). Gumstix Overo·LogicPD Torpedo 같은 sub-10 g 프로세서 모듈과 동일 프로세서 → 경량 지상 차량 (OctoRoACH [23]) 배포 가능. Ubuntu Linux + Python + OpenCV. 모든 소프트웨어/하드웨어 오픈소스 (BSD)."}, {"type": "bullet", "text": "<span class=\"term\">Particle filter 기반 2D pose estimation</span>: 모노큘러 2D object tracking in pixel space. Motion model: Gaussian transition + ε-random uniform sampling (ε=0.3). 초기 파티클을 프레임 전체에 균등 분포, 평균 가중치가 임계 이하일 때만 리샘플링."}, {"type": "formula", "label": "식 (4) — Particle filter motion model", "latex": "x^{[i]}_t \\sim \\begin{cases} \\mathcal{N}(x^{[i]}_{t-1},\\, \\Sigma), & \\text{prob } 1-\\varepsilon \\\\ U(0,\\, b), & \\text{prob } \\varepsilon \\end{cases}", "description": "$x^{[i]}_t$ 는 640×480 pixel space 에서 $i$ 번째 파티클 위치. $\\Sigma$ 는 대각 공분산 (분산 256), $b$ 는 pixel space 경계. $\\varepsilon=0.3$ 의 확률로 전체 pixel space 에서 균등 샘플링 → overconfidence/collapse 방지 + 재획득 지연 감소."}, {"type": "bullet", "text": "<span class=\"term\">Emission model — na&iuml;ve background subtraction</span>: 초기 프레임 f₀ 와 현재 프레임 f_t 의 RGB 색상 거리로 파티클 가중치 결정. 이동 객체가 있는 영역의 파티클이 높은 가중치 → 리샘플링 확률 증가. 단순하지만 5초 이내 단시간 추적에 충분히 신뢰."}, {"type": "formula", "label": "식 (5) — Emission model 가중치", "latex": "w^{[i]}_t = 1 + \\| f_0(x^{[i]}_t) - f_t(x^{[i]}_t) \\|^2", "description": "$f_0$ 은 배경 프레임, $f_t$ 는 현재 프레임. 파티클 위치의 RGB 색상 차이 L2 norm 제곱이 가중치. 배경과 크게 다른 영역(H2Bird 위치)의 파티클이 높은 가중치. Na&iuml;ve 하지만 단시간 (5초 이내) narrow passage traversal 에 충분."}, {"type": "bullet", "text": "<span class=\"term\">Cooperative visual servoing</span>: ground station 이 2D pose estimate 로 H2Bird-목표 간 고도·수평 오차 계산 → PID 법칙으로 새 참조 pitch/yaw 산출 → radio 전송 (10 Hz 외부 루프). Fixed-lag window 로 적분항 wind-up 방지. PD 항 튜닝으로 시스템 latency 에 의한 overshoot/drift 감쇠."}, {"type": "bullet", "text": "<span class=\"term\">시스템 모델 — Yaw 동역학 + Dubin's car</span>: yaw 를 1차 전달함수 (K/(1+Rs)) 로 근사, 병진 운동을 Dubin's car (일정 전진속도, 최대 조향각 제한) 로 모델링. 두 모델을 독립 취급 — yaw 가 나머지 비행 동역학에서 대부분 분리."}, {"type": "formula", "label": "식 (6)-(7) — Yaw 동역학 + Dubin's car 모델", "latex": "\\theta(s) = \\frac{K}{1+Rs}\\, u(s), \\qquad \\dot{x}=u_s\\sin\\theta,\\; \\dot{y}=u_s\\cos\\theta,\\; \\dot{\\theta}=u", "description": "식 (6): $K$, $R$ 은 system identification 으로 결정. $u(s)$ 는 참조 heading, $\\theta(s)$ 는 실제 heading. 식 (7): Dubin's car 에서 $u_s$ 는 전진 속도 (1.2 m/s), $\\theta$ 는 식 (6) 의 시간 영역 출력. $u \\in [-\\tan\\phi_{\\max}, \\tan\\phi_{\\max}]$ 로 조향 제한."}]}, "experiment": {"content": [{"type": "bullet", "text": "<span class=\"term\">System identification — Yaw step response</span>: clockwise 90° step 입력에 대한 onboard gyroscope 자세 추정 기록. MATLAB 으로 1차 모델 fitting → K=0.95, R=0.62. Rise time 1.4초 측정."}, {"type": "formula", "label": "식 (9)-(10) — Fitted yaw model + 최소 회전 반경", "latex": "\\theta(s)=\\frac{0.95}{1+0.62s}\\,u(s), \\qquad R_{\\min}=\\frac{360^\\circ \\times 1.4\\,\\text{s} \\times 1.2\\,\\text{m/s}}{90^\\circ \\times 2\\pi}=1.07\\,\\text{m}", "description": "Yaw 전달함수: gain 0.95, 시정수 0.62초. 최소 회전 반경 1.07 m 는 rise time (1.4 s) × 비행속도 (1.2 m/s) 로부터 기하학적 산출. 이 반경이 feasible region 의 기하학적 경계를 결정."}, {"type": "bullet", "text": "<span class=\"term\">Latency 측정</span>: 화면 색상 변화 감지 기법으로 카메라 capture latency 40 ms, particle filter 계산 latency 12.5 ms, radio 전송 latency 25 ms 측정. 총 시스템 latency 약 77.5 ms — 10 Hz 외부 제어 루프의 핵심 제약."}, {"type": "bullet", "text": "<span class=\"term\">Backwards-reachable set — 기하학적 분석</span>: 최소 회전 반경 + 카메라 시야 삼각형 (63°) 기하로 infeasible region 결정. 카메라에 가까울수록, 시야 가장자리일수록 충분한 회전 공간 부족."}, {"type": "bullet", "text": "<span class=\"term\">Monte Carlo 시뮬레이션</span>: 카메라 시야 내 10 cm 격자의 각 점에서 40 trial — 초기 heading 을 -90°~90° 균등 분포에서 랜덤 샘플링. <span class=\"term\">중앙부에 40/40 성공 영역</span> 존재 (기하학적 feasible region 의 부분집합). 시야 삼각형 가장자리에서 성공률 점진적 감소."}, {"type": "bullet", "text": "<span class=\"term\">실험 설정</span>: 나무 프레임 (0.66 m × 0.94 m) 을 창문으로 사용, 카메라에서 3.66 m 거리. Vicon motion capture 로 ground truth. 5 trial 마다 배터리 교체. 총 80 trial: 시야 가장자리 60 trial (5 cm 간격 격자) + 카메라 정면 중앙 20 trial."}, {"type": "bullet", "text": "<span class=\"term\">결과 — 중앙부 80% 성공률</span>: 카메라 정면·시야 중앙 초기 조건에서 80% 성공. <span class=\"term\">Monte Carlo 예측의 약 80% 성공 확률과 정합</span>. 간단한 모델링 접근이 cooperative 시스템 성능 예측에 유용함을 입증."}, {"type": "bullet", "text": "<span class=\"term\">결과 — 가장자리 50% 성공률</span>: 시야 삼각형 가장자리에서 성공률 50% 로 감소. 원인: (a) 가장자리에서 yaw 제어 입력이 큰 크기, (b) 깊이 정보 부재로 동일 제어 입력이 거리에 따라 과보상/과소보상, (c) 추적 노이즈, (d) 수동 발사 변동, (e) 배터리 전력 변동."}, {"type": "bullet", "text": "<span class=\"term\">모델 검증 종합</span>: (a) 기하학적 infeasible region 내 성공 0건 — 모델 정확, (b) 시뮬레이션 infeasible 경계 부근 성공 극소, (c) 시야 삼각형 경계에서 성공·실패 혼재 — Monte Carlo 의 감소 예측과 일치. <span class=\"term\">단순 모델 (1차 yaw + Dubin's car) 이 cooperative 시스템 성능을 저비용으로 예측 가능</span>함을 확인."}]}, "discussion": {"content": [{"type": "bullet", "text": "<span class=\"term\">단순 모델링의 가치</span>: yaw 를 1차 전달함수, 병진을 Dubin's car 로 근사한 극도로 단순한 모델이 Monte Carlo 시뮬레이션에서 실험 결과 (80% 중앙, 50% 가장자리) 를 정확히 예측. <span class=\"term\">복잡한 비선형 flapping-wing 동역학을 단순화해도 cooperative 시스템 성능 예측에 충분</span>함을 입증."}, {"type": "bullet", "text": "<span class=\"term\">Cooperative 접근의 정당성</span>: 13 g MAV 의 onboard 자원 (40 MIPS, 90 mAh) 으로는 정교한 항법 불가. Ground station 으로 sensing + computation 이전 시 1 W 의 추가 전력만으로 visual servoing 구현. <span class=\"term\">전문화 + 협업이 monolithic 설계보다 효율적</span>임을 millirobotic 에서 실증."}, {"type": "bullet", "text": "<span class=\"term\">깊이 정보 부재의 영향</span>: 모노큘러 2D 추적으로 깊이 미추정 → 카메라에 가까워질수록 heading 추정 왜곡 (수평 거리 일정인데 heading 증가). <span class=\"term\">카메라 가까이에서 성능 저하</span>의 주요 원인. 스테레오 비전 또는 깊이 센서 추가가 자연스러운 개선 방향이나 중량 제약 존재."}, {"type": "bullet", "text": "<span class=\"term\">Na&iuml;ve background subtraction 의 한계</span>: 장면 변화에 취약하나 5초 이내 단시간 추적에는 충분. 더 정교한 background extraction 으로 추적 robust 성 향상 가능 — 알고리즘 복잡도와 계산 자원의 trade-off."}, {"type": "bullet", "text": "<span class=\"term\">ε-random sampling 의 효과</span>: ε=0.3 으로 30% 확률의 균등 랜덤 샘플링이 파티클 collapse 방지 + 재획득 지연 감소에 기여. 빠르게 움직이는 ornithopter 추적에 핵심적 역할 — 표준 particle filter 보다 <span class=\"term\">robustness 우선 설계</span>."}, {"type": "bullet", "text": "<span class=\"term\">10 Hz 외부 루프의 latency 영향</span>: 총 77.5 ms latency (camera 40 + computation 12.5 + radio 25) 가 PD 제어기의 overshoot/drift 유발. 1.2 m/s 전진속도에서 1 루프 사이 약 12 cm 이동 — 정밀 제어에 한계. Onboard sensing 능력 향상 또는 더 빠른 통신이 개선 방향."}, {"type": "bullet", "text": "<span class=\"term\">2013 년 시점의 역사적 위치</span>: sub-20 g FWAV cooperative guidance 의 <span class=\"term\">첫 실험적 baseline</span>. 이후 10여 년간 DelFly 의 자율 비행 발전, E-Flap (Zufferey RAL 2021) 의 large-scale ornithopter, perching (Zufferey Nat Comms 2022) 등으로 flapping-wing 분야가 크게 발전. 본 연구는 이 발전의 초기 cooperative 시도로서 참조 가치."}, {"type": "bullet", "text": "<span class=\"term\">오픈소스 기여</span>: 모든 소프트웨어·하드웨어를 BSD 라이센스로 공개. Biomimetic Millisystems Lab 의 전통에 따라 재현 가능성 보장 — 2013 년 기준으로 millirobotic 연구 커뮤니티에 기여."}]}, "conclusion": {"content": [{"type": "bullet", "text": "<span class=\"term\">핵심 성과 — 13 g FWAV cooperative guidance 시연</span>: flapping-wing MAV 와 경량 base station 의 cooperative guidance 를 실험적으로 증명. sub-20 g 급에서의 <span class=\"term\">첫 cooperative narrow passage traversal</span>."}, {"type": "bullet", "text": "<span class=\"term\">모델 기반 성능 예측</span>: system identification 으로 결정한 단순 모델이 실험 결과와 정합 (중앙 80%, 가장자리 50%). <span class=\"term\">Low computational cost 로 cooperative 시스템의 feasible region 예측 가능</span>."}, {"type": "bullet", "text": "<span class=\"term\">H2Bird 플랫폼 기여</span>: 13 g, 26.5 cm wingspan, clap-fling wing, carbon fiber airframe, tail rotor + elevator, ImageProc 2.4 (6-DOF IMU + radio + camera), 1.2 m/s, 10분 비행. 2.8 g payload 로 추가 센서 탑재 가능."}, {"type": "bullet", "text": "<span class=\"term\">경량 ground station 의 실용성</span>: BeagleBoard (1 W) + USB 카메라로 particle filter 기반 실시간 추적 + cooperative 제어 구현. OctoRoACH 같은 10 g payload 지상 차량에 배포 가능 — <span class=\"term\">완전 이동식 cooperative 시스템</span>의 가능성."}, {"type": "bullet", "text": "<span class=\"term\">성능 한계 정량화</span>: 중앙부 80%, 가장자리 50% — 깊이 정보 부재, 시스템 latency (77.5 ms), 배터리 변동, 수동 발사가 한계 요인. <span class=\"term\">Backwards-reachable set</span> 으로 성공 가능 초기 조건을 사전 판단 가능."}, {"type": "bullet", "text": "<span class=\"term\">Future — Millirobotic ground vehicle 배포</span>: ground station 을 OctoRoACH 등 millirobotic ground vehicle 에 탑재하여 미탐색·비구조 환경에서 <span class=\"term\">완전 자율 이종 협업</span> 탐구."}, {"type": "bullet", "text": "<span class=\"term\">Future — 다중 agent + 복잡 상호작용</span>: 현재 2-agent (MAV + ground station) 에서 더 많은 agent·상호작용의 복잡 시스템으로 확장 시 모델링 접근의 유효성 검증이 향후 과제."}, {"type": "bullet", "text": "<span class=\"term\">연구사적 위치</span>: 2013 년 AAMAS 발표로, <span class=\"term\">FWAV cooperative control 의 초기 실증 사례</span>. Berkeley Fearing 그룹의 millirobotic 연구 전통 (RoACH, OctoRoACH, VelociRoACH) 위에 구축. 이후 ornithopter 분야의 cooperative 연구 (E-Flap, leader-follower 등) 의 역사적 baseline."}]}};
+
+        function openModal(key) {
+            const detail = SECTION_DETAIL[key];
+            if (!detail) return;
+            document.getElementById('modal-title').innerText = SECTION_TITLES[key] || key;
+
+            let html = '';
+            html += (detail.content || []).map(item => {
+                if (item.type === 'bullet') {
+                    return `<div class="bullet">${item.text}</div>`;
+                } else if (item.type === 'formula') {
+                    return `<div class="formula-block">
+                        <div class="formula-label">${item.label}</div>
+                        <div class="formula-latex">$$${item.latex}$$</div>
+                        <div class="formula-desc">${item.description}</div>
+                    </div>`;
+                }
+                return '';
+            }).join('');
+
+            const body = document.getElementById('modal-body');
+            body.innerHTML = html;
+            body.scrollTop = 0;
+            document.getElementById('modal-overlay').classList.add('active');
+
+            // Re-render KaTeX in the new content
+            if (window.renderMathInElement) {
+                renderMathInElement(body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$',  right: '$',  display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
