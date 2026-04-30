@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Sticking the landing: Insect-inspired strategies for safely landing flapping-wing aerial microrobots</title>
+    <meta name="keywords" content="safe landing, insect-inspired, compliant leg, crane fly, RoboBee, FWMAV, insect-scale, ground effect, adaptive control, energy dissipation, piezoelectric actuator, bioinspired">
+    <meta name="paper-authors" content="Nak-seung P. Hyun, Christian M. Chan, Alyssa M. Hernandez, Robert J. Wood">
+    <meta name="paper-journal" content="Science Robotics, Vol. 10, eadq3059 (April 16, 2025) · DOI: 10.1126/scirobotics.adq3059">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$',  right: '$',  display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Noto Sans KR', 'Arial', sans-serif;
+            margin: 0; padding: 0;
+            background: #f5f5f5;
+            color: #333;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+        }
+        .slide {
+            width: min(1680px, 98vw);
+            height: 96vh;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            overflow: hidden;
+        }
+        .header {
+            background: #005b96;
+            color: white;
+            padding: 26px 38px;
+        }
+        .title { font-size: 32px; font-weight: bold; margin-bottom: 10px; line-height: 1.3; }
+        .authors { font-size: 17px; margin-bottom: 5px; }
+        .journal { font-size: 15px; opacity: 0.9; }
+
+        .summary-container {
+            background: #f0f5fa;
+            padding: 18px 38px;
+            border-bottom: 1px solid #e1e5e8;
+        }
+        .summary-title {
+            font-size: 19px; font-weight: bold; margin-bottom: 8px; color: #005b96;
+        }
+        .summary { font-size: 17px; line-height: 1.65; }
+        .keywords {
+            margin-top: 10px;
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .keyword-chip {
+            font-size: 12px;
+            padding: 3px 10px;
+            background: white;
+            color: #005b96;
+            border: 1px solid #c6dbed;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 14px;
+            padding: 14px 18px;
+            overflow: hidden;
+        }
+        .section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,91,150,0.18);
+            border-color: #005b96;
+        }
+        .section-title {
+            color: #005b96;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 9px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #005b96;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .click-hint {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+        .section-summary {
+            font-size: 15px;
+            line-height: 1.6;
+            flex: 1;
+            overflow: hidden;
+        }
+        .term { font-weight: bold; color: #005b96; }
+        .eng { color: #666; font-style: italic; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            justify-content: center; align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.18s ease-out;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: white;
+            width: min(1100px, 90vw);
+            height: min(800px, 88vh);
+            border-radius: 10px;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .modal-header {
+            background: #005b96;
+            color: white;
+            padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 22px; font-weight: bold; }
+        .modal-close {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px; line-height: 1;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.2); }
+        .modal-body {
+            padding: 24px 32px;
+            overflow-y: auto;
+            font-size: 15.5px;
+            line-height: 1.75;
+        }
+        .modal-body .bullet {
+            margin-bottom: 10px;
+            padding-left: 18px;
+            text-indent: -18px;
+        }
+        .modal-body .bullet:before {
+            content: "▸ ";
+            color: #005b96;
+            font-weight: bold;
+        }
+        .modal-body .formula-block {
+            background: #f8f9fb;
+            border-left: 4px solid #005b96;
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 4px;
+        }
+        .modal-body .formula-label {
+            font-size: 12px;
+            color: #005b96;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .modal-body .formula-desc {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+        .modal-body h4 {
+            color: #005b96;
+            margin-top: 22px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="header">
+            <div class="title">Sticking the landing: Insect-inspired strategies for safely landing flapping-wing aerial microrobots</div>
+            <div class="authors">Nak-seung P. Hyun, Christian M. Chan, Alyssa M. Hernandez, Robert J. Wood</div>
+            <div class="journal">Science Robotics, Vol. 10, eadq3059 (April 16, 2025) · DOI: 10.1126/scirobotics.adq3059</div>
+        </div>
+
+        <div class="summary-container">
+            <div class="summary-title">논문 요약</div>
+            <div class="summary">이 논문은 <span class="term">insect-scale FWMAV (Harvard RoboBee, 100 mg)</span> 의 안전한 착륙을 위해 <span class="term">crane fly 영감 compliant leg + adaptive control + insect 모방 trajectory</span> 의 3 모듈을 결합한 첫 통합 framework. <span class="term">Lossy compliant joint</span> (viscoelastic 재료) 가 충격 에너지를 능동 dissipate, leg stance/joint 수/joint placement 3 변수로 설계 최적화. Adaptive controller 는 <span class="term">ground effect</span> 와 model uncertainty 를 보상 — 27 회 호버링 실험으로 ground effect 를 strong (>7%) / weak (4-7%) / weakest (<4%) 3 영역 정량 분류. Pre-impact deceleration trajectory 가 nonzero impact velocity 로 마무리 (insect 모방). 자연 leaf 위 자율 착륙 시연. Zufferey 의 large-scale perching (Nat Comms 2022) 과 대조되는 <span class="term">insect-scale 영역의 safe landing 첫 통합 사례</span>.</div>
+            <div class="keywords"><span class="keyword-chip">safe landing</span><span class="keyword-chip">insect-inspired</span><span class="keyword-chip">compliant leg</span><span class="keyword-chip">crane fly</span><span class="keyword-chip">RoboBee</span><span class="keyword-chip">FWMAV</span><span class="keyword-chip">insect-scale</span><span class="keyword-chip">ground effect</span><span class="keyword-chip">adaptive control</span><span class="keyword-chip">energy dissipation</span><span class="keyword-chip">piezoelectric actuator</span><span class="keyword-chip">bioinspired</span></div>
+        </div>
+
+        <div class="content">
+            <div class="section" onclick="openModal('introduction')">
+                <div class="section-title">Introduction: 연구 동기 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">곤충은 비행과 지상 이동을 일상적으로 전환하며 — 에너지 절감을 위해 효율적 착륙이 필수. 곤충은 (a) hovering·grazing 하는 통제 접근 (꿀벌·호박벌) 과 (b) 가속·crash-landing (모기·stingless bee) 의 다양한 전략을 사용하며, <span class="term">compliant leg 가 충격 흡수 + tarsal 부착</span> 의 핵심 역할. Multi-rotor 의 compliant landing gear 는 잘 연구됐지만 <span class="term">insect-scale FWMAV 영역은 거의 미개척</span>. 본 연구는 RoboBee + crane fly 영감으로 이 갭을 메운다.</div>
+            </div>
+            <div class="section" onclick="openModal('related_works')">
+                <div class="section-title">Related Works: 관련 연구 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">곤충 착륙 행동 연구 ([3-9]) 가 본 연구의 직접적 영감. Multi-rotor 영역의 compliant landing gear ([10-12]) 가 큰 vehicle 에서 검증됐으나 insect-scale 은 부재. 기존 RoboBee 연구 — perching with iterative learning [41], electrostatic ceiling perching [42], geometric controller [19], DEA 기반 [17] — 가 본 연구의 토대. <span class="term">insect-scale safe landing 의 통합 framework 은 본 연구가 첫 사례</span>.</div>
+            </div>
+            <div class="section" onclick="openModal('method')">
+                <div class="section-title">Method: 새로운 접근 방법 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">방법은 3 모듈: (1) <span class="term">Compliant leg design</span> — crane fly 영감 lossy 다관절 다리, leg stance/joint 수/joint placement 의 3 design parameter. (2) <span class="term">Ground effect quantification</span> — 27 hover 실험 + ground effect ratio G 정의, strong (>7%)/weak (4-7%)/weakest (<4%) 의 3 region 정량 분류. (3) <span class="term">Adaptive controller + landing trajectory</span> — geometric controller [19] 에 adaptive component 추가 (model uncertainty + 외란 보상), 곤충 모방 trajectory (가속 → 감속 → nonzero impact velocity).</div>
+            </div>
+            <div class="section" onclick="openModal('experiment')">
+                <div class="section-title">Experiment: 실험 방법과 결과 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary"><span class="term">3 종 실험</span>: (1) Hover 실험 27 회 (H ∈ 0.5-3) 로 ground effect 정량화 — strong/weak/weakest 3 region 분류, adaptive vs nonadaptive controller 비교. (2) Free-fall drop test (3000 fps high-speed video) 로 leg 디자인 변수 (stance/joint 수/placement) 별 CoR·Δx·e 측정 — crash dummy vehicle 사용. (3) <span class="term">실 비행 leaf-to-leaf landing 시연</span> — compliant 경사 leaf 표면에 자율 착륙 성공. Motion capture 환경, RoboBee 본체.</div>
+            </div>
+            <div class="section" onclick="openModal('discussion')">
+                <div class="section-title">Discussion: 결과의 해석 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary"><span class="term">Compliant leg + adaptive control + insect 모방 trajectory 의 3 통합</span>이 결정적 — 단독으로는 어느 하나도 안전 착륙 불가. Energy dissipation 이 piezo actuator 보호의 enabler — vehicle lifespan 연장. 한계: 경사면 / 거친 표면 robust 성, 더 큰 impact velocity, scalability, 완전 onboard 자율성. Future: actuated DEA joint 로 self-righting + multimodal locomotion + 능동 leg 제어. <span class="term">Robots for biology</span> — RoboBee 가 곤충 biomechanics 연구의 physical model 역할 가능.</div>
+            </div>
+            <div class="section" onclick="openModal('conclusion')">
+                <div class="section-title">Conclusion: 최종 요약 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">본 연구는 <span class="term">insect-scale FWMAV (RoboBee 100 mg) 의 첫 통합 safe-landing framework</span>을 제시. Crane fly 영감 compliant leg + ground effect 보상 adaptive controller + 곤충 모방 trajectory 의 3 모듈 결합으로 다양 표면 (compliant leaf 포함) 자율 착륙 성공. <span class="term">Energy dissipation 이 piezo actuator 보호</span>로 vehicle lifespan 연장 → 개발 가속. Future: actuated joint, multimodal locomotion, full onboard autonomy.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title"></div>
+                <button class="modal-close" onclick="closeModal()" aria-label="닫기">×</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const SECTION_TITLES = {
+            introduction: "Introduction — 연구 동기",
+            related_works: "Related Works — 관련 연구",
+            method: "Method — 새로운 접근 방법",
+            experiment: "Experiment — 실험 방법과 결과",
+            discussion: "Discussion — 결과의 해석",
+            conclusion: "Conclusion — 최종 요약"
+        };
+
+        const SECTION_DETAIL = {"introduction": {"content": [{"type": "bullet", "text": "<span class=\"term\">곤충 비행의 본질적 제약</span>: 비행은 에너지 비용 매우 큼. 곤충은 air ↔ substrate 전환을 자주 하며 효율적 회복 (휴식·섭식). 따라서 <span class=\"term\">착륙 능력</span>이 기능적 필수."}, {"type": "bullet", "text": "<span class=\"term\">곤충 착륙 전략의 다양성</span>: (a) hovering / grazing 하는 통제 접근 — 꿀벌, 호박벌 (Srinivasan, Reber, Goyal 등), (b) 가속·crash-landing — stingless bee, 모기 (Smith et al., Tichit et al., Shackleton). 각 전략은 morphology·substrate·ecology 의 trade-off."}, {"type": "bullet", "text": "<span class=\"term\">Compliant leg 의 핵심 역할</span>: 접근 속도에 따라 차이 있지만, 곤충 다리는 표면 접촉 전에 펼쳐져 충격 흡수 + tarsal 부착장치 (claw, adhesive pad) engage. Smith et al. (2020) 모기 연구: foreleg 와 proboscis 가 dampers 역할, 첫 접촉 후 bouncing 발생 후 재접촉."}, {"type": "bullet", "text": "<span class=\"term\">Compliant landing gear 의 기존 연구 — 큰 vehicle 에서만</span>: kg 규모 rotary-wing 항공기에는 잘 연구됨 ([10-12]). 그러나 <span class=\"term\">insect-scale FWMAV 영역은 거의 미개척</span> ([13]) — payload 제약으로 \"leg-like\" 구조의 복잡도 한계."}, {"type": "bullet", "text": "<span class=\"term\">Insect-scale 의 추가 도전</span>: 작은 piezoelectric / electromagnetic 액추에이터가 외부 충격에 매우 fragile (low fracture toughness). Soft DEA 같은 alternative 는 robust 하지만 wing 자체가 여전히 깨지기 쉬움. <span class=\"term\">Lightweight compliant leg</span> 가 충격 에너지 흡수로 actuator·wing 보호 필수."}, {"type": "bullet", "text": "<span class=\"term\">Crane fly 가 모델 생물</span>: 모기와 유사 morphology 지만 RoboBee 와 비슷한 크기 (wingspan, body length). 긴 다리가 dampers 역할, 비행 능력이 약해 다양 표면에 자주 착륙. 본 연구의 \"insect-inspired leg\" 의 직접 영감원."}, {"type": "bullet", "text": "<span class=\"term\">RoboBee 플랫폼</span>: 100 mg, 30 mm wingspan, piezoelectric bimorph actuator, 170 Hz flapping. Split-actuator variant ([18]) 에 geometric controller ([19] McGill 2021) 로 yaw control authority 확보. 그러나 ground effect 가 hovering 에서 dynamics 를 더 불안정하게 만들고, 정확한 표면 착륙을 어렵게 함."}, {"type": "bullet", "text": "<span class=\"term\">Ground effect 의 본질</span>: 표면 가까이서 lift force 가 증강되는 효과. Fixed-wing 에서 잘 연구됨, hovering rotary-wing 에서 약 rotor 직경 거리에서 발견. Flapping-wing 에서는 2-3 chord length 에서 시작 (시뮬레이션), insect-scale RoboBee 에서는 H<5.2 부터 8% lift enhancement (Maeda 2013)."}, {"type": "bullet", "text": "<span class=\"term\">기존 RoboBee leg</span>: 4 개의 rigid carbon-fiber stick, 임의 길이/위치, 단순 \"upright 유지\" 목적. 본 연구는 더 methodical 한 접근 — leg length·stance·viscoelastic joint·joint 수·joint placement 모두 체계적 변수로."}, {"type": "bullet", "text": "<span class=\"term\">본 연구의 3 contribution</span>: (1) crane fly 영감 compliant leg 설계 + 에너지 dissipation 최적화, (2) adaptive controller (geometric + model uncertainty 보상) 으로 ground effect 극복, (3) insect 모방 pre-impact trajectory (가속 → 감속 → nonzero impact velocity)."}]}, "related_works": {"content": [{"type": "bullet", "text": "<span class=\"term\">곤충 착륙 행동 연구 — 통제 접근형</span>: Srinivasan [3] 꿀벌 평면 grazing landing, Evangelista [4] honeybee 근접 maneuver, Reber [5] 호박벌 final moment, Goyal [6] honeybee 시각 가이드 vertical landing — 모두 hovering 가능 곤충의 점진적 감속 전략."}, {"type": "bullet", "text": "<span class=\"term\">곤충 착륙 행동 — 적극 가속형</span>: Tichit [7] stingless bee 가속 landing (교통 정체 회피 이점), Shackleton [8] Partamona helleri \"crash-landing\", Smith [9] 모기 bouncing landing. 본 연구의 nonzero impact velocity trajectory 는 이 흐름에서 영감."}, {"type": "bullet", "text": "<span class=\"term\">Compliant landing gear — 큰 vehicle</span>: Baker [10] passive landing gear coupled mechanical, Zhang [11] soft shock absorber autonomous aerial robot, Roderick [12] bird-inspired dynamic grasp/perching arboreal. 모두 kg 규모 — payload 충분, leg 복잡도 부담 적음."}, {"type": "bullet", "text": "<span class=\"term\">Hammad-Armanini 2024 review [13]</span>: bioinspired aerial vehicle 의 takeoff/landing 종합 리뷰. <span class=\"term\">Insect-scale FWMAV 의 compliant leg 는 거의 미연구</span>로 적시 — 본 논문의 갭 명확화."}, {"type": "bullet", "text": "<span class=\"term\">RoboBee 가족의 perching 사례</span>: Chirarattananon 2016 [41] — adaptive tracking + iterative learning control 로 perching, Graule 2016 [42] — switchable electrostatic adhesion 으로 overhang perching (Science). 모두 ceiling perching 위주, ground landing 은 다름."}, {"type": "bullet", "text": "<span class=\"term\">RoboBee 의 controller 진화</span>: Ma 2013 [15] 첫 controlled flight, Jafferis 2016 [34] non-linear resonance 모델, Chen 2019 [17] DEA 기반 robust, McGill 2021 [19] geometric controller 로 yaw authority 확보. 본 연구는 [19] 위에 adaptive 확장."}, {"type": "bullet", "text": "<span class=\"term\">Ground effect 시뮬레이션 연구</span>: Gao [28] 2D 호버링 ground effect, Wu [29] flexible tail 효과, Maeda 2013 [30] fruit fly 3D 호버링 — H=0.8 에서 8% lift enhancement (out-of-ground at H=5.2). Lu [32] 3D hovering ground effect. <span class=\"term\">본 연구는 RoboBee 로 첫 실험적 정량화</span>."}, {"type": "bullet", "text": "<span class=\"term\">Wing pitch 직접 제어 vs passive</span>: 기존 ground effect 연구는 wing pitch + stroke 직접 제어 (sinusoidal trajectory). 그러나 RoboBee 는 wing rotation 이 passive — wing velocity 만 직접 제어. 본 연구의 ground effect 결과가 기존 연구와 다른 이유 중 하나."}, {"type": "bullet", "text": "<span class=\"term\">Visual landing 곤충 연구</span>: Wagner [43] flow field variable trigger, Baird [44] universal visual strategy, van Breugel [45] fruit fly visual control. tau theory 적용 사례 [47, 48]. 본 연구는 visual 측면은 다루지 않으나 future onboard sensor 제안."}, {"type": "bullet", "text": "<span class=\"term\">본 연구의 위치</span>: 곤충 착륙 행동 + multi-rotor compliant landing gear + RoboBee adaptive control 의 3 흐름이 만나는 점. <span class=\"term\">insect-scale FWMAV 의 safe landing 통합 framework 은 첫 사례</span>."}]}, "method": {"content": [{"type": "bullet", "text": "<span class=\"term\">RoboBee split-actuator 플랫폼 [18]</span>: 100 mg, 30 mm wingspan, piezoelectric bimorph actuator (~170 Hz). Wing rotation 은 passive (active 제어 안 함) — wing velocity 만 입력 변수. Modular 디자인 — leg/wing/airframe/actuator 각각 detachable, 본 연구는 leg 모듈 교체 가능을 활용."}, {"type": "bullet", "text": "<span class=\"term\">Ground effect 정의 — height ratio H</span>: dimensionless로 정의, 표면-COP 거리를 wingspan 으로 정규화. H = h_cop / l_wing 으로 곤충/곤충 로봇 간 비교 가능."}, {"type": "formula", "label": "식 (1) — 무차원 height ratio H", "latex": "H = \\frac{h_{\\text{cop}}}{l_{\\text{wing}}}", "description": "$h_{\\text{cop}}$ 는 착륙 표면에서 wing root 의 median point (COP, center of pressure 의 평균 위치) 까지 거리. $l_{\\text{wing}}$ 는 wingspan (RoboBee 의 경우 30 mm). H<0.8 에서 강한 in-ground effect 시작 (Maeda 2013), H>5.2 에서 out-of-ground effect."}, {"type": "formula", "label": "식 (2) — Ground effect ratio G", "latex": "G = \\left(1 - \\frac{T_{\\text{avg}}}{T_{\\text{max}}}\\right) \\times 100\\%", "description": "Ground effect 의 정량적 강도 측정. $T_{\\text{avg}}$ 는 호버링 고도에서 vehicle 의 평균 commanded thrust force, $T_{\\text{max}}$ 는 모든 호버링 실험 중 최대 commanded thrust force (H≈2.7 등 out-of-ground effect 영역). G 가 클수록 thrust 더 적게 필요 (lift enhancement 큼) → ground effect 강함. <span class=\"term\">3 region 분류</span>: strong (G > 7%, H < 1.1), weak (4% < G < 7%), weakest (G < 4%, H > 2.3)."}, {"type": "bullet", "text": "<span class=\"term\">Adaptive controller 설계</span> — McGill 2021 [19] geometric controller 위에 adaptive component 추가. (a) model uncertainty 보상, (b) constant external disturbance 보상. 호버링 실험 (H=4.4 = weakest ground effect) 에서 nonadaptive 대비 lateral position error + SD 모두 개선. 다양 H 에서 commanded thrust 다르게 — ground effect 정량화 가능."}, {"type": "bullet", "text": "<span class=\"term\">Compliant leg 의 3 design parameter</span>: (1) <span class=\"term\">Leg stance</span> — 30° (narrow) / 45° (intermediate) / 60° (wide). (2) <span class=\"term\">Joint 수</span> — 1 / 2 / 3 (multi-segment). (3) <span class=\"term\">Joint placement</span> — leg 의 어디에 viscoelastic joint 위치. 모두 free-fall drop test (3000 fps high-speed video) 로 평가."}, {"type": "bullet", "text": "<span class=\"term\">Leg height 결정</span>: weak ground effect region (h_cop = 30 mm) 에 vehicle 위치하도록 leg height h_leg = 20 mm 설정. <span class=\"term\">표면 접촉 시 ground effect 가 weak 영역에 머물도록 \"기계적 elevation\"</span> — 단순하지만 효과적."}, {"type": "bullet", "text": "<span class=\"term\">Viscoelastic joint material</span>: laminate manufacturing (Pop-up book MEMS [40] 기법) 로 제작. 곤충 tarsi 의 multi-segment 가 highly flexible 한 점 모방. Future: DEA (dielectric elastomer actuator) 로 active joint 가능 — 동일 viscoelastic material."}, {"type": "bullet", "text": "<span class=\"term\">3 landing performance metrics</span>: (1) <span class=\"term\">CoR (coefficient of restitution)</span> — 충격 후 bounce 정도, 작을수록 energy dissipation 큼. (2) <span class=\"term\">Δx</span> — 수평 drift, 정확도 측정. (3) <span class=\"term\">e (orientation error)</span> — landing 시 자세 오차. 모두 Free-fall drop test 와 high-speed video 분석으로 측정."}, {"type": "bullet", "text": "<span class=\"term\">Insect-inspired landing trajectory</span>: 3 phase. (a) 호버링 → (b) 가속 (rate α=3) → (c) 감속 toward target → (d) nonzero impact velocity 로 표면 도달. 호박벌 [49] 의 \"intermittent acceleration/deceleration\" 와 stingless bee [7] 의 가속 landing 패턴에서 영감."}, {"type": "bullet", "text": "<span class=\"term\">Pre-impact behavior 의 핵심</span> — \"마지막 free-fall\" — 호버링 후 자유 낙하로 표면 도달. 비행 제어 부담 줄이고 (ground effect 영역 통과 시간 최소화), compliant leg 가 충격 에너지 흡수. 곤충의 hovering → drop 패턴과 일치."}]}, "experiment": {"content": [{"type": "bullet", "text": "<span class=\"term\">실험 환경</span>: Motion capture 시스템 (retroreflective marker), tethered RoboBee (power + control), high-speed video (Phantom v710, 3000 fps), Physlets Tracker 로 위치·속도 추출."}, {"type": "bullet", "text": "<span class=\"term\">Ground effect 정량화 — 27 hover 실험</span>: H ∈ (0.5, 3) 범위, 각 H 에서 2초 hover. 5번째 ground effect ratio table column 에 mean+SD 정리. 3 region 분류: strong (G>7%, H<1.1), weak (4-7%, 1.1≤H<2.3), weakest (G<4%, H≥2.3)."}, {"type": "bullet", "text": "<span class=\"term\">Tether perturbation 분석</span>: tether 가 power+control 공급, force injection 가능. Isolated tether stiffness 실험으로 H=1.14 에서 peak force 4.9 μN (body weight 의 0.49%) 로 측정 — strong ground effect ratio 7.3% 대비 매우 작음. 따라서 random perturbation 으로 처리."}, {"type": "bullet", "text": "<span class=\"term\">Adaptive vs nonadaptive 비교</span>: H=4.4 (weakest ground effect) 에서 10 회 호버링, 각 40 초, sample N=400,000. Lateral position error + SD 모두 adaptive 가 우수. Movie S6 에서 lateral 정확도 향상 시각 확인."}, {"type": "bullet", "text": "<span class=\"term\">Drop test 셋업</span>: woven fiberglass (FR-4) crash dummy vehicle (split-actuator RoboBee 와 mass·inertia 동일). 40 mm 높이 fixed clamp + reverse-action tweezer 로 잡고 manually release. CoM 자유낙하 위치를 Physlets Tracker 로 trace, numerical differentiation 으로 속도 추출."}, {"type": "bullet", "text": "<span class=\"term\">Leg 디자인 비교 — Legacy vs 새 디자인</span>: Legacy = 4 carbon-fiber rigid stick. 새 디자인 = narrow 30° / intermediate 45° / wide 60° stance. 모두 dummy vehicle 에 rigid attach. CoR/Δx/e 3 metric 측정. Wide 60° stance 가 작은 Δx, narrow 30° 는 큰 Δx — \"안정 영역\" 시각화."}, {"type": "bullet", "text": "<span class=\"term\">Drop test 결과</span>: 다관절 (multi-segment) viscoelastic joint 가 single-joint 대비 energy dissipation 압도. Joint placement 도 결정적 — leg 중앙 joint vs 끝부분 joint 가 다른 동작."}, {"type": "bullet", "text": "<span class=\"term\">Unforced oscillation 실험 — leg 모델 식별</span>: leg 를 manual perturbation 후 free oscillation 관찰. 결과: <span class=\"eng\">underdamped spring-mass-damper with viscoelastic creep</span> 모델. Eq. S6 으로 fitting. 이로부터 design optimization 의 cost function 산출."}, {"type": "bullet", "text": "<span class=\"term\">실 비행 controlled landing</span>: hover → 가속 (α=3) → 감속 → nonzero impact velocity 로 target 표면 착륙. Pitch angle 30°, hover 후 free fall 모드. 다양 target altitude 에서 success/failure rate 측정."}, {"type": "bullet", "text": "<span class=\"term\">Leaf-to-leaf 시연</span>: 한 leaf 에서 다른 leaf 로 비행 + 착륙. Retroreflective marker 로 leaf 표면 X/Y/Z 측정. <span class=\"term\">경사진 compliant leaf 위 자율 착륙 성공</span> — body orientation 6° tilt 에도 fitted classifier function 안에 들어옴."}, {"type": "bullet", "text": "<span class=\"term\">Leaf 착륙 sequence</span>: 두 right leg 가 먼저 접촉 (slight positive roll) → contact 순간 tip over 충분치 않음 → tarsus 끝의 \"foot\" 가 leg slide 도와 안정 → 추가 leg 접촉 → upright. Compliant right leg 가 첫 충격에서 kinetic energy dissipate, 이후 leg 충격 부담 감소."}, {"type": "bullet", "text": "<span class=\"term\">Statistical analysis</span>: Fig 1 (B,C) 의 sample N≥20,000 에 K=N-1, Fig 3 의 N=5 에 K=N. Standard mean + SD 식 사용 (식 8). Movie S1-S8 + Supplementary Table 1-7 에 모든 raw 결과 publish."}]}, "discussion": {"content": [{"type": "bullet", "text": "<span class=\"term\">3 모듈 통합의 가치</span> — flight controller 가 위치 도달, adaptive 가 ground effect 보상, compliant leg 가 충격 흡수, trajectory 가 timing 최적화. 어느 한 모듈 단독으로는 안전 착륙 불가 — 계층적 접근의 정당성."}, {"type": "bullet", "text": "<span class=\"term\">Compliant leg 의 vehicle protection 가치</span> — piezoelectric actuator 의 fragility (low fracture toughness) 가 microrobot 의 큰 한계. Compliant leg 가 충격 에너지를 dissipate 하여 actuator·wing 손상 방지 → vehicle lifespan 연장 → development rate 가속."}, {"type": "bullet", "text": "<span class=\"term\">Ground effect 의 정량화 contribution</span>: 기존 [30] 의 strict 2-region 분류 (in/out) 와 달리 본 연구는 <span class=\"term\">gradual 변화 + 3-region 분류</span>. RoboBee 의 passive wing rotation 특성이 wing-pitch-controlled 시뮬과 다른 결과의 원인 — 실제 hardware 의 ground effect 측정의 가치."}, {"type": "bullet", "text": "<span class=\"term\">Insect 모방 trajectory 의 과학적 통찰</span> — \"왜 곤충이 nonzero impact velocity 로 마무리하는가\" 의 robotic 검증. 본 연구의 nonzero velocity 결과가 정확도 + 안전성 모두 향상 → 곤충 행동의 evolutionary 가치 입증."}, {"type": "bullet", "text": "<span class=\"term\">Crane fly 의 적합성</span> — 모기와 morphology 유사하나 RoboBee 와 같은 size scale. 긴 다리 dampers + 약한 비행 능력 (자주 착륙) 의 두 특성이 본 연구의 직접 영감. <span class=\"term\">Robots-as-models</span> 역방향: RoboBee 가 crane fly 다리 mechanics 의 physical model 로 역할."}, {"type": "bullet", "text": "<span class=\"term\">한계 1 — 경사·거친 표면</span>: 본 연구의 leaf demo 는 연한 곡면. 실제 자연 환경의 다양 surface (이끼·바위·곡면 가지) 에서 robust 성은 미검증. Active joint control 이 future direction."}, {"type": "bullet", "text": "<span class=\"term\">한계 2 — Higher impact velocity</span>: stingless bee, 모기의 \"적극 가속\" landing 전략은 더 높은 impact velocity 요구. Multi-segment joint 의 damping 더 정밀 tuning 필요. 본 연구는 \"slow approach\" 위주."}, {"type": "bullet", "text": "<span class=\"term\">한계 3 — Scalability</span>: insect-scale (RoboBee 100 mg) 결과를 더 큰 vehicle 로 transfer 가능성 미검증. 큰 vehicle 은 payload 여유 더 있어 더 복잡한 leg geometry 가능 — 본 연구의 framework 이 그쪽으로도 확장 가능 추정."}, {"type": "bullet", "text": "<span class=\"term\">한계 4 — Full autonomy</span>: tethered, motion capture 의존. Full landing autonomy 를 위해서는 onboard sensor 필요 — biomimetic ocelli ([54] Fuller), neuromorphic sensor ([55] Stroobants) 가 후보."}, {"type": "bullet", "text": "<span class=\"term\">Future — Actuated DEA joint</span>: 본 연구의 viscoelastic compliant joint 와 동일 laminate manufacturing 으로 DEA (dielectric elastomer actuator) 도 제작 가능. Active joint control 시: (a) multimodal locomotion (flying + walking), (b) self-righting (착륙 실패 시), (c) leg oscillation 능동 제어 (비행 중 관찰됨)."}, {"type": "bullet", "text": "<span class=\"term\">Robots for biology</span>: RoboBee modular platform (detachable leg/wing/airframe/actuator) 이 곤충 leg 의 form-function 관계 연구 도구 역할. Tarsomere 분포·크기 다양성 등이 future comparative biomechanics 연구 대상."}, {"type": "bullet", "text": "<span class=\"term\">Zufferey 2022 (large-scale) 와의 대조</span> — 같은 \"perching/landing\" 영역이지만 (a) Zufferey: large-scale + 단일 가지 perching + bistable claw active grasp, (b) Hyun: insect-scale + 다양 표면 landing + passive compliant leg. 두 접근이 scale-specific 으로 발전 — flapping-wing 영역의 양 끝."}]}, "conclusion": {"content": [{"type": "bullet", "text": "<span class=\"term\">First integrated safe-landing framework for insect-scale FWMAV</span> — multi-rotor 영역의 compliant landing gear 연구를 RoboBee 영역에 처음 도입."}, {"type": "bullet", "text": "<span class=\"term\">Compliant leg design</span> — crane fly 영감 lossy multi-segment viscoelastic joint. Leg stance 60° wide / 다관절 / 적절 joint placement 가 energy dissipation 최대화."}, {"type": "bullet", "text": "<span class=\"term\">Ground effect 정량화 + 3-region 분류</span> — strong (G>7%) / weak (4-7%) / weakest (<4%). 27 hover 실험으로 검증. <span class=\"term\">Leg height 20 mm 설계</span>로 표면 접촉 시 ground effect 가 weak region 에 머물게 함."}, {"type": "bullet", "text": "<span class=\"term\">Adaptive controller</span> — McGill 2021 geometric controller 위에 adaptive component (model uncertainty + 외란 보상). H=4.4 hover 실험에서 lateral 정확도 향상 입증."}, {"type": "bullet", "text": "<span class=\"term\">Insect-inspired pre-impact trajectory</span> — hover → 가속 → 감속 → nonzero impact velocity. 곤충의 \"의도적 충격\" 전략을 robot 에 이식."}, {"type": "bullet", "text": "<span class=\"term\">Energy dissipation 이 vehicle protection 의 enabler</span> — piezo actuator 가 충격 fracture 에 매우 약함. Compliant leg 가 충격 흡수 → actuator/wing 보호 → lifespan 연장 → 개발 rate 가속."}, {"type": "bullet", "text": "<span class=\"term\">Leaf-to-leaf 자율 착륙 시연</span> — compliant 경사 leaf 표면에 성공. 환경 모니터링·delicate organism manipulation 등 응용 가능성."}, {"type": "bullet", "text": "<span class=\"term\">Foundation for actuated joints</span> — 본 연구의 viscoelastic joint design 이 DEA 와 동일 laminate manufacturing process. Active joint 추가 시 multimodal locomotion / self-righting / 능동 leg 제어 가능."}, {"type": "bullet", "text": "<span class=\"term\">Future — Outdoor autonomy</span>: tethered, motion capture 의존. 완전 자율을 위해서는 onboard biomimetic ocelli / neuromorphic sensor 통합 필요. 다양 표면 (경사·거친) robust 성 향상."}, {"type": "bullet", "text": "<span class=\"term\">Broader impact</span> — insect-scale 영역의 contact-rich task (perching, manipulation, 다양 표면 landing) 에 본 framework 적용 가능. \"passive energy dissipation + active control\" 의 design pattern 이 다른 flapping-wing 응용에도 확장."}, {"type": "bullet", "text": "<span class=\"term\">Zufferey 2022 와의 보완</span> — 같은 그룹 (Wood lab vs Ollero lab) 이 아니지만 같은 시기 (2025 vs 2022) 의 perching/landing 양극단. Insect-scale 의 본 연구 + large-scale 의 Zufferey 가 합쳐 flapping-wing 의 \"표면 상호작용\" 영역을 정의함."}]}};
+
+        function openModal(key) {
+            const detail = SECTION_DETAIL[key];
+            if (!detail) return;
+            document.getElementById('modal-title').innerText = SECTION_TITLES[key] || key;
+
+            let html = '';
+            html += (detail.content || []).map(item => {
+                if (item.type === 'bullet') {
+                    return `<div class="bullet">${item.text}</div>`;
+                } else if (item.type === 'formula') {
+                    return `<div class="formula-block">
+                        <div class="formula-label">${item.label}</div>
+                        <div class="formula-latex">$$${item.latex}$$</div>
+                        <div class="formula-desc">${item.description}</div>
+                    </div>`;
+                }
+                return '';
+            }).join('');
+
+            const body = document.getElementById('modal-body');
+            body.innerHTML = html;
+            body.scrollTop = 0;
+            document.getElementById('modal-overlay').classList.add('active');
+
+            // Re-render KaTeX in the new content
+            if (window.renderMathInElement) {
+                renderMathInElement(body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$',  right: '$',  display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
