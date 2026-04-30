@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>A review on flapping-wing robots: Recent progress and challenges</title>
+    <meta name="keywords" content="review, flapping-wing robot, ornithopter, bio-inspired, aerial robotics, dynamics modeling, port-Hamiltonian, intelligent functionalities, visual servoing, perching, obstacle avoidance">
+    <meta name="paper-authors" content="Saeed Rafee Nekoo, Ramy Rashad, Christophe De Wagter, Sawyer B Fuller, Guido de Croon, Stefano Stramigioli, Anibal Ollero">
+    <meta name="paper-journal" content="International Journal of Robotics Research, Vol. 44, No. 14, 2025, pp. 2305-2339 · DOI: 10.1177/02783649251343638">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$',  right: '$',  display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Noto Sans KR', 'Arial', sans-serif;
+            margin: 0; padding: 0;
+            background: #f5f5f5;
+            color: #333;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+        }
+        .slide {
+            width: min(1680px, 98vw);
+            height: 96vh;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            overflow: hidden;
+        }
+        .header {
+            background: #005b96;
+            color: white;
+            padding: 26px 38px;
+        }
+        .title { font-size: 32px; font-weight: bold; margin-bottom: 10px; line-height: 1.3; }
+        .authors { font-size: 17px; margin-bottom: 5px; }
+        .journal { font-size: 15px; opacity: 0.9; }
+
+        .summary-container {
+            background: #f0f5fa;
+            padding: 18px 38px;
+            border-bottom: 1px solid #e1e5e8;
+        }
+        .summary-title {
+            font-size: 19px; font-weight: bold; margin-bottom: 8px; color: #005b96;
+        }
+        .summary { font-size: 17px; line-height: 1.65; }
+        .keywords {
+            margin-top: 10px;
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .keyword-chip {
+            font-size: 12px;
+            padding: 3px 10px;
+            background: white;
+            color: #005b96;
+            border: 1px solid #c6dbed;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 14px;
+            padding: 14px 18px;
+            overflow: hidden;
+        }
+        .section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,91,150,0.18);
+            border-color: #005b96;
+        }
+        .section-title {
+            color: #005b96;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 9px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #005b96;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .click-hint {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+        .section-summary {
+            font-size: 15px;
+            line-height: 1.6;
+            flex: 1;
+            overflow: hidden;
+        }
+        .term { font-weight: bold; color: #005b96; }
+        .eng { color: #666; font-style: italic; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            justify-content: center; align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.18s ease-out;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: white;
+            width: min(1100px, 90vw);
+            height: min(800px, 88vh);
+            border-radius: 10px;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .modal-header {
+            background: #005b96;
+            color: white;
+            padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 22px; font-weight: bold; }
+        .modal-close {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px; line-height: 1;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.2); }
+        .modal-body {
+            padding: 24px 32px;
+            overflow-y: auto;
+            font-size: 15.5px;
+            line-height: 1.75;
+        }
+        .modal-body .bullet {
+            margin-bottom: 10px;
+            padding-left: 18px;
+            text-indent: -18px;
+        }
+        .modal-body .bullet:before {
+            content: "▸ ";
+            color: #005b96;
+            font-weight: bold;
+        }
+        .modal-body .formula-block {
+            background: #f8f9fb;
+            border-left: 4px solid #005b96;
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 4px;
+        }
+        .modal-body .formula-label {
+            font-size: 12px;
+            color: #005b96;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .modal-body .formula-desc {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+        .modal-body h4 {
+            color: #005b96;
+            margin-top: 22px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="header">
+            <div class="title">A review on flapping-wing robots: Recent progress and challenges</div>
+            <div class="authors">Saeed Rafee Nekoo, Ramy Rashad, Christophe De Wagter, Sawyer B Fuller, Guido de Croon, Stefano Stramigioli, Anibal Ollero</div>
+            <div class="journal">International Journal of Robotics Research, Vol. 44, No. 14, 2025, pp. 2305-2339 · DOI: 10.1177/02783649251343638</div>
+        </div>
+
+        <div class="summary-container">
+            <div class="summary-title">논문 요약</div>
+            <div class="summary">이 논문은 <span class="term">flapping-wing flying robot (FWFR) 분야의 종합 리뷰</span>로, 5개 메이저 그룹 (GRVC Sevilla · TU Delft · KFUPM · UW · Twente) 의 7명 공저. 30 년에 걸친 ornithopter 발전을 정리하면서, 시스템을 <span class="term">3 카테고리</span> — insect-sized (&lt;1 g, 전기정 액추에이터) · small-scale (&lt;100 g, 전자기 모터) · large-scale (~1 kg, wingspan 0.5–2.2 m) 으로 분류한다. 핵심 내용: dynamics·aerodynamics 모델 (Lie group / port-Hamiltonian framework), control 접근법, 그리고 가장 최근 부상한 <span class="term">intelligent functionalities</span> (visual servoing · 자율 perching · 정적/동적 obstacle avoidance · GPS-denied navigation) 의 SOTA 정리. 자율성 3 단계 (Floreano-Wood) 기준으로 각 카테고리의 도달점을 점검하고, FWFR 만의 본질적 제약 (페이로드 한계 · 진동에 의한 sensor degradation · computational scarcity) 이 만드는 연구 갭을 명시.</div>
+            <div class="keywords"><span class="keyword-chip">review</span><span class="keyword-chip">flapping-wing robot</span><span class="keyword-chip">ornithopter</span><span class="keyword-chip">bio-inspired</span><span class="keyword-chip">aerial robotics</span><span class="keyword-chip">dynamics modeling</span><span class="keyword-chip">port-Hamiltonian</span><span class="keyword-chip">intelligent functionalities</span><span class="keyword-chip">visual servoing</span><span class="keyword-chip">perching</span><span class="keyword-chip">obstacle avoidance</span></div>
+        </div>
+
+        <div class="content">
+            <div class="section" onclick="openModal('introduction')">
+                <div class="section-title">Introduction: 연구 동기 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">Ornithopter 개발은 다빈치·Lilienthal 시대부터 이어졌으나 fixed-wing/multirotor 의 성공에 가려 오랜 기간 정체되었다가 1990 년대부터 재개됐다. 본 리뷰는 <span class="term">로보틱스 관점</span>에서 1990 년대~현재까지의 progress 를 정리 — 단순 history 가 아닌 design·control·intelligent functionality 의 main approach·기술·challenge 분류. EU 의 GRIFFIN·PortWings ERC Advanced Grant 2 건이 견인한 최근 지식 surge 가 본 리뷰의 직접적 동기.</div>
+            </div>
+            <div class="section" onclick="openModal('related_works')">
+                <div class="section-title">Related Works: 관련 연구 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">본 리뷰가 다루는 "기존 연구" 는 곧 ornithopter 분야 전체의 30 년 누적이라 분량이 방대. 핵심 mile stone 들 — DelFly 시리즈 (TU Delft, indoor exploration·gate following), i-Bird (Baek 2011, 13 g 첫 onboard 시각 추종), Robobee (Harvard, mg 단위 전기정 perching), HIT-Phoenix (large-scale, 2.3 m wingspan), E-Flap (GRVC, 510 g, 자율 perching·동적 회피), USTBird (USTB) 등이 본 리뷰의 axis. Floreano-Wood 2015 의 자율성 3 단계 (sensory-motor / reactive / cognitive) 가 평가 frame.</div>
+            </div>
+            <div class="section" onclick="openModal('method')">
+                <div class="section-title">Method: 새로운 접근 방법 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">리뷰의 modeling·control 부분이 "Method" 에 해당. <span class="term">Lie group / screw theory</span> framework 으로 main body 의 SE(3) 동역학 + 팩터화된 wing dynamics 정리. 새롭게 강조된 것이 <span class="term">port-Hamiltonian framework</span> — modeling, simulation, model-order reduction, model-based control 을 unified 하게 다룸. Aerodynamics 는 fixed-wing 의 선형 모델로 표현 불가능하다는 점을 명시. Control 은 under-actuated 특성으로 PID 가 부족하며 LQR·MPC·CBF·sliding mode 등이 사용. Intelligent functionality 는 visual servoing (IBVS), 자율 perching, obstacle avoidance, autonomous navigation 4 분야로 정리.</div>
+            </div>
+            <div class="section" onclick="openModal('experiment')">
+                <div class="section-title">Experiment: 실험 방법과 결과 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">리뷰이므로 자체 실험은 없고 <span class="term">survey 된 연구들의 reported result 정리</span>가 "experiment" 에 해당. 주요 milestone results: DelFly Explorer 의 indoor multi-room (가장 cognitive 한 small-scale 사례), E-Flap 의 88.3% perching 성공률 (large-scale 자율 perching SOTA), Free as a Bird 의 89.7% 동적 회피 성공률 (large-scale 동적 회피 첫 사례), Robobee 의 mg 단위 자율 비행. <span class="term">Time-of-flight·range·payload</span> 를 카테고리별로 비교 — large-scale 이 outdoor·payload 측면 우세, insect-sized 가 confined space 우세, small-scale 이 trade-off zone.</div>
+            </div>
+            <div class="section" onclick="openModal('discussion')">
+                <div class="section-title">Discussion: 결과의 해석 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary"><span class="term">Intelligent functionality 의 3 핵심 challenge</span>: (1) FWFR design 자체의 미성숙도로 "FWFR + AI" 양쪽 전문성을 가진 그룹이 적음, (2) 페이로드·전력 제약이 멀티로터보다 훨씬 strict (DelFly Nimble payload 2.54 g, Robobee 6 mg 수준), (3) flapping motion 이 sensor 측정에 직접 영향 (rolling shutter blur, IMU 진동). <span class="term">Inherent safety</span> 가 FWFR 의 비교 우위 — propellerless soft body 가 인간·환경 인접 운영에 적합. 응용: 모니터링, 인프라 inspection, 지속 가능한 sampling, last-mile 배달 등.</div>
+            </div>
+            <div class="section" onclick="openModal('conclusion')">
+                <div class="section-title">Conclusion: 최종 요약 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">본 리뷰는 FWFR 분야 30 년을 <span class="term">3 카테고리 (insect / small / large) × 4 차원 (dynamics·design·control·intelligent functionality)</span> 의 격자로 정리하고, 각 셀의 SOTA·갭을 제시. 핵심 메시지: <span class="term">resource 제약 (페이로드·전력·compute) 이 본질이며, 이를 우회하기 위한 minimal 알고리즘·event-based 처리·body enrichment 가 다음 도약의 축</span>. Inherent safety 와 camouflage 라는 FWFR 만의 비교 우위 가 specific application 에서 결정적 — 모니터링, 인프라 인스펙션, sampling, 배달 등이 우선 application 영역.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title"></div>
+                <button class="modal-close" onclick="closeModal()" aria-label="닫기">×</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const SECTION_TITLES = {
+            introduction: "Introduction — 연구 동기",
+            related_works: "Related Works — 관련 연구",
+            method: "Method — 새로운 접근 방법",
+            experiment: "Experiment — 실험 방법과 결과",
+            discussion: "Discussion — 결과의 해석",
+            conclusion: "Conclusion — 최종 요약"
+        };
+
+        const SECTION_DETAIL = {"introduction": {"content": [{"type": "bullet", "text": "<span class=\"term\">Bio-inspired flight</span> 의 시도는 그리스 신화 (다이달로스), Architas (BC 4세기), Leonardo da Vinci (1485, 1490), Borelli (1680) 부터의 긴 역사를 가진다. George Cayley (1799) 의 새 연구가 fixed-wing 안정화의 시초; Trouvé (1870) 가 \"ornithopter\" 라는 단어와 첫 flapping 플랫폼을 제시; Lilienthal 은 ~2,000 회의 글라이딩 비행을 수행."}, {"type": "bullet", "text": "근대 ornithopter 의 부진과 부활 — 20 세기 중후반에는 fixed-wing/multirotor 의 성공으로 ornithopter 개발이 사실상 중단됐다가, 1990 년대 후반 들어 mechatronics 와 micro-fabrication 기술 발전으로 재개. 2000 년대부터 곤충·소형 새 모방 prototype 이 활발히 등장."}, {"type": "bullet", "text": "<span class=\"term\">시스템 3 카테고리 분류 (본 리뷰의 핵심 frame)</span>: (1) <span class=\"term\">insect-sized</span> &lt; 1 g — 전기정 (electrostatic) 또는 piezo 액추에이터, 매우 빠른 flapping. (2) <span class=\"term\">small-scale</span> &lt; 100 g — 평균 ~25 g, 전자기 모터 + 기어. (3) <span class=\"term\">large-scale</span> &gt; 100 g — 평균 ~500 g, 최대 1.15 kg, wingspan 0.5–2.2 m, conventional motor + gear."}, {"type": "bullet", "text": "카테고리간 본질적 차이 — (a) flapping frequency: insect/small 이 높고 large 가 낮음. (b) hovering capability: 큰 시스템일수록 어렵고, 일부는 불가. (c) actuation 방식: large 는 conventional motor + gear, 소형으로 갈수록 새 actuation tech (piezo, dielectric elastomer, electrostatic) 필요."}, {"type": "bullet", "text": "<span class=\"term\">왜 FWFR 인가</span> — 멀티로터 대비 본질적 안전성 (soft 재질, 충돌 시 사람·환경 손상 적음), 잠재적 에너지 효율 (gliding + flapping hybrid + dynamic soaring), 자연스러운 인간 인접 환경 적합성. 그러나 dynamics·aerodynamics 의 비선형성과 underactuation 이 큰 도전."}, {"type": "bullet", "text": "본 리뷰의 위치 — 기존 리뷰들 (Zhang 2017 transmission · Helbling-Wood 2018 propulsion/power/control · Phan-Park 2019 micro-tailless · Nan 2019 hummingbird-like · Xiao 2021 hoverable · Zhang 2023 large-scale deformable) 을 보완. 본 리뷰의 차별점은 <span class=\"term\">intelligent functionality 까지 포함한 종합성</span>."}, {"type": "bullet", "text": "EU 의 두 ERC Advanced Grant — GRIFFIN (Univ. Sevilla, 2018-2024) · PortWings (Univ. Twente, 2018-2024) — 가 본 리뷰 시점에서의 지식 surge 의 직접적 동인. 두 grant 모두 FWFR 의 \"새와 닮은 자율비행\" 을 표방."}, {"type": "bullet", "text": "본 리뷰의 7개 섹션 구조 — Sec. 2 dynamics+energy, Sec. 3 insect/small-scale, Sec. 4 large-scale (morphology+functional), Sec. 5 control, Sec. 6 intelligent functionalities, Sec. 7 conclusions."}, {"type": "bullet", "text": "FWFR 연구의 두 mainstream — 대부분이 design·flight control·mechatronics 에 집중. <span class=\"term\">상승 추세인 minor stream</span> 이 perception·decision-making 등 intelligent functionality. 본 리뷰는 후자에 의도적으로 비중을 부여하여 \"기존 design 위주 리뷰들\" 과 차별화."}, {"type": "bullet", "text": "리뷰 동기 — 새로운 연구자들이 knowledge gap 을 빠르게 식별하고 development 를 가속화할 수 있도록 하는 것. 본 리뷰가 단순 정리가 아닌 <span class=\"term\">field guide</span> 의 성격을 가짐을 명시."}]}, "related_works": {"content": [{"type": "bullet", "text": "<span class=\"term\">DelFly 시리즈 (TU Delft MAV Lab, de Croon 등)</span> — DelFly Explorer (2014, 20 g, 4 g stereo + STM32F04) 가 indoor multi-room exploration 시연 첫 사례. DelFly Nimble (Olejnik 2020, tailless) 가 hover-capable + 2.54 g payload 로 line following · circular gate 통과 시연."}, {"type": "bullet", "text": "<span class=\"term\">Robobee (Harvard, Wood 그룹)</span> — Insect-sized (mg 단위) FWFR 의 대명사. Graule 2016 의 평면 천장 perching (electrostatic adhesion 활용) 이 대표 사례. 2022 년에는 Fuller et al. 의 6 mg 자율 비행."}, {"type": "bullet", "text": "<span class=\"term\">i-Bird (Baek 2011)</span> — 13 g ornithopter + Wii-mote IR camera. 첫 onboard visual servoing 사례. 작은 페이로드에서 IR sensor 가 가벼운 시각 솔루션."}, {"type": "bullet", "text": "<span class=\"term\">HIT-Phoenix (Pan 2021)</span> — 대형 large-scale, wingspan 2.3 m. Pan 2020 이 3-DoF 카메라 stabilizer 를 별도 설계해 진동 보상. Xu 2023 의 leader-follower formation 도 이 플랫폼."}, {"type": "bullet", "text": "<span class=\"term\">E-Flap (Zufferey 2021, GRVC)</span> — 510 g, eagle-inspired. Zufferey 2022 의 자율 perching (Nature Comms): 700 g 로봇이 25 ms 안에 가지를 잡는 bistable claw, 첫 large-scale FWFR 자율 perching. Nekoo 2024 가 perching 성공률을 66% → 88.3% 로 개선."}, {"type": "bullet", "text": "<span class=\"term\">Free as a Bird (Rodriguez-Gomez 2022)</span> — E-Flap 위 fully onboard event camera 기반 동적 obstacle 회피. 250 Hz, 89.7% 회피 성공률. <span class=\"term\">FWFR 동적 회피의 첫 onboard 시연</span>."}, {"type": "bullet", "text": "<span class=\"term\">Tay (V-formation), Ramananarivo (vortex coupling), Ghommem (unsteady vortex lattice)</span> — FWFR formation 의 aerodynamic·해석 측면 연구. Kim et al. 의 indoor 원형 formation 실험. Xu 2023 의 outdoor leader-follower 실험 이 가장 최근 진전."}, {"type": "bullet", "text": "<span class=\"term\">Floreano-Wood 2015 의 자율성 3 단계</span>: (1) <span class=\"eng\">sensory-motor autonomy</span> (자세·속도·위치 제어), (2) <span class=\"eng\">reactive autonomy</span> (장애물 회피·다른 드론 협조·이착륙), (3) <span class=\"eng\">cognitive autonomy</span> (장소 간 navigation·객체 인식·학습). FWFR 은 카테고리별로 1~2 단계에 머물고 3 단계는 거의 없음."}, {"type": "bullet", "text": "<span class=\"term\">기존 리뷰들과의 비교</span> — Zhang-Rossi 2017 (transmission), Helbling-Wood 2018 (insect-scale propulsion), Phan-Park 2019 (micro-tailless), Nan 2019 (hummingbird), Xiao 2021 (hoverable design), Zhang 2023 (large-scale deformable wing). 본 리뷰는 모든 카테고리 + intelligent functionality 까지 포괄."}, {"type": "bullet", "text": "<span class=\"term\">DeLaurier 1999</span> — 캐나다 팀의 piloted ornithopter, jet-assisted. 90년대 ornithopter 연구의 상징적 사례 — engineering 으로서의 가능성을 입증한 milestone."}]}, "method": {"content": [{"type": "bullet", "text": "<span class=\"term\">FWFR 의 6 subsystem 분해</span>: (a) main hull (rigid body), (b) 두 개의 flexible wing (분포 강성·질량), (c) wing 의 분포 actuator (능동 변형), (d) 분포 sensor (airflow 감지), (e) airflow dynamics, (f) 로봇이면 추가로 control system + onboard electronics. 자연 비행체와의 차이는 (f) 뿐."}, {"type": "bullet", "text": "<span class=\"term\">Main body dynamics — Lie group / screw theory</span>: configuration $(\\xi^0_b, R^0_b) \\in SE(3)$. Generic rigid body 운동을 twist $T = (\\omega, v)^T \\in se(3) \\cong \\mathbb{R}^6$ 로 표현; wrench (torque + force) $W \\in se^*(3)$ 와의 pairing 이 mechanical power. 이 framework 가 fixed-wing/멀티로터 와 동일 표기로 처리 가능."}, {"type": "formula", "label": "식 — Twist (rigid body 일반화 속도)", "latex": "T = \\begin{bmatrix} \\omega \\\\ v \\end{bmatrix} \\in \\mathbb{R}^6, \\quad \\dot{\\xi}^0_b = R^0_b\\, v^{b,0}_b, \\quad \\dot{R}^0_b = R^0_b\\, \\widetilde{\\omega}^{b,0}_b", "description": "FWFR main body 의 SE(3) 위 운동을 angular velocity $\\omega$ 와 linear velocity $v$ 의 쌍으로 표현. $\\widetilde{\\omega}$ 는 skew-symmetric matrix. 이 framework 은 Euler-Poincaré 방정식 (관성 행렬 + 외력 wrench) 으로 자연스럽게 확장."}, {"type": "bullet", "text": "<span class=\"term\">Wing dynamics modeling</span> — 두 가지 접근. (a) <span class=\"eng\">Rigid wing 근사</span>: 빠른 시뮬레이션, 제어 설계용. (b) <span class=\"eng\">Flexible (distributed)</span>: 정확하나 PDE 해법 필요, MPC 등에 부적합. 대부분의 control 연구는 (a) 채택."}, {"type": "bullet", "text": "<span class=\"term\">Aerodynamics 의 도전</span> — fixed-wing 의 quasi-steady linear airflow 모델이 FWFR 에 그대로 적용 불가. 이유: leading edge vortex, wake-wing 상호작용, Reynolds 수 영역의 차이. State-space airload theory, blade-element method, CFD-based reduced model 등이 alternative."}, {"type": "bullet", "text": "<span class=\"term\">Port-Hamiltonian framework (본 리뷰의 강조점)</span> — energy-based modeling: 시스템을 energy-storing/-dissipating element + interconnection 으로 분해. modeling, simulation, model-order reduction, energy-based control 모두를 통일 처리. 특히 wing 의 elastic energy + aerodynamic dissipation 을 같은 frame 에서 다룸."}, {"type": "bullet", "text": "<span class=\"term\">Control 접근법 5종</span>: (1) PID — 가장 단순, 카메라 platform stabilization 등에 사용. (2) LQR — linearized model 위에서 가장 흔함. (3) MPC — receding horizon 으로 복잡한 제약 처리. (4) sliding mode — robustness 강조. (5) Control Barrier Function (CBF) — safety filter, 장애물 회피·geofencing."}, {"type": "bullet", "text": "<span class=\"term\">Sensors</span> — 표준 IMU + GPS + barometer 외에, FWFR 특수 sensor: Hall sensor (flapping cycle 측정, Xu 2023), event camera (motion blur robust, Free as a Bird), stereo (DelFly Explorer), tactile (microflapper). Power 소비·무게가 platform 에 따라 결정적 제약."}, {"type": "bullet", "text": "<span class=\"term\">Intelligent functionality 4 분야</span>: (1) Visual servoing — IBVS 식 (21) 로 카메라 속도 명령 산출, FWFR 의 회전 보정이 핵심 도전. (2) 자율 perching — bistable claw (E-Flap), electrostatic (Robobee), SMA-based soft claw. (3) Obstacle avoidance — 정적은 stereo + bug algorithm, 동적은 event camera. (4) Autonomous navigation — GPS / UWB / visual SLAM / bug algorithm / view-familiarity."}, {"type": "formula", "label": "식 (21) — Image-Based Visual Servoing (IBVS)", "latex": "v(t) = -K\\, J^{+}\\, e(t), \\quad \\dot{p} = J_p\\, v", "description": "FWFR 카메라의 desired feature 위치 $p^*_i$ 와 현재 위치 사이 error $e(t)$ 로부터 카메라 속도 명령 $v(t)$ 산출. $K$ 는 양의 정정 weighting matrix, $J^+$ 는 interaction matrix 의 pseudoinverse. FWFR 에서 어려운 이유: rotation 보상이 underactuated 제약 때문에 fixed-wing/멀티로터 보다 까다롭다 (가지치기 risk 큼)."}, {"type": "bullet", "text": "<span class=\"term\">Closed-loop control challenges</span> — flapping cycle 에 의한 주기 disturbance 가 모든 제어 loop 의 noise floor. Xu 2023 의 \"3-cycle averaging\" 같은 explicit 보상 또는 high-bandwidth control + low-pass filter 가 필요. Tail control 의 roll-pitch coupling 은 미해결 본질 문제."}]}, "experiment": {"content": [{"type": "bullet", "text": "<span class=\"term\">DelFly Explorer (De Wagter 2014)</span> — 20 g, 4 g stereo + STM32F04 onboard. 정적 obstacle 회피로 indoor multi-room exploration 시연. Scheper 2018 이 \"Snake-Gate\" monocular algorithm 추가하여 doorway 통과까지 확장 — 본 리뷰가 평가하는 small-scale cognitive autonomy 의 거의 최고점."}, {"type": "bullet", "text": "<span class=\"term\">i-Bird (Baek 2011)</span> — 13 g + Wii-mote IR. 첫 onboard visual servoing. 따라가는 target 의 IR 방출 의존이 한계지만, FWFR 위 onboard 시각 처리의 출발점."}, {"type": "bullet", "text": "<span class=\"term\">E-Flap perching (Zufferey 2022, Nekoo 2024)</span> — 700 g (520 g 본체 + perching appendage). Bistable claw 25 ms grasp time. 초기 success 66% → 개선 후 88.3%. <span class=\"term\">large-scale FWFR 자율 perching SOTA</span>."}, {"type": "bullet", "text": "<span class=\"term\">Free as a Bird (Rodriguez-Gomez 2022)</span> — E-Flap + 단일 onboard event camera. 250 Hz event-by-event 처리. 동적 obstacle 회피 성공률 89.7% (regular illumination). <span class=\"term\">large-scale FWFR 동적 회피 첫 사례</span>."}, {"type": "bullet", "text": "<span class=\"term\">Robobee perching (Graule 2016)</span> — 100 mg insect-scale. 평면 ceiling 에 electrostatic adhesion 으로 perching. Insect-sized 가 power 제약으로 active grasp 어려운 점을 해결한 alternative."}, {"type": "bullet", "text": "<span class=\"term\">시간·거리·페이로드 비교</span> — large-scale 이 endurance (분~10 분), payload (수십~수백 g), range (수십 m~km) 모두에서 우세; insect-sized 는 무시할 만한 endurance·payload 지만 confined space 통과·근접 sensing 가능; small-scale 은 trade-off zone."}, {"type": "bullet", "text": "<span class=\"term\">DelFly Nimble (Olejnik 2020)</span> — tailless 20 g, hover-capable. Onboard visual line-following + circular gate 통과. tailless 설계가 멀티로터처럼 hover 가능하게 하지만 stability 제어 부담 큼."}, {"type": "bullet", "text": "<span class=\"term\">Eguiluz 2021 (E-Flap event camera 자율 비행)</span> — event camera 로 triangular target detection + visual servoing 으로 target 도달. flapping frequency 에 robust 한 sensing modality 검증."}, {"type": "bullet", "text": "<span class=\"term\">Bug algorithms 기반 navigation (McGuire 2019)</span> — ~30 g 드론에 적용. Map 없이 cluttered 환경 통과. FWFR 자원 제약에 적합한 minimal compute alternative — 단 goal direction 가정 필요 (wireless beacon 등)."}, {"type": "bullet", "text": "<span class=\"term\">Hsiao 2012, Ndoye 2023 — motion-tracking 기반 외부 sensing</span> — 매우 가벼운 ~10 g FWFR 의 비행 제어를 motion capture 로 수행한 사례. onboard 한계의 실용적 우회로지만 lab 환경 한정."}]}, "discussion": {"content": [{"type": "bullet", "text": "<span class=\"term\">Intelligent functionality 의 3 challenge</span> — (1) <span class=\"term\">platform 미성숙</span>: FWFR design + control + AI 동시 전문성을 가진 그룹이 적음 → 연구 capacity 자체가 제한적. (2) <span class=\"term\">resource 제약</span>: 페이로드 2.54 g (DelFly Nimble), 6 mg (insect-scale Robobee). compute 와 sensor 모두 \"극단적\" 으로 적음. (3) <span class=\"term\">flapping noise</span>: rolling shutter 카메라의 image 가 blur·shape 왜곡, IMU 가 cycle 진동에 묶임."}, {"type": "bullet", "text": "<span class=\"term\">Vision 이 dominant 한 이유</span> — 제약 환경에서 카메라가 가장 가벼운 passive sensor. 그러나 flapping 진동 보상이 추가 hardware (gimbal, Pan 2020 의 3-DoF stabilizer) 또는 robust algorithm (event camera) 없이는 어려움. 이것이 \"event camera + FWFR\" 조합이 hot research direction 인 이유."}, {"type": "bullet", "text": "<span class=\"term\">Tactile sensing 의 잠재력</span> — vision 외 alternative 로 microflapper 의 contact-based sensing 이 부상. 진동 영향이 적고, 작은 충돌 시 \"bounce back + recover\" 가능. Insect 의 antenna-like sensor 모방이 유망."}, {"type": "bullet", "text": "<span class=\"term\">자율성 3 단계 도달 현황</span> — sensory-motor (자세·속도·위치 제어) 는 모든 카테고리에서 OK. reactive (회피·이착륙·multi-agent) 는 large-scale 만 충분히 입증. cognitive (navigation·인식·학습) 는 대부분 카테고리에서 거의 부재 — 가장 큰 갭."}, {"type": "bullet", "text": "<span class=\"term\">FWFR 만의 비교 우위</span> — propellerless soft body 가 인간·환경 인접 안전성 압도. 멀티로터의 공중 위험·소음 제한이 큰 응용 영역 (실내 인스펙션·인구 밀집 도시·생태 모니터링) 에서 FWFR 만의 활로가 있다."}, {"type": "bullet", "text": "<span class=\"term\">Camouflage·noise 우위</span> — 새 모방 모양·소리는 군 정찰 (covert delivery) 과 야생 sampling (동물 disturbance 최소) 에 fixed/멀티로터가 못 가는 영역. 본 리뷰가 specific 한 응용 가능성으로 강조."}, {"type": "bullet", "text": "<span class=\"term\">Application 4 가지</span> — (a) 모니터링·visual inspection (도시·산업 인프라), (b) 환경 monitoring (대기질·소음 sensor 부착), (c) 인프라 contact inspection (perching 후), (d) tiny object delivery (last-mile, 발코니 배달)."}, {"type": "bullet", "text": "<span class=\"term\">Off-the-shelf board 부재</span> — multirotor 의 PX4·Pixhawk 같은 표준 플랫폼이 FWFR 에 없음. 대부분 custom STM32 + custom firmware. 산업 진출의 큰 걸림돌 — 표준 board 가 등장해야 \"기업 투자\" 와 \"연구자 진입 장벽 감소\" 가 동시에 가능."}, {"type": "bullet", "text": "<span class=\"term\">Walking/jumping leg 와의 통합</span> — Wu 2024 등이 multi-modal locomotion (flying + crawling + self-righting + horizontal takeoff) 을 시도. 정밀 landing 에 대한 의존을 줄이고, takeoff 가능 위치 확장, fall recovery 가능. <span class=\"term\">Body 자체의 enrichment 가 AI 추가만큼 중요</span>."}, {"type": "bullet", "text": "<span class=\"term\">미래 전망</span> — robotic advance 와 real-world application 의 상호작용으로 FWFR 이 specific application area 에서 traditional flying robot 을 surpass 할 것으로 전망. \"전체 기술의 win\" 이 아닌 \"틈새 영역의 결정적 우위\" 의 paradigm."}]}, "conclusion": {"content": [{"type": "bullet", "text": "<span class=\"term\">FWFR = bio-inspired safety + 잠재적 효율 + 제약</span>. propellerless soft body 의 안전성이 가장 큰 비교 우위. gliding + flapping hybrid + dynamic soaring 으로 endurance 확장 가능."}, {"type": "bullet", "text": "<span class=\"term\">3 카테고리 분류 frame</span> 이 본 리뷰의 backbone. 각 카테고리는 actuator·flapping freq·hovering 능력·compute capacity 가 본질적으로 다르고, 따라서 적용 알고리즘·sensor·application 도 다르다."}, {"type": "bullet", "text": "<span class=\"term\">Modeling — Lie group + port-Hamiltonian</span>. SE(3) 위 rigid body + flexible wing + airflow 의 통합 처리. port-Hamiltonian 이 modeling/simulation/MOR/control 을 unified 하게 다루는 framework 으로 부상."}, {"type": "bullet", "text": "<span class=\"term\">Aerodynamics 의 비선형성</span> 이 fixed-wing 식 modeling 한계. state-space airload, blade-element, CFD reduced 모델 등이 대안."}, {"type": "bullet", "text": "<span class=\"term\">Control — under-actuated 가 본질</span>. PID 부족, LQR/MPC/CBF/sliding mode 가 dominant. tail roll-pitch coupling 은 미해결 본질 문제."}, {"type": "bullet", "text": "<span class=\"term\">Intelligent functionality 4 분야 의 SOTA</span> — (a) visual servoing (E-Flap IBVS, DelFly line following), (b) 자율 perching (E-Flap 88.3%, Robobee electrostatic), (c) obstacle avoidance (DelFly stereo 정적 / Free-as-a-Bird event 동적), (d) autonomous navigation (DelFly multi-room, Bug algorithm)."}, {"type": "bullet", "text": "<span class=\"term\">Event camera 가 FWFR 에 특히 적합</span>. flapping 진동에도 robust, μs 분해능, 낮은 무게·전력 — \"high-speed FWFR + low-resource onboard\" 조합에 본질적 매칭."}, {"type": "bullet", "text": "<span class=\"term\">자율성 3 단계 frame 으로 본 갭</span> — sensory-motor 는 OK, reactive 는 large-scale 위주, cognitive 는 거의 부재. 다음 5~10 년의 핵심 도전."}, {"type": "bullet", "text": "<span class=\"term\">Future direction 1 — Off-the-shelf platform</span>. PX4 같은 표준 board·firmware 없이는 산업 진출 어려움. 표준화가 연구 진입 장벽도 낮춤."}, {"type": "bullet", "text": "<span class=\"term\">Future direction 2 — Body enrichment</span>. AI 만이 답이 아님 — leg 추가 (walking·jumping), morphing wing (적응형 비행), tactile antenna (vision 보완) 등 hardware 차원의 enrichment 가 함께 가야 한다."}, {"type": "bullet", "text": "<span class=\"term\">Final message</span> — FWFR 이 멀티로터·fixed-wing 을 \"전체적으로\" 추월하지는 않을 가능성. 그러나 <span class=\"term\">specific application area</span> (인간 인접, 자연 sampling, 조용한 monitoring, 인프라 inspection) 에서는 결정적 우위를 가질 수 있다. 이 전제 위에 ecosystem 이 형성될 것."}]}};
+
+        function openModal(key) {
+            const detail = SECTION_DETAIL[key];
+            if (!detail) return;
+            document.getElementById('modal-title').innerText = SECTION_TITLES[key] || key;
+
+            let html = '';
+            html += (detail.content || []).map(item => {
+                if (item.type === 'bullet') {
+                    return `<div class="bullet">${item.text}</div>`;
+                } else if (item.type === 'formula') {
+                    return `<div class="formula-block">
+                        <div class="formula-label">${item.label}</div>
+                        <div class="formula-latex">$$${item.latex}$$</div>
+                        <div class="formula-desc">${item.description}</div>
+                    </div>`;
+                }
+                return '';
+            }).join('');
+
+            const body = document.getElementById('modal-body');
+            body.innerHTML = html;
+            body.scrollTop = 0;
+            document.getElementById('modal-overlay').classList.add('active');
+
+            // Re-render KaTeX in the new content
+            if (window.renderMathInElement) {
+                renderMathInElement(body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$',  right: '$',  display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
