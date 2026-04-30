@@ -93,46 +93,6 @@
         .counts { font-size: 13px; color: var(--text-soft); white-space: nowrap; }
         .counts strong { color: var(--text); }
 
-        /* Keyword chips */
-        .keyword-chips-wrap {
-            max-width: 1280px; margin: 12px auto 0;
-            padding: 0;
-            display: flex; flex-wrap: wrap; gap: 6px;
-            align-items: center;
-        }
-        .keyword-chips-label {
-            font-size: 12px; color: var(--text-muted);
-            margin-right: 4px;
-        }
-        .chip {
-            padding: 5px 12px;
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            font-size: 12px;
-            cursor: pointer;
-            background: white;
-            color: var(--text-soft);
-            transition: all 0.15s;
-            user-select: none;
-        }
-        .chip .chip-count {
-            margin-left: 6px;
-            color: var(--text-muted);
-            font-size: 10.5px;
-        }
-        .chip:hover { border-color: var(--primary); color: var(--primary); }
-        .chip.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        .chip.active .chip-count { color: rgba(255,255,255,0.85); }
-        .chip-clear {
-            font-size: 11px; color: var(--primary); cursor: pointer;
-            padding: 4px 8px; user-select: none;
-        }
-        .chip-clear:hover { text-decoration: underline; }
-
         /* Grid */
         main {
             max-width: 1280px;
@@ -176,10 +136,7 @@
             border-radius: 4px;
             color: white;
             letter-spacing: 0.1px;
-            cursor: pointer;
-            transition: opacity 0.15s;
         }
-        .card-keyword:hover { opacity: 0.82; }
         .card-title {
             font-size: 15px;
             font-weight: 600;
@@ -239,7 +196,7 @@
     <header class="hero">
         <div class="hero-inner">
             <h1>KHS Research Papers Summary</h1>
-            <div class="meta">총 <strong>7</strong>편 · <strong>63</strong>개 키워드 · 마지막 갱신 2026-04-30 17:19</div>
+            <div class="meta">총 <strong>7</strong>편 · 마지막 갱신 2026-04-30 17:32</div>
         </div>
     </header>
 
@@ -253,7 +210,6 @@
             </div>
             <div class="counts" id="counts"></div>
         </div>
-        <div class="keyword-chips-wrap" id="keyword-chips"></div>
     </div>
 
     <main>
@@ -278,7 +234,6 @@
         const state = {
             search: '',
             readFilter: 'all',           // all | read | unread
-            activeKeywords: new Set(),   // empty = all (no filter)
         };
 
         function isRead(paper) {
@@ -296,13 +251,6 @@
                        + paper.venue + ' ' + paper.stem + ' ' + kwText).toLowerCase();
             return q.toLowerCase().split(/\s+/).every(token => t.includes(token));
         }
-        function matchesKeywords(paper) {
-            if (state.activeKeywords.size === 0) return true;
-            const pkw = new Set((paper.keywords || []).map(k => k.toLowerCase()));
-            // OR: paper matches if it has ANY of the active keywords
-            for (const kw of state.activeKeywords) if (pkw.has(kw.toLowerCase())) return true;
-            return false;
-        }
         function matchesRead(paper) {
             if (state.readFilter === 'all') return true;
             const r = isRead(paper);
@@ -311,53 +259,8 @@
         function visiblePapers() {
             return PAPERS.filter(p =>
                 matchesSearch(p, state.search) &&
-                matchesKeywords(p) &&
                 matchesRead(p)
             );
-        }
-
-        function keywordCounts() {
-            const m = new Map();
-            PAPERS.forEach(p => (p.keywords || []).forEach(k => {
-                m.set(k, (m.get(k) || 0) + 1);
-            }));
-            return m;
-        }
-
-        function renderChips() {
-            const counts = keywordCounts();
-            const sorted = [...counts.entries()].sort(
-                (a, b) => b[1] - a[1] || a[0].localeCompare(b[0])
-            );
-            const root = document.getElementById('keyword-chips');
-            root.innerHTML = '<span class="keyword-chips-label">키워드:</span>';
-
-            sorted.forEach(([kw, count]) => {
-                const el = document.createElement('span');
-                const active = state.activeKeywords.has(kw);
-                el.className = 'chip' + (active ? ' active' : '');
-                el.innerHTML = `${kw} <span class="chip-count">${count}</span>`;
-                if (active) {
-                    const c = keywordColor(kw);
-                    el.style.background = c;
-                    el.style.borderColor = c;
-                    el.style.color = 'white';
-                }
-                el.onclick = () => {
-                    if (state.activeKeywords.has(kw)) state.activeKeywords.delete(kw);
-                    else state.activeKeywords.add(kw);
-                    render();
-                };
-                root.appendChild(el);
-            });
-
-            if (state.activeKeywords.size > 0) {
-                const clr = document.createElement('span');
-                clr.className = 'chip-clear';
-                clr.textContent = `× ${state.activeKeywords.size}개 해제`;
-                clr.onclick = () => { state.activeKeywords.clear(); render(); };
-                root.appendChild(clr);
-            }
         }
 
         function render() {
@@ -373,7 +276,6 @@
             const readCnt = PAPERS.filter(isRead).length;
             document.getElementById('counts').innerHTML =
                 `<strong>${visible.length}</strong> / ${total} · 읽음 ${readCnt}`;
-            renderChips();
         }
 
         function makeCard(paper) {
@@ -381,7 +283,7 @@
             card.className = 'card' + (isRead(paper) ? ' read' : '');
             const kws = paper.keywords || [];
             const kwHtml = kws.map(k =>
-                `<span class="card-keyword" data-kw="${k}" style="background:${keywordColor(k)}">${k}</span>`
+                `<span class="card-keyword" style="background:${keywordColor(k)}">${k}</span>`
             ).join('');
             card.innerHTML = `
                 <div class="card-keywords">${kwHtml}</div>
@@ -397,16 +299,6 @@
             `;
             const cb = card.querySelector('input');
             cb.addEventListener('change', () => { setRead(paper, cb.checked); render(); });
-            // Click on keyword inside the card → toggle that keyword filter
-            card.querySelectorAll('.card-keyword').forEach(el => {
-                el.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const kw = el.dataset.kw;
-                    if (state.activeKeywords.has(kw)) state.activeKeywords.delete(kw);
-                    else state.activeKeywords.add(kw);
-                    render();
-                });
-            });
             return card;
         }
 
