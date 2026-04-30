@@ -93,11 +93,16 @@
         .counts { font-size: 13px; color: var(--text-soft); white-space: nowrap; }
         .counts strong { color: var(--text); }
 
-        /* Topic chips */
-        .topic-chips {
+        /* Keyword chips */
+        .keyword-chips-wrap {
             max-width: 1280px; margin: 12px auto 0;
             padding: 0;
             display: flex; flex-wrap: wrap; gap: 6px;
+            align-items: center;
+        }
+        .keyword-chips-label {
+            font-size: 12px; color: var(--text-muted);
+            margin-right: 4px;
         }
         .chip {
             padding: 5px 12px;
@@ -110,12 +115,23 @@
             transition: all 0.15s;
             user-select: none;
         }
+        .chip .chip-count {
+            margin-left: 6px;
+            color: var(--text-muted);
+            font-size: 10.5px;
+        }
         .chip:hover { border-color: var(--primary); color: var(--primary); }
         .chip.active {
             background: var(--primary);
             color: white;
             border-color: var(--primary);
         }
+        .chip.active .chip-count { color: rgba(255,255,255,0.85); }
+        .chip-clear {
+            font-size: 11px; color: var(--primary); cursor: pointer;
+            padding: 4px 8px; user-select: none;
+        }
+        .chip-clear:hover { text-decoration: underline; }
 
         /* Grid */
         main {
@@ -146,17 +162,24 @@
         }
         .card.read { opacity: var(--read-fade); }
         .card.read:hover { opacity: 1; }
-        .card-tag {
-            display: inline-block;
-            padding: 3px 10px;
-            font-size: 11px;
-            font-weight: 600;
-            border-radius: 4px;
+        .card-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
             margin-bottom: 10px;
-            color: white;
-            letter-spacing: 0.2px;
-            align-self: flex-start;
         }
+        .card-keyword {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 10.5px;
+            font-weight: 500;
+            border-radius: 4px;
+            color: white;
+            letter-spacing: 0.1px;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+        .card-keyword:hover { opacity: 0.82; }
         .card-title {
             font-size: 15px;
             font-weight: 600;
@@ -216,7 +239,7 @@
     <header class="hero">
         <div class="hero-inner">
             <h1>KHS Research Papers Summary</h1>
-            <div class="meta">총 <strong>1</strong>편 · <strong>1</strong>개 토픽 · 마지막 갱신 2026-04-30 15:34</div>
+            <div class="meta">총 <strong>2</strong>편 · <strong>16</strong>개 키워드 · 마지막 갱신 2026-04-30 15:51</div>
         </div>
     </header>
 
@@ -230,7 +253,7 @@
             </div>
             <div class="counts" id="counts"></div>
         </div>
-        <div class="topic-chips" id="topic-chips"></div>
+        <div class="keyword-chips-wrap" id="keyword-chips"></div>
     </div>
 
     <main>
@@ -238,22 +261,24 @@
     </main>
 
     <script>
-        const PAPERS = [{"title": "Free as a Bird: Event-Based Dynamic Sense-and-Avoid for Ornithopter Robot Flight", "authors": "Juan Pablo Rodríguez-Gómez, Raul Tapia, Maria del Mar Guzmán Garcia, Jose Ramiro Martínez-de Dios, Anibal Ollero", "authors_short": "Juan Pablo Rodríguez-Gómez et al.", "journal": "IEEE Robotics and Automation Letters, Vol. 7, No. 2, April 2022, pp. 5413–5420 · DOI: 10.1109/LRA.2022.3153904", "year": "2022", "venue": "IEEE Robotics and Automation Letters", "stem": "Rodriguez-Gomez_RAL_2022", "topic": "Ornithopter_Mission_Flight", "url": "Ornithopter_Mission_Flight/Rodriguez-Gomez_RAL_2022.html"}];
+        const PAPERS = [{"title": "Free as a Bird: Event-Based Dynamic Sense-and-Avoid for Ornithopter Robot Flight", "authors": "Juan Pablo Rodríguez-Gómez, Raul Tapia, Maria del Mar Guzmán Garcia, Jose Ramiro Martínez-de Dios, Anibal Ollero", "authors_short": "Juan Pablo Rodríguez-Gómez et al.", "journal": "IEEE Robotics and Automation Letters, Vol. 7, No. 2, April 2022, pp. 5413–5420 · DOI: 10.1109/LRA.2022.3153904", "year": "2022", "venue": "IEEE Robotics and Automation Letters", "keywords": ["collision avoidance", "sense-and-avoid", "event camera", "ornithopter", "flapping-wing robot", "dynamic obstacle", "perception and autonomy", "E-Flap", "onboard processing"], "stem": "Rodriguez-Gomez_RAL_2022", "url": "Paper/Rodriguez-Gomez_RAL_2022.html"}, {"title": "Autonomous Formation Flight Control of Large-Sized Flapping-Wing Flying Robots Based on Leader-Follower Strategy", "authors": "Hui Xu, Yuanpeng Wang, Erzhen Pan, Wenfu Xu, Dong Xue", "authors_short": "Hui Xu et al.", "journal": "Journal of Bionic Engineering, Vol. 20, 2023, pp. 2542-2558 · DOI: 10.1007/s42235-023-00402-5", "year": "2023", "venue": "Journal of Bionic Engineering", "keywords": ["formation flight", "leader-follower", "flapping-wing robot", "ornithopter", "large-scale FWFR", "HIT-Phoenix", "outdoor experiment", "periodic flight characteristics", "consensus control"], "stem": "Xu_JBE_2023", "url": "Paper/Xu_JBE_2023.html"}];
 
-        const TOPIC_PALETTE = [
+        const KEYWORD_PALETTE = [
             '#FF6B6B', '#4ECDC4', '#FFA94D', '#95E1D3', '#C9B1FF',
-            '#FFB4B4', '#6BCF7F', '#FF8FB1', '#5B8DEF', '#F4A261'
+            '#FFB4B4', '#6BCF7F', '#FF8FB1', '#5B8DEF', '#F4A261',
+            '#A8DADC', '#E29578', '#90BE6D', '#F9C74F', '#577590'
         ];
-        function topicColor(topic) {
+        function keywordColor(kw) {
             let h = 0;
-            for (let i = 0; i < topic.length; i++) h = (h * 31 + topic.charCodeAt(i)) | 0;
-            return TOPIC_PALETTE[Math.abs(h) % TOPIC_PALETTE.length];
+            const k = kw.toLowerCase();
+            for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) | 0;
+            return KEYWORD_PALETTE[Math.abs(h) % KEYWORD_PALETTE.length];
         }
 
         const state = {
             search: '',
-            readFilter: 'all',         // all | read | unread
-            activeTopics: new Set(),   // empty = all topics
+            readFilter: 'all',           // all | read | unread
+            activeKeywords: new Set(),   // empty = all (no filter)
         };
 
         function isRead(paper) {
@@ -266,12 +291,17 @@
 
         function matchesSearch(paper, q) {
             if (!q) return true;
-            const t = (paper.title + ' ' + paper.authors + ' ' + paper.year + ' ' + paper.venue + ' ' + paper.topic + ' ' + paper.stem).toLowerCase();
+            const kwText = (paper.keywords || []).join(' ');
+            const t = (paper.title + ' ' + paper.authors + ' ' + paper.year + ' '
+                       + paper.venue + ' ' + paper.stem + ' ' + kwText).toLowerCase();
             return q.toLowerCase().split(/\s+/).every(token => t.includes(token));
         }
-        function matchesTopic(paper) {
-            if (state.activeTopics.size === 0) return true;
-            return state.activeTopics.has(paper.topic);
+        function matchesKeywords(paper) {
+            if (state.activeKeywords.size === 0) return true;
+            const pkw = new Set((paper.keywords || []).map(k => k.toLowerCase()));
+            // OR: paper matches if it has ANY of the active keywords
+            for (const kw of state.activeKeywords) if (pkw.has(kw.toLowerCase())) return true;
+            return false;
         }
         function matchesRead(paper) {
             if (state.readFilter === 'all') return true;
@@ -281,29 +311,53 @@
         function visiblePapers() {
             return PAPERS.filter(p =>
                 matchesSearch(p, state.search) &&
-                matchesTopic(p) &&
+                matchesKeywords(p) &&
                 matchesRead(p)
             );
         }
 
+        function keywordCounts() {
+            const m = new Map();
+            PAPERS.forEach(p => (p.keywords || []).forEach(k => {
+                m.set(k, (m.get(k) || 0) + 1);
+            }));
+            return m;
+        }
+
         function renderChips() {
-            const topics = [...new Set(PAPERS.map(p => p.topic))].sort();
-            const root = document.getElementById('topic-chips');
-            root.innerHTML = '';
-            topics.forEach(topic => {
-                const el = document.createElement('div');
-                el.className = 'chip' + (state.activeTopics.has(topic) ? ' active' : '');
-                el.textContent = topic.replace(/_/g, ' ').replace(/\//g, ' / ');
-                el.style.borderColor = state.activeTopics.has(topic) ? topicColor(topic) : '';
-                el.style.background = state.activeTopics.has(topic) ? topicColor(topic) : '';
-                el.style.color = state.activeTopics.has(topic) ? 'white' : '';
+            const counts = keywordCounts();
+            const sorted = [...counts.entries()].sort(
+                (a, b) => b[1] - a[1] || a[0].localeCompare(b[0])
+            );
+            const root = document.getElementById('keyword-chips');
+            root.innerHTML = '<span class="keyword-chips-label">키워드:</span>';
+
+            sorted.forEach(([kw, count]) => {
+                const el = document.createElement('span');
+                const active = state.activeKeywords.has(kw);
+                el.className = 'chip' + (active ? ' active' : '');
+                el.innerHTML = `${kw} <span class="chip-count">${count}</span>`;
+                if (active) {
+                    const c = keywordColor(kw);
+                    el.style.background = c;
+                    el.style.borderColor = c;
+                    el.style.color = 'white';
+                }
                 el.onclick = () => {
-                    if (state.activeTopics.has(topic)) state.activeTopics.delete(topic);
-                    else state.activeTopics.add(topic);
+                    if (state.activeKeywords.has(kw)) state.activeKeywords.delete(kw);
+                    else state.activeKeywords.add(kw);
                     render();
                 };
                 root.appendChild(el);
             });
+
+            if (state.activeKeywords.size > 0) {
+                const clr = document.createElement('span');
+                clr.className = 'chip-clear';
+                clr.textContent = `× ${state.activeKeywords.size}개 해제`;
+                clr.onclick = () => { state.activeKeywords.clear(); render(); };
+                root.appendChild(clr);
+            }
         }
 
         function render() {
@@ -325,9 +379,12 @@
         function makeCard(paper) {
             const card = document.createElement('div');
             card.className = 'card' + (isRead(paper) ? ' read' : '');
-            const color = topicColor(paper.topic);
+            const kws = paper.keywords || [];
+            const kwHtml = kws.map(k =>
+                `<span class="card-keyword" data-kw="${k}" style="background:${keywordColor(k)}">${k}</span>`
+            ).join('');
             card.innerHTML = `
-                <span class="card-tag" style="background:${color}">${paper.topic.replace(/_/g, ' ').replace(/\//g, ' / ')}</span>
+                <div class="card-keywords">${kwHtml}</div>
                 <h3 class="card-title">${paper.title}</h3>
                 <p class="card-meta">${paper.authors_short} · ${paper.year || ''} · ${paper.venue || ''}</p>
                 <div class="card-footer">
@@ -340,6 +397,16 @@
             `;
             const cb = card.querySelector('input');
             cb.addEventListener('change', () => { setRead(paper, cb.checked); render(); });
+            // Click on keyword inside the card → toggle that keyword filter
+            card.querySelectorAll('.card-keyword').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const kw = el.dataset.kw;
+                    if (state.activeKeywords.has(kw)) state.activeKeywords.delete(kw);
+                    else state.activeKeywords.add(kw);
+                    render();
+                });
+            });
             return card;
         }
 
