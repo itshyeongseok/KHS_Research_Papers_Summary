@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Trajectory Generation and Tracking Control for Flapping Wing Robot Three-Dimensional Flight</title>
+    <meta name="keywords" content="trajectory generation, trajectory tracking, flapping-wing robot, ornithopter, 3D flight, differential flatness, Lyapunov stability, nonlinear control, underactuated system, vertical frame dynamics, obstacle avoidance, waypoint flight">
+    <meta name="paper-authors" content="Chen Qian, Rui Chen, Peiyao Shen, Yongchun Fang, Jifu Yan, Tiefeng Li">
+    <meta name="paper-journal" content="IEEE/ASME Transactions on Mechatronics, Vol. 30, No. 2, April 2025, pp. 1248-1260 · DOI: 10.1109/TMECH.2024.3405318">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$',  right: '$',  display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Noto Sans KR', 'Arial', sans-serif;
+            margin: 0; padding: 0;
+            background: #f5f5f5;
+            color: #333;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+        }
+        .slide {
+            width: min(1680px, 98vw);
+            height: 96vh;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            overflow: hidden;
+        }
+        .header {
+            background: #005b96;
+            color: white;
+            padding: 26px 38px;
+        }
+        .title { font-size: 32px; font-weight: bold; margin-bottom: 10px; line-height: 1.3; }
+        .authors { font-size: 17px; margin-bottom: 5px; }
+        .journal { font-size: 15px; opacity: 0.9; }
+
+        .summary-container {
+            background: #f0f5fa;
+            padding: 18px 38px;
+            border-bottom: 1px solid #e1e5e8;
+        }
+        .summary-title {
+            font-size: 19px; font-weight: bold; margin-bottom: 8px; color: #005b96;
+        }
+        .summary { font-size: 17px; line-height: 1.65; }
+        .keywords {
+            margin-top: 10px;
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .keyword-chip {
+            font-size: 12px;
+            padding: 3px 10px;
+            background: white;
+            color: #005b96;
+            border: 1px solid #c6dbed;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 14px;
+            padding: 14px 18px;
+            overflow: hidden;
+        }
+        .section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,91,150,0.18);
+            border-color: #005b96;
+        }
+        .section-title {
+            color: #005b96;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 9px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #005b96;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .click-hint {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+        .section-summary {
+            font-size: 15px;
+            line-height: 1.6;
+            flex: 1;
+            overflow: hidden;
+        }
+        .term { font-weight: bold; color: #005b96; }
+        .eng { color: #666; font-style: italic; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            justify-content: center; align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.18s ease-out;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: white;
+            width: min(1100px, 90vw);
+            height: min(800px, 88vh);
+            border-radius: 10px;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .modal-header {
+            background: #005b96;
+            color: white;
+            padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 22px; font-weight: bold; }
+        .modal-close {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px; line-height: 1;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.2); }
+        .modal-body {
+            padding: 24px 32px;
+            overflow-y: auto;
+            font-size: 15.5px;
+            line-height: 1.75;
+        }
+        .modal-body .bullet {
+            margin-bottom: 10px;
+            padding-left: 18px;
+            text-indent: -18px;
+        }
+        .modal-body .bullet:before {
+            content: "▸ ";
+            color: #005b96;
+            font-weight: bold;
+        }
+        .modal-body .formula-block {
+            background: #f8f9fb;
+            border-left: 4px solid #005b96;
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 4px;
+        }
+        .modal-body .formula-label {
+            font-size: 12px;
+            color: #005b96;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .modal-body .formula-desc {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+        .modal-body h4 {
+            color: #005b96;
+            margin-top: 22px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="header">
+            <div class="title">Trajectory Generation and Tracking Control for Flapping Wing Robot Three-Dimensional Flight</div>
+            <div class="authors">Chen Qian, Rui Chen, Peiyao Shen, Yongchun Fang, Jifu Yan, Tiefeng Li</div>
+            <div class="journal">IEEE/ASME Transactions on Mechatronics, Vol. 30, No. 2, April 2025, pp. 1248-1260 · DOI: 10.1109/TMECH.2024.3405318</div>
+        </div>
+
+        <div class="summary-container">
+            <div class="summary-title">논문 요약</div>
+            <div class="summary">이 논문은 <span class="term">underactuated FWAV 의 3D 비행</span>을 위한 trajectory generation + tracking control 의 <span class="term">첫 closed-loop 통합 사례</span>다. 핵심 이론적 통찰: <span class="term">vertical frame dynamics</span> 를 채택하면 FWAV 시스템이 <span class="term">differential flatness</span> 를 가짐을 증명 — flat output (x, y, z) 와 그 미분으로부터 모든 상태·입력을 결정 가능, 이것이 polynomial trajectory generation 의 토대. Tracking 측은 robust + switch (hysteretic) control 결합으로 Lyapunov asymptotic stability 보장. <span class="term">29 g X-wing FWAV</span> 에서 (a) 구형 장애물, (b) 실린더 장애물 2개, (c) 6 waypoint 통과의 3 case 실 비행 검증 — heading-direction-changing-rate 가 정확도의 결정적 변수임을 실험적으로 확인.</div>
+            <div class="keywords"><span class="keyword-chip">trajectory generation</span><span class="keyword-chip">trajectory tracking</span><span class="keyword-chip">flapping-wing robot</span><span class="keyword-chip">ornithopter</span><span class="keyword-chip">3D flight</span><span class="keyword-chip">differential flatness</span><span class="keyword-chip">Lyapunov stability</span><span class="keyword-chip">nonlinear control</span><span class="keyword-chip">underactuated system</span><span class="keyword-chip">vertical frame dynamics</span><span class="keyword-chip">obstacle avoidance</span><span class="keyword-chip">waypoint flight</span></div>
+        </div>
+
+        <div class="content">
+            <div class="section" onclick="openModal('introduction')">
+                <div class="section-title">Introduction: 연구 동기 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">FWAV 는 acrobatic 한 maneuverability 로 surveillance·monitoring·SAR 등에 매력적이나 복잡한 dynamics 때문에 stable·efficient 비행이 어렵다. 특히 <span class="term">trajectory generation</span> 연구는 fixed-wing/rotor 대비 매우 빈약하고, 기존 시도들 ([15] perching only, [12]/[16] tracking 미통합, [17] 2D only) 모두 부분적 해결에 그쳤다. Tracking controller 들도 [23] 실험 미검증, [24] vertical plane only, [25] time-independent 한계. 본 논문은 <span class="term">3D + closed-loop + obstacle 회피 + 실 비행 검증</span> 을 동시 달성한 첫 사례.</div>
+            </div>
+            <div class="section" onclick="openModal('related_works')">
+                <div class="section-title">Related Works: 관련 연구 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">FWAV trajectory generation 의 두 흐름 — Bat Bot 계열 ([12][16] direct collocation, 2-stage optimization), perching 위주 ([15] dihedral-based gliding). Tracking 측은 robust ([23] sliding-mode), neural ([24]), vector field ([25]), adaptive ([26]) 의 4 흐름. 각각의 한계: open-loop generation, 2D only, time-independence, lab-only validation. 본 논문은 위 갭을 모두 메우려는 시도 — <span class="term">3D + closed-loop + obstacle + 실 비행</span>.</div>
+            </div>
+            <div class="section" onclick="openModal('method')">
+                <div class="section-title">Method: 새로운 접근 방법 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary"><span class="term">Vertical frame dynamics</span> ([30] 의 개념) 으로 시스템 모델을 정리 — yaw 회전을 분리해 dynamics 가 더 단순·정확하게. <span class="term">Reduced attitude Γ = R^T e_3</span> 도입으로 thrust 와 drag 의 표현이 깔끔해짐. 핵심 발견: 이 frame 에서 시스템이 <span class="term">differential flatness</span> 를 가져 flat outputs σ = [x, y, z]^T 의 미분만으로 모든 state·input 결정 가능. Trajectory generation 은 <span class="term">minimum-snap polynomial</span> + kinodynamic + obstacle constraint 의 nonlinear programming. Tracking 은 outer loop (saturation + Lyapunov) + inner loop (reduced attitude PD) + heading subsystem (switch + hysteretic) 의 cascade.</div>
+            </div>
+            <div class="section" onclick="openModal('experiment')">
+                <div class="section-title">Experiment: 실험 방법과 결과 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary"><span class="term">29 g X-wing FWAV</span> (wingspan 34 cm, brushless 모터 + 2 servo) 를 Qualisys motion capture (48 cameras) 환경에서 실 비행 검증. 3 case: (a) 1 ball 장애물 회피 + point-to-point, (b) 2 cylinder 장애물 회피, (c) 6 waypoint 통과. Case (a)(b) 는 정확한 추적 성공. Case (c) 는 큰 추적 오차 — heading-direction-changing-rate 가 결정적 변수임을 발견. 0.5 m/s straight uniform 비행 보조 실험으로 가설 확인.</div>
+            </div>
+            <div class="section" onclick="openModal('discussion')">
+                <div class="section-title">Discussion: 결과의 해석 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary"><span class="term">Vertical frame + differential flatness 의 통찰</span>이 본 논문의 핵심 — 기존 FWAV trajectory 연구가 풀지 못한 "closed-loop 3D 통합" 을 가능하게 했다. <span class="term">Heading rate 가 추적 정확도의 결정적 변수</span> 라는 실험적 발견은 후속 연구에 매우 중요. Tracking 측의 switch + hysteretic 구조는 FWAV 의 underactuated · 비선형 dynamics 에 잘 맞음. 한계: motion capture 의존, sharp climb / sharp turn 시 정확도 저하, sensing 이 onboard 가 아님 — 모두 "lab → 실외" 전환의 큰 장애물.</div>
+            </div>
+            <div class="section" onclick="openModal('conclusion')">
+                <div class="section-title">Conclusion: 최종 요약 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">본 논문은 <span class="term">underactuated FWAV 의 3D 비행에서 trajectory generation + tracking control 의 첫 closed-loop 통합</span>을 달성. 이론적 토대로는 vertical frame dynamics + differential flatness, planning 측은 polynomial minimum-snap, control 측은 switch + hysteretic + Lyapunov. 29 g X-wing FWAV 에서 ball/cylinder 장애물 회피·waypoint 추종 실 비행 검증. Future: onboard 추정·제어, perching, heading rate 제약 추가, aerodynamic configuration 개선.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title"></div>
+                <button class="modal-close" onclick="closeModal()" aria-label="닫기">×</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const SECTION_TITLES = {
+            introduction: "Introduction — 연구 동기",
+            related_works: "Related Works — 관련 연구",
+            method: "Method — 새로운 접근 방법",
+            experiment: "Experiment — 실험 방법과 결과",
+            discussion: "Discussion — 결과의 해석",
+            conclusion: "Conclusion — 최종 요약"
+        };
+
+        const SECTION_DETAIL = {"introduction": {"content": [{"type": "bullet", "text": "<span class=\"term\">FWAV 의 매력</span> — flapping flight 가 주는 unparalleled maneuverability 와 agility. surveillance·environmental monitoring·search-and-rescue 응용 가능성. 그러나 복잡한 비선형 dynamics 가 \"stable + efficient\" 비행을 동시 달성하기 어렵게 만드는 본질적 challenge."}, {"type": "bullet", "text": "<span class=\"term\">FWAV trajectory generation 연구의 빈약함</span> — fixed-wing/rotary-wing 대비 사례 수가 매우 적음. 그 이유는 (a) 비선형·시변 aerodynamics, (b) underactuation, (c) flapping 주기 진동이 trajectory 평탄성 가정을 깨뜨림."}, {"type": "bullet", "text": "<span class=\"term\">기존 trajectory generation 시도 1: Paranjape 2013 [15]</span> — perching maneuver 에 wing articulation + closed-loop motion planning + dynamic inversion. MAX upward elevator 로 빠른 감속·flatten. 단 <span class=\"term\">gliding 위주</span>로 flapping dynamics 자체는 미고려."}, {"type": "bullet", "text": "<span class=\"term\">기존 시도 2: Hoff 2019 [12] / 2021 [16] (Bat Bot)</span> — direct collocation 또는 2-stage optimization (fixed-wing 모델 init → flapping 모델 update). load-cell 데이터 의존이 약점, 그리고 <span class=\"term\">tracking control 미통합 (open-loop)</span> 으로 외부 disturbance 에 취약."}, {"type": "bullet", "text": "<span class=\"term\">기존 시도 3: Rodriguez 2022 [17]</span> — energy-efficient graph-based trajectory. <span class=\"term\">2D 만 다룸</span> — 실제 FWAV 응용의 다수가 3D 임을 고려할 때 한계. obstacle avoidance 거의 미고려."}, {"type": "bullet", "text": "<span class=\"term\">Tracking controller 들의 한계</span> — [23] Wissa integral sliding-mode 는 실 비행 미검증. [24] neural network 는 vertical plane 에 한정. [26] Fei 의 onboard nonlinear + adaptive + robust 는 진보된 사례지만 여전히 underactuation 본질을 충분히 처리 못 함."}, {"type": "bullet", "text": "<span class=\"term\">Vector field controller [25] 의 한계</span> — initial condition 과 time 의 independence 가 robustness 측면에는 장점이지만, <span class=\"term\">specific time 에 specific position 도달</span> 같은 임무 비행 요구를 충족 못 함. waypoint flight 에 부적합."}, {"type": "bullet", "text": "<span class=\"term\">Obstacle avoidance 의 미흡</span> — 비행 로봇 일반에서 ([18][19][20]) obstacle 회피가 핵심이지만 FWAV trajectory generation 에서는 거의 다루어지지 않음. biomimetic 로봇 [21] 이나 일반 flying robot [22] 의 사례를 FWAV 에 이식할 필요."}, {"type": "bullet", "text": "<span class=\"term\">본 논문의 3 가지 contribution</span>: (1) underactuated FWAV trajectory planning 의 이론적 base 확립, (2) trajectory generation 전략과 호환되는 새로운 trajectory tracking controller 제안, (3) <span class=\"term\">실 3D 비행에서 trajectory generation + control 의 첫 closed-loop 통합</span>."}, {"type": "bullet", "text": "본 논문 구성 — Sec. II vertical frame dynamics, Sec. III trajectory generation, Sec. IV tracking control, Sec. V 실 비행 실험 (3 case), Sec. VI 결론. 핵심은 vertical frame 의 채택이 분석·planning·control 모두에 자연스러운 frame 을 제공한다는 점."}]}, "related_works": {"content": [{"type": "bullet", "text": "<span class=\"term\">Trajectory generation 흐름 1 — Bat Bot 계열 (Hoff 시리즈, Hutchinson)</span>: Bat-like FWAV 에 대해 dynamics-aware 한 trajectory planning. [12] 는 direct collocation, [16] 은 fixed-wing 모델 init 후 flapping 모델 update 의 2-stage. 모두 generation 만, tracking 미포함."}, {"type": "bullet", "text": "<span class=\"term\">Trajectory generation 흐름 2 — Perching 위주 (Paranjape 2013 [15])</span>: dihedral-based 제어로 perching maneuver. wing articulation + closed-loop motion planning. 단 gliding 단계의 정적 분석 위주이고 flapping 의 비주기적 forcing 은 미고려."}, {"type": "bullet", "text": "<span class=\"term\">Trajectory generation 흐름 3 — Energy-efficient (Rodriguez 2022 [17])</span>: graph-based 방법으로 dynamically feasible + energy-efficient trajectory 검색. 2D 만 다루며 obstacle 회피는 부수적."}, {"type": "bullet", "text": "<span class=\"term\">Tracking 흐름 1 — Sliding-mode (Wissa 2018 [23])</span>: integral sliding-mode 로 model uncertainty 와 disturbance robust. 시뮬만 — 실 비행 검증 부재가 약점."}, {"type": "bullet", "text": "<span class=\"term\">Tracking 흐름 2 — Neural network ([24])</span>: 데이터 기반 controller. 정확한 vertical plane 추적. 그러나 3D 일반화·robust 보장 한계."}, {"type": "bullet", "text": "<span class=\"term\">Tracking 흐름 3 — Vector field ([25])</span>: path-following 에 적합. 다양한 초기 위치·속도에 robust. 그러나 \"특정 시간에 특정 위치\" 요구 충족 불가."}, {"type": "bullet", "text": "<span class=\"term\">Tracking 흐름 4 — Adaptive + robust onboard (Fei et al. [26])</span>: parameter adaptation + robust control 결합. flapping 진동에 의한 sensing challenge 도 일부 해결. 본 논문이 가장 가까운 선행연구로 간주."}, {"type": "bullet", "text": "<span class=\"term\">Differential flatness 의 quadrotor 적용 (Mellinger-Kumar 2011 [34])</span>: minimum-snap polynomial 로 quadrotor aggressive flight. 본 연구가 이 framework 을 underactuated FWAV 에 확장."}, {"type": "bullet", "text": "<span class=\"term\">FWAV vertical frame 개념 ([30])</span>: yaw 회전을 분리한 frame 채택. 본 논문이 이를 활용해 dynamics 의 differential flatness 증명을 가능하게 함."}, {"type": "bullet", "text": "<span class=\"term\">본 논문의 위치</span>: 위 모든 흐름의 한계를 동시에 메우려는 시도 — 3D + closed-loop + obstacle 회피 + 실 비행 검증. 단순 통합이 아니라 vertical frame + differential flatness 라는 새로운 이론적 토대 위에서 가능."}]}, "method": {"content": [{"type": "bullet", "text": "<span class=\"term\">FWAV 의 3 가지 dynamic 특성 (분석의 출발점)</span>: (a) rudder 회전이 roll torque 외에 부수적 yaw torque 도 발생 (force arm 이 짧아 작지만 무시 불가), (b) wing 의 V-shape 이 wind-vane-like dynamics 를 만들어 추가 yaw torque, (c) rudder/elevator 가 free flow + flapping 의 down-wash flow 를 받으므로 hovering 에 가까운 비행에서도 non-negligible torque 생성."}, {"type": "bullet", "text": "<span class=\"term\">Vertical frame 의 도입</span> — yaw rotation 을 분리한 좌표계. body-fixed frame 에서 보면 복잡한 dynamics 가 vertical frame 에서는 더 깔끔하게 표현됨. position $p$, vertical-frame velocity $v_V = R_Z(\\psi)^T v$, yaw $\\psi$, yaw rate $\\omega_\\psi$ 로 system 정의."}, {"type": "formula", "label": "식 (1)-(5) — Vertical frame dynamics", "latex": "\\dot{p} = v, \\quad v = R_Z(\\psi)\\, v_V \\\\[4pt] \\dot{v}_{Vx} = F_{th,Vx}/m + F_{d,Vx}/m - \\omega_\\psi v_{Vy} \\\\ \\dot{v}_{Vy} = F_{th,Vy}/m + F_{d,Vy}/m + \\omega_\\psi v_{Vx} \\\\ \\dot{v}_{Vz} = F_{th,Vz}/m + F_{d,Vz}/m - g \\\\[4pt] \\dot{\\psi} = \\omega_\\psi, \\quad \\dot{\\omega}_\\psi = a_{\\tau,Vz}", "description": "Vertical frame 에서의 FWAV 동역학. $F_{th,V}$ 는 vertical frame 에서의 thrust (flapping wing 으로부터 생성), $F_{d,V}$ 는 drag, $a_{\\tau,Vz}$ 는 rudder + wind-vane-like + damping 으로 인한 yaw 각가속도. $R_Z(\\psi)$ 는 inertia → vertical frame 의 yaw rotation matrix."}, {"type": "bullet", "text": "<span class=\"term\">Reduced attitude $\\Gamma = R^T e_3 = [\\Gamma_x, \\Gamma_y, \\Gamma_z]^T$</span> — body-fixed frame 에서 본 inertia frame Z-axis. yaw 와 무관해 underactuated 분석에 자연스러움. $\\Gamma_x$ 는 pitch 회전과 관련, $\\Gamma_y$ 는 roll 회전과 관련."}, {"type": "formula", "label": "식 (9, 10) — Thrust force in vertical frame", "latex": "F_{th,Vx} = -k_{tf}\\, f_{flap}^2\\, \\Gamma_x, \\quad F_{th,Vz} = k_{tf}\\, f_{flap}^2\\, \\Gamma_z", "description": "flapping wing 으로 생성되는 thrust 의 vertical frame 분해. $k_{tf}$ 는 mean thrust force coefficient (hovering 비행에서 식별), $f_{flap}$ 는 flapping frequency. <span class=\"term\">thrust ∝ frequency$^2$</span> 의 이차 비례 관계가 핵심 — 이것이 controller 설계의 입력 nonlinearity."}, {"type": "bullet", "text": "<span class=\"term\">Drag force (식 11)</span> — vertical frame 에서 quadratic drag $F_{d,V} = -k_{d,*}\\, \\text{sgn}(v_{V*})\\, v_{V*}^2$. 양의 drag coefficient 들 ($k_{d,x}, k_{d,y}, k_{d,z}$) 는 uniform speed forward flight 에서 식별."}, {"type": "bullet", "text": "<span class=\"term\">Yaw torque 모델 (식 12)</span> — 3 성분의 합: rudder-induced yaw torque (negative) + wind-vane-like (negative) + damping (positive). <span class=\"term\">Nonholonomic 유사 제약</span>: $v_{Vy} \\equiv 0$ 으로 dynamic 단순화 (식 14) — wheeled mobile robot 의 nonholonomic constraint 와 유사."}, {"type": "bullet", "text": "<span class=\"term\">Differential flatness 증명</span> — 시스템이 differentially flat 이려면 flat outputs 와 그 미분으로부터 모든 state 와 input 이 uniquely 결정되어야 함. 본 논문은 vertical frame dynamics 와 nonholonomic constraint $v_{Vy}=0$ 가정 하에서 FWAV 가 flat 임을 증명."}, {"type": "formula", "label": "식 (15) — Flat outputs", "latex": "\\sigma = [x,\\ y,\\ z,\\ \\psi]^T \\implies \\sigma = [x,\\ y,\\ z]^T \\text{ (yaw 는 } \\psi = \\text{atan2}(\\dot{y}, \\dot{x}) \\text{ 로 결정)}", "description": "FWAV 의 flat outputs 는 mass center 위치 $(x, y, z)$. yaw $\\psi$ 는 transient 단계에서 misalignment 가 있을 수 있으나 $\\psi = \\text{atan2}(\\dot{y}, \\dot{x})$ 로 결정되며 controller 가 transient 보상. 이 결과는 trajectory generation 을 polynomial 위에서 자유롭게 할 수 있다는 의미 — quadrotor 와 유사한 framework 이 FWAV 에서도 가능."}, {"type": "formula", "label": "식 (24) — Polynomial trajectory + objective (74) Minimum snap", "latex": "\\sigma_{\\mu,j}(t) = \\sum_{i=0}^{N} c_{\\mu,j,i}\\, t^i, \\quad t \\in (0, T] \\\\[6pt] \\min \\int_0^{M T} \\Bigl( \\mu_p \\sum_{j=1}^{3} \\Bigl|\\frac{d^4\\sigma_j}{dt^4}\\Bigr|^2 + \\mu_v \\sum_{j=1}^{3} \\Bigl|\\frac{d\\sigma_j}{dt}\\Bigr|^2 \\Bigr) dt", "description": "$M$ 개의 polynomial segment 를 이어붙임. 각 segment 는 $N=6$ 차. Objective 는 minimum-snap (4차 미분, smoothness) + velocity term 의 가중합. $\\mu_p$ 가 크면 부드러운 trajectory, $\\mu_v$ 가 크면 짧고 직선적인 trajectory. Continuity (식 25-28) + boundary (식 29, 30) + kinodynamic + obstacle constraint 모두 포함된 nonlinear programming. MATLAB fmincon 으로 풀이."}, {"type": "bullet", "text": "<span class=\"term\">Tracking controller — Outer loop (positional)</span>: position error $e_p = p - p_d$, velocity error $e_v = v - v_d$ 도입. desired velocity $v_d = \\dot{\\sigma}_r + K_p \\tanh(e_p)$ 의 saturation 으로 actuator 한계 회피. Lyapunov candidate $V_1$ 으로 globally uniformly asymptotically stable 증명 (Proposition 1)."}, {"type": "bullet", "text": "<span class=\"term\">Tracking controller — Heading subsystem</span>: $\\delta_\\psi = \\psi_d - \\psi$ 의 변화로 nonlinear dynamics. <span class=\"term\">Switch + hysteretic</span> 구조 (식 57-60) 로 discontinuity 처리. Lyapunov $V_2$ 가 flow + jump 모두에서 단조 감소 → globally practically asymptotically stable (Proposition 2)."}, {"type": "bullet", "text": "<span class=\"term\">Tracking controller — Cascade 안정성</span>: positional + heading 의 cascade 가 closed-loop 으로 결합. cascade system stability theory ([37] Panteley-Loria) 적용. $|\\dot{\\psi}_d| \\le \\dot{\\psi}_{d,max}$ 조건 하에서 closed set $\\mathbb{R}^3 \\times \\mathbb{R}^3 \\times S^1 \\times [-e_{\\omega_\\psi}, e_{\\omega_\\psi}]$ 위에서 asymptotically stable (Proposition 3)."}, {"type": "formula", "label": "식 (72, 73) — Inner-loop attitude control (PD-like)", "latex": "\\theta_{rud} = k_{rud}(\\Gamma_{yp}\\Gamma_z - \\Gamma_{zp}\\Gamma_y) - k_{\\omega,x}\\omega_x \\\\[4pt] \\theta_{ele} = k_{ele}(\\Gamma_{zp}\\Gamma_x - \\Gamma_{xp}\\Gamma_z) - k_{\\omega,y}\\omega_y", "description": "Reduced attitude error 와 angular velocity damping 의 PD 형 제어. $\\theta_{rud}, \\theta_{ele}$ 는 rudder 와 elevator 의 deflection 각. $k_{rud}, k_{ele}$ 는 비례 게인, $k_{\\omega,*}$ 는 damping 게인. Body-fixed frame 의 Z-axis 회전은 무시 (under-actuation 본질)."}, {"type": "bullet", "text": "<span class=\"term\">Practical adaptation</span>: (a) Z-direction drag 무시 (windward area 작음), (b) low-pass filter 로 $\\dot{v}_d$ · $\\dot{\\psi}_d$ · $\\dot{\\omega}_\\psi$ 의 derivative signal 생성 — Farrell command-filter [42] 와 유사하지만 보조 보상 생략, (c) jump 발생 시 filter reset."}]}, "experiment": {"content": [{"type": "bullet", "text": "<span class=\"term\">실험 플랫폼 — 자체 제작 X-wing FWAV</span>: 무게 ~29 g, wingspan 34 cm. 2 linear steering servo 가 elevator 와 rudder 작동, brushless 모터가 flapping. 작은 사이즈로 small-scale 카테고리 — 상대적으로 high flapping frequency 와 hover 가능에 가까운 비행."}, {"type": "bullet", "text": "<span class=\"term\">측정 환경</span> — Qualisys 모션 캡쳐 arena (48 Arqus A12 카메라). 정밀 ground truth 제공. 제어 알고리즘은 ground station 에서 실행, attitude·position 정보를 motion capture 시스템에서 받음. \"DIY multiprotocol TX module\" 을 통해 제어 신호 송신."}, {"type": "bullet", "text": "<span class=\"term\">Trajectory 생성 (offline)</span> — MATLAB fmincon 의 nonlinear programming solver. 6차 polynomial 채택. 케이스별 segment 수: (a) 1 segment, (b) 2 segments, (c) 3 segments."}, {"type": "bullet", "text": "<span class=\"term\">Case (a): 1 ball obstacle 회피</span> — 시작 $[0,0,0]$ m, 끝 $[1,1,1]$ m, 초·종 속도 zero. 중앙에 반경 0.5 m 구형 장애물 ($[0.5, 0.5, 0.5]$). FWAV 가 trajectory 추적 + 장애물 회피 동시 달성."}, {"type": "bullet", "text": "<span class=\"term\">Case (b): 2 cylinder obstacles</span> — 시작 $[0,0,0]$ m, 끝 $[0,2,0]$ m. 축 방향 무한 cylinder 2개 (반경 0.3 m), Y-Z 평면 위치 $[0.5, -0.2]$ 와 $[1.5, 0.1]$. 직선 경로상의 두 장애물을 좌우로 회피. <span class=\"term\">실 비행 검증 성공</span>."}, {"type": "bullet", "text": "<span class=\"term\">Case (c): 6 waypoint 통과</span> — circle 형 trajectory 위에 6 waypoint. 시작·끝 모두 $[1.5, 0, 0]$ m, intermediate waypoint 들이 작은·큰 원 (0.3 m, 1.5 m 반경) 의 점들. <span class=\"term\">FWAV 가 generated trajectory 를 잘 못 따라감</span> — 빠른 heading change 가 원인."}, {"type": "bullet", "text": "<span class=\"term\">Heading 변화율의 결정성 (검증 실험)</span> — 추가 실험에서 FWAV 가 X-axis 방향으로 0.5 m/s 균일속도 직진 비행. 결과: heading 변화 없을 때는 정확한 추적 가능. → <span class=\"term\">heading-direction-changing-rate 가 정확도의 dominant factor</span> 라는 가설 확인."}, {"type": "bullet", "text": "<span class=\"term\">Tracking error 분포</span> — Table I 에 RMS error 정리. altitude tracking 은 sharp climb 가 없으면 매우 정확. along-track / cross-track error 는 non-negligible. 특히 along-track error 가 큼 — 이것 보상하려면 orientation 조정 필요해서 dynamics 가 더 복잡해짐."}, {"type": "bullet", "text": "<span class=\"term\">Reduced attitude validation (Remark 2)</span> — Fig 6, 7 에서 0.5~2초 사이 $\\Gamma_x$ 감소 → $v_{Vx}$ 증가 (예상대로). 1.5~3초 사이 양의 $\\Gamma_y$ → 음의 $\\dot{\\psi}$ (예상대로). <span class=\"term\">단순화된 모델의 타당성 실험적 확인</span>."}, {"type": "bullet", "text": "<span class=\"term\">Open-source 공개</span> — trajectory generation: github.com/Chainplain/CrappyMinimumSnap, tracking control + flight test: github.com/Chainplain/UATrajTrack. 비행 영상: youtube.com/watch?v=yOA0aA6X4FI. 재현성 가능한 reference benchmark."}, {"type": "bullet", "text": "<span class=\"term\">Initial release condition</span> — FWAV 는 운영자 손에서 release 되어 reduced attitude stabilizing mode 진입 → 3초 후 안정 비행 → trajectory tracking 시작. 시작 시점에 zero 속도가 아니라서 첫 몇 초의 큰 deviation 은 자연스러움."}]}, "discussion": {"content": [{"type": "bullet", "text": "<span class=\"term\">Vertical frame + differential flatness 의 가치</span> — 이 두 결과가 본 논문의 가장 큰 contribution. quadrotor 의 minimum-snap framework 을 underactuated FWAV 에 자연스럽게 이식 가능하게 했으며, polynomial trajectory generation 의 모든 후속 연구가 이 토대 위에서 가능해짐."}, {"type": "bullet", "text": "<span class=\"term\">Heading rate 의 결정성</span> — Case (c) 실패 → uniform straight 성공의 대조가 중요한 인사이트. \"trajectory 의 heading 변화율\" 자체를 optimization objective 에 추가해야 함을 제시. 단 quadratic form 유지하면서 추가하기는 computational challenge — 추후 연구."}, {"type": "bullet", "text": "<span class=\"term\">Switch + hysteretic 제어의 적합성</span> — sgn 함수의 chattering 우회를 hysteretic mechanism 으로. discrete 변화를 jump 로 모델링하고 hybrid system 안정성 도구 ([39] Goebel-Sanfelice-Teel) 사용. FWAV 의 attitude singularity 영역을 자연스럽게 회피."}, {"type": "bullet", "text": "<span class=\"term\">Open-loop generation 의 본질적 약점</span> — 기존 [12][16] 의 generation-only 접근은 외부 disturbance 에 무방비. 본 연구의 closed-loop 통합이 outdoor 응용으로 가는 필수 단계."}, {"type": "bullet", "text": "<span class=\"term\">Underactuation 의 본질적 한계</span> — Z-axis (yaw) 의 회전이 inner loop 에서 무시됨 (식 72, 73). 이것이 sharp turn 에서의 cross-track error 의 본질적 원인. 더 많은 actuator (예: 분리 tail) 또는 morphing wing 을 도입하지 않는 한 본질적 trade-off."}, {"type": "bullet", "text": "<span class=\"term\">Motion capture 의존</span> — 본 연구는 ground station + Qualisys 환경. 실외 환경에서는 GPS·IMU·visual SLAM 의 onboard 추정이 필요. 특히 flapping 진동에 의한 IMU·vision noise 가 추가 challenge."}, {"type": "bullet", "text": "<span class=\"term\">Compute load (offline vs online)</span> — trajectory generation 은 offline (MATLAB fmincon). online tracking 만 ground station 에서. 실용 응용은 onboard 실시간 trajectory regeneration 이 요구됨 — 현재 미해결."}, {"type": "bullet", "text": "<span class=\"term\">Aerodynamic 모델 단순화의 영향</span> — Z-direction drag 무시, mean-thrust 가정. 이런 단순화가 controller 설계에는 도움이 되나 outdoor wind gust 에서는 성능 저하 가능. 모델 정확도 vs 계산 가능성 trade-off."}, {"type": "bullet", "text": "<span class=\"term\">Body 자체의 enrichment 부재</span> — 같은 IJRR 리뷰 (Nekoo 2025) 에서 강조한 \"AI 만이 답이 아니고 body 도 enrich 해야\" 의 관점. 본 연구는 algorithmic side 만, hardware 변화 (분리 tail, morphing) 는 future work."}, {"type": "bullet", "text": "<span class=\"term\">실용 응용으로의 거리</span> — 본 연구의 closed-loop 통합은 결정적 진보. 그러나 (a) onboard sensing/computing, (b) outdoor robust 성, (c) sharp maneuver, (d) wind disturbance robust 등 4가지 추가 단계 가 필요. 본 연구의 framework 은 이 4가지 모두로 확장 가능한 토대를 제공."}]}, "conclusion": {"content": [{"type": "bullet", "text": "<span class=\"term\">Underactuated FWAV trajectory planning 의 이론적 base</span> 확립 — vertical frame dynamics 와 nonholonomic 유사 제약 위에서 시스템이 differential flat 임을 증명."}, {"type": "bullet", "text": "<span class=\"term\">Polynomial-based trajectory generation</span> — minimum-snap + velocity term 의 가중 objective. continuity·boundary·kinodynamic·obstacle constraint 모두 통합. MATLAB fmincon 으로 offline 풀이."}, {"type": "bullet", "text": "<span class=\"term\">새 trajectory tracking controller</span> — outer loop (saturation + Lyapunov V_1), heading subsystem (switch + hysteretic, Lyapunov V_2), inner loop (reduced attitude PD). cascade system stability theory 로 closed-loop asymptotic stability 증명."}, {"type": "bullet", "text": "<span class=\"term\">실 3D 비행에서 generation + control 의 첫 closed-loop 통합</span> — Bat Bot 등 기존 사례는 generation 또는 control 만 또는 2D 만. 본 연구가 underactuated FWAV 에서 둘을 결합한 첫 사례."}, {"type": "bullet", "text": "<span class=\"term\">3 case 실 비행 검증</span> — ball obstacle (Case a), cylinder obstacles (b), waypoint flight (c). (a)(b) 성공, (c) 의 한계가 heading rate 라는 발견 자체가 의미있는 결과."}, {"type": "bullet", "text": "<span class=\"term\">Open-source 코드·영상 공개</span> — github.com/Chainplain/{CrappyMinimumSnap, UATrajTrack} 와 YouTube 비행 영상. 재현성 + 후속 연구 가속화."}, {"type": "bullet", "text": "<span class=\"term\">Future work — Onboard 통합</span>: aerodynamic configuration 개선과 함께 attitude·position estimation/control 을 완전 onboard 로. 이는 outdoor 응용의 prerequisite."}, {"type": "bullet", "text": "<span class=\"term\">Future work — Small-scale FWAV perching</span>: 정밀 maneuverability 가 perching 의 prerequisite. 본 연구의 framework 위에 추가 capability 로 확장."}, {"type": "bullet", "text": "<span class=\"term\">Future work — Heading rate constraint</span>: case (c) 의 실패 원인 해결. quadratic form 유지 + heading rate 추가의 동시 달성이 challenge — 본 연구 범위 밖이지만 명확한 다음 단계."}, {"type": "bullet", "text": "<span class=\"term\">Sufficiency for 일반 비행 임무</span> — obstacle 회피 등 일반적 임무에는 본 controller 만으로 충분. 더 정밀한 mission (예: 작은 표적 picking) 을 위해서는 추가 정확도 향상 필요."}]}};
+
+        function openModal(key) {
+            const detail = SECTION_DETAIL[key];
+            if (!detail) return;
+            document.getElementById('modal-title').innerText = SECTION_TITLES[key] || key;
+
+            let html = '';
+            html += (detail.content || []).map(item => {
+                if (item.type === 'bullet') {
+                    return `<div class="bullet">${item.text}</div>`;
+                } else if (item.type === 'formula') {
+                    return `<div class="formula-block">
+                        <div class="formula-label">${item.label}</div>
+                        <div class="formula-latex">$$${item.latex}$$</div>
+                        <div class="formula-desc">${item.description}</div>
+                    </div>`;
+                }
+                return '';
+            }).join('');
+
+            const body = document.getElementById('modal-body');
+            body.innerHTML = html;
+            body.scrollTop = 0;
+            document.getElementById('modal-overlay').classList.add('active');
+
+            // Re-render KaTeX in the new content
+            if (window.renderMathInElement) {
+                renderMathInElement(body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$',  right: '$',  display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
