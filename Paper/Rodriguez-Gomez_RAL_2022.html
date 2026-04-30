@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Free as a Bird: Event-Based Dynamic Sense-and-Avoid for Ornithopter Robot Flight</title>
+    <meta name="keywords" content="collision avoidance, sense-and-avoid, event camera, ornithopter, flapping-wing robot, dynamic obstacle, perception and autonomy, E-Flap, onboard processing">
+    <meta name="paper-authors" content="Juan Pablo Rodríguez-Gómez, Raul Tapia, Maria del Mar Guzmán Garcia, Jose Ramiro Martínez-de Dios, Anibal Ollero">
+    <meta name="paper-journal" content="IEEE Robotics and Automation Letters, Vol. 7, No. 2, April 2022, pp. 5413–5420 · DOI: 10.1109/LRA.2022.3153904">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -52,6 +55,19 @@
             font-size: 19px; font-weight: bold; margin-bottom: 8px; color: #005b96;
         }
         .summary { font-size: 17px; line-height: 1.65; }
+        .keywords {
+            margin-top: 10px;
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .keyword-chip {
+            font-size: 12px;
+            padding: 3px 10px;
+            background: white;
+            color: #005b96;
+            border: 1px solid #c6dbed;
+            border-radius: 999px;
+            font-weight: 500;
+        }
 
         .content {
             display: grid;
@@ -193,6 +209,7 @@
         <div class="summary-container">
             <div class="summary-title">논문 요약</div>
             <div class="summary">이 논문은 대형 ornithopter (날갯짓 비행체) 의 동적 장애물 회피를 위한 <span class="term">세계 최초 event camera 기반 sense-and-avoid 시스템</span>을 제안한다. 온보드 자원 제약이 큰 ornithopter 의 특성 (날갯짓 진동·낮은 페이로드·중속비행 3~6 m/s) 을 고려하여 <span class="term">event-by-event 처리</span> 방식으로 <span class="term">250 Hz</span> 응답을 달성한다. Time filter · corner detector · optical flow · clustering 으로 동적 객체를 추적하고, geometry 기반 collision risk 평가 후 tail deflection 으로 회피 기동을 수행한다. GRVC E-Flap (날개폭 1.5 m, 510 g) 에서 indoor/outdoor 검증 — 평균 회피 성공률 <span class="term">89.7%</span>, 검출 정확도 <span class="term">91.7%</span> 로 quadrotor 용 기존 방법으로 해결 불가했던 ornithopter 고유 문제를 처음으로 해결했다.</div>
+            <div class="keywords"><span class="keyword-chip">collision avoidance</span><span class="keyword-chip">sense-and-avoid</span><span class="keyword-chip">event camera</span><span class="keyword-chip">ornithopter</span><span class="keyword-chip">flapping-wing robot</span><span class="keyword-chip">dynamic obstacle</span><span class="keyword-chip">perception and autonomy</span><span class="keyword-chip">E-Flap</span><span class="keyword-chip">onboard processing</span></div>
         </div>
 
         <div class="content">
