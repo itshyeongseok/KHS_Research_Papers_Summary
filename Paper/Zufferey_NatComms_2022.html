@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>How ornithopters can perch autonomously on a branch</title>
+    <meta name="keywords" content="autonomous perching, bistable claw, ornithopter, flapping-wing robot, branch landing, bio-inspired, E-Flap, P-Flap, pitch-yaw-altitude control, close-range correction, line-scan sensor, passive grasping">
+    <meta name="paper-authors" content="Raphael Zufferey, Jesus Tormo-Barbero, Daniel Feliu-Talegón, Saeed Rafee Nekoo, José Ángel Acosta, Anibal Ollero">
+    <meta name="paper-journal" content="Nature Communications, Vol. 13, 7713 (2022) · DOI: 10.1038/s41467-022-35356-5">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$',  right: '$',  display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Noto Sans KR', 'Arial', sans-serif;
+            margin: 0; padding: 0;
+            background: #f5f5f5;
+            color: #333;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+        }
+        .slide {
+            width: min(1680px, 98vw);
+            height: 96vh;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            overflow: hidden;
+        }
+        .header {
+            background: #005b96;
+            color: white;
+            padding: 26px 38px;
+        }
+        .title { font-size: 32px; font-weight: bold; margin-bottom: 10px; line-height: 1.3; }
+        .authors { font-size: 17px; margin-bottom: 5px; }
+        .journal { font-size: 15px; opacity: 0.9; }
+
+        .summary-container {
+            background: #f0f5fa;
+            padding: 18px 38px;
+            border-bottom: 1px solid #e1e5e8;
+        }
+        .summary-title {
+            font-size: 19px; font-weight: bold; margin-bottom: 8px; color: #005b96;
+        }
+        .summary { font-size: 17px; line-height: 1.65; }
+        .keywords {
+            margin-top: 10px;
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .keyword-chip {
+            font-size: 12px;
+            padding: 3px 10px;
+            background: white;
+            color: #005b96;
+            border: 1px solid #c6dbed;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 14px;
+            padding: 14px 18px;
+            overflow: hidden;
+        }
+        .section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,91,150,0.18);
+            border-color: #005b96;
+        }
+        .section-title {
+            color: #005b96;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 9px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #005b96;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .click-hint {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+        .section-summary {
+            font-size: 15px;
+            line-height: 1.6;
+            flex: 1;
+            overflow: hidden;
+        }
+        .term { font-weight: bold; color: #005b96; }
+        .eng { color: #666; font-style: italic; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            justify-content: center; align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.18s ease-out;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: white;
+            width: min(1100px, 90vw);
+            height: min(800px, 88vh);
+            border-radius: 10px;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .modal-header {
+            background: #005b96;
+            color: white;
+            padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 22px; font-weight: bold; }
+        .modal-close {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px; line-height: 1;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.2); }
+        .modal-body {
+            padding: 24px 32px;
+            overflow-y: auto;
+            font-size: 15.5px;
+            line-height: 1.75;
+        }
+        .modal-body .bullet {
+            margin-bottom: 10px;
+            padding-left: 18px;
+            text-indent: -18px;
+        }
+        .modal-body .bullet:before {
+            content: "▸ ";
+            color: #005b96;
+            font-weight: bold;
+        }
+        .modal-body .formula-block {
+            background: #f8f9fb;
+            border-left: 4px solid #005b96;
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 4px;
+        }
+        .modal-body .formula-label {
+            font-size: 12px;
+            color: #005b96;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .modal-body .formula-desc {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+        .modal-body h4 {
+            color: #005b96;
+            margin-top: 22px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="header">
+            <div class="title">How ornithopters can perch autonomously on a branch</div>
+            <div class="authors">Raphael Zufferey, Jesus Tormo-Barbero, Daniel Feliu-Talegón, Saeed Rafee Nekoo, José Ángel Acosta, Anibal Ollero</div>
+            <div class="journal">Nature Communications, Vol. 13, 7713 (2022) · DOI: 10.1038/s41467-022-35356-5</div>
+        </div>
+
+        <div class="summary-container">
+            <div class="summary-title">논문 요약</div>
+            <div class="summary">이 논문은 <span class="term">대형 ornithopter 의 첫 자율 가지 perching</span>을 시연한 GRVC Robotics Lab (Sevilla) 의 Nature Communications 발표 — Free as a Bird 와 같은 그룹의 시그니처 결과. <span class="term">P-Flap (Perching Flapping-Wing Robot)</span> 은 E-Flap 기반 700 g · 1.5 m wingspan 로봇에 (1) pitch-yaw-altitude 비행 제어, (2) line-scan vision 의 close-range correction (±10-15 cm 비행 오차 보상), (3) <span class="term">bistable carbon-fiber claw + 능동 leg</span> 의 3 모듈을 통합. Bistable claw 는 25 ms 안에 가지를 잡고 56.8 N 지속 grip 을 적용하며, 충격 시 mechanical 단독으로 발동 (외부 sensing/actuation 불필요). 4 단계 개발 프로세스 (launcher → flight only → soft branch → real branch) 와 motion capture 기반 indoor 실험에서 <span class="term">9 회 시도 중 6 회 성공 (67%)</span>, 두 번째 로봇으로도 재현 — 첫 large-scale FWFR 가지 perching 사례.</div>
+            <div class="keywords"><span class="keyword-chip">autonomous perching</span><span class="keyword-chip">bistable claw</span><span class="keyword-chip">ornithopter</span><span class="keyword-chip">flapping-wing robot</span><span class="keyword-chip">branch landing</span><span class="keyword-chip">bio-inspired</span><span class="keyword-chip">E-Flap</span><span class="keyword-chip">P-Flap</span><span class="keyword-chip">pitch-yaw-altitude control</span><span class="keyword-chip">close-range correction</span><span class="keyword-chip">line-scan sensor</span><span class="keyword-chip">passive grasping</span></div>
+        </div>
+
+        <div class="content">
+            <div class="section" onclick="openModal('introduction')">
+                <div class="section-title">Introduction: 연구 동기 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">FWFR 가 application 영역을 확장하려면 perching·landing 능력이 필수 — 야생 모니터링·biological sampling·인프라 inspection·solar 충전 등의 응용이 모두 perching 위에 가능. 그러나 large-scale ornithopter 의 perching 은 본질적으로 어렵다 — flapping 의 unsteady aerodynamics 가 정밀 위치 제어를 방해, hover 불가능 (forward velocity 유지 필요), kinetic energy ($Lv^2 \sim 1$ scaling) 가 grasp strength 보다 빠르게 증가. 기존 perching 연구 (multi-rotor, fixed-wing, RoboBee insect-scale) 는 모두 이 문제를 부분적으로만 해결. <span class="term">large flapping-wing robot 의 가지 perching 은 처음</span>.</div>
+            </div>
+            <div class="section" onclick="openModal('related_works')">
+                <div class="section-title">Related Works: 관련 연구 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">Perching 연구는 vehicle type 별로 서로 다른 흐름. <span class="term">Multirotor</span> — gripper·spine·tendon mechanism 등 다양 (hover 가능 + 위에서 perch). <span class="term">Fixed-wing</span> — catapult-based [26] 정도, free flight perching 은 미해결. <span class="term">Insect-scale FWFR (RoboBee)</span> — flat ceiling electrostatic adhesion, 다른 scale 문제. <span class="term">Large FWFR</span> — perching 자체가 본 연구 이전엔 부재. 본 연구가 large-scale 영역의 최초.</div>
+            </div>
+            <div class="section" onclick="openModal('method')">
+                <div class="section-title">Method: 새로운 접근 방법 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">방법은 3 모듈 통합: (1) <span class="term">Bistable carbon-fiber claw</span> — 스프링 저장 에너지로 25 ms 안에 closing, 56.8 N 지속 grip, 충격 단독 발동 (외부 트리거 없음). (2) <span class="term">Active leg with line-scan vision</span> — TSL1401 sensor 가 6 cm 가지를 190 cm 거리에서 검출, PD controller 가 elbow servo 작동으로 ±10-15 cm 비행 오차 보상. (3) <span class="term">Pitch-yaw-altitude flight controller</span> — 120 Hz C++ autopilot, NanoPi Neo Air + 커스텀 uC, 3 parallel control loop. 4 단계 development process (launcher → flight only → soft branch → real branch) 로 안전한 iterative tuning.</div>
+            </div>
+            <div class="section" onclick="openModal('experiment')">
+                <div class="section-title">Experiment: 실험 방법과 결과 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary"><span class="term">4 단계 개발 프로세스</span>: (1) Launcher 만 (no flight, claw 단독 시험), (2) Flight only (no claw), (3) Soft branch + claw + leg, (4) Full perching (real wooden branch). Launcher 단계에서 100% 성공 4 m/s 까지, 25 ms grip lock, force <150 N, yaw deviation 허용 ±10-20°. Flight 단계에서 30° pitch · 2.5-3 m/s · 2 m altitude 유지. <span class="term">9 회 perching 시도 중 6 회 성공 (67%)</span>, 두 번째 로봇으로도 modification 없이 재현. Indoor + motion capture 환경.</div>
+            </div>
+            <div class="section" onclick="openModal('discussion')">
+                <div class="section-title">Discussion: 결과의 해석 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">본 연구의 결정적 차별점은 <span class="term">3 모듈의 단순한 합이 아닌 통합</span>. Bistable claw 가 mechanical 단독 발동 (외부 sensing/actuation 불필요) 으로 fail-safe; close-range correction 이 비행 오차의 마지막 5-15 cm 보정; flight controller 가 envelope 안에서만 작동하도록 trajectory 선택. 한계: indoor + motion capture, 통제된 환경, 정량적 success rate (67%) 는 실용 응용에는 추가 향상 필요. Outdoor perching, cluttered environment, 풍속 disturbance 가 다음 도전.</div>
+            </div>
+            <div class="section" onclick="openModal('conclusion')">
+                <div class="section-title">Conclusion: 최종 요약 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">본 연구는 <span class="term">large-scale flapping-wing robot 의 첫 자율 가지 perching</span> 을 시연했다. 3 모듈 통합 — pitch-yaw-altitude flight controller, line-scan close-range correction, bistable claw + active leg — 으로 700 g · 1.5 m wingspan P-Flap 이 67% 성공률 (9 시도 중 6 회) 로 perching. <span class="term">Bistable claw 가 25 ms grasp · 56.8 N grip · mechanical 단독 발동</span>의 핵심 enabler. Long-range mission, bird observation, outdoor manipulation 등 vast application 의 길을 엶.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title"></div>
+                <button class="modal-close" onclick="closeModal()" aria-label="닫기">×</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const SECTION_TITLES = {
+            introduction: "Introduction — 연구 동기",
+            related_works: "Related Works — 관련 연구",
+            method: "Method — 새로운 접근 방법",
+            experiment: "Experiment — 실험 방법과 결과",
+            discussion: "Discussion — 결과의 해석",
+            conclusion: "Conclusion — 최종 요약"
+        };
+
+        const SECTION_DETAIL = {"introduction": {"content": [{"type": "bullet", "text": "<span class=\"term\">Perching 의 application 가치</span> — 자연계 모든 새가 perching 능력을 보유. FWFR 에 perching 도입 시: (a) propeller-less + quiet 으로 야생 모니터링, (b) microscopic branch surface 분석, (c) leaf 샘플 회수, (d) solar 충전으로 long-range 임무, (e) pipe·power line·인프라 contact inspection 등 vast array of applications."}, {"type": "bullet", "text": "<span class=\"term\">Large-scale FWFR 만의 본질적 어려움 1 — Aerodynamics</span>: hard-to-model 한 unsteady aerodynamics + flapping motion 이 정밀 제어를 방해. 결과적으로 위치 제어 정확도가 낮아 정확한 가지 위치 도달이 어렵다."}, {"type": "bullet", "text": "<span class=\"term\">Large vs. small scale 의 trade-off</span>: small-scale + hover-capable (RoboBee 같은) 은 정밀 위치 가능하지만 payload 한계와 manufacturing 복잡도. large + tail 가진 FWFR 는 hover 불가 → forward velocity 유지 필요 → grasping 이 forward-moving robot 을 stop 시켜야 함."}, {"type": "bullet", "text": "<span class=\"term\">Scaling 의 본질적 갭 (식)</span>: $Lv^2 \\sim 1$ (kinetic energy ~ $L^3 v^2$, grasp strength ~ $L^2$). 즉 큰 로봇일수록 landing speed 가 더 느려야 하지만 $v$ 의 lower bound 는 비행 유지를 위해 존재. 그리고 grasp 후 무게 ~ $L^3$ 인데 grip force ~ $L^2$ 라 perching 가능 사이즈 상한도 존재."}, {"type": "bullet", "text": "<span class=\"term\">Bird 의 perching 메커니즘</span>: 강한 muscle 로 body weight 의 2.5 배 까지 force 발휘. ~1 ms ultra-fast grasping (tendon 의 stored potential energy). 단단한 claw + 부드러운 toe pad 로 high friction. 본 논문이 \"hard tip + soft pad\" 조합 직접 모방."}, {"type": "bullet", "text": "<span class=\"term\">Multirotor perching 사례</span>: micro-spines [14,15], spines [16], fiber adhesive [17], mechanical gripper [18,19], 가지에 hang [20], 가지에 sit [21], beam 아래 hang (bistable [22]), localized perching with vision [23,24], Roderick et al. [25] 의 tendon-driven multi-joint claw — 모두 hover 가능 platform 이 전제."}, {"type": "bullet", "text": "<span class=\"term\">Fixed-wing perching</span>: Stewart et al. [26] 가 catapult 발사로 7.4 m/s perching (fixed-wing). 인상적이지만 free flight 에서의 perching 은 여전히 미시연."}, {"type": "bullet", "text": "<span class=\"term\">FWFR 만의 추가 제약</span>: payload restriction 이 더 엄격, flapping 진동이 추가로 발생. multi-rotor 는 위에서 perching 가능하지만 FWFR 는 그렇지 않음 — 이 차이가 본 연구의 핵심 도전."}, {"type": "bullet", "text": "<span class=\"term\">기존 FWFR perching</span>: RoboBee (centimeter-scale, 100 mg) — flat ceiling 에 electrostatic adhesion. 매우 다른 scale·메커니즘. <span class=\"term\">large flapping-wing robot 의 branch perching 은 본 연구가 첫 사례</span>."}, {"type": "bullet", "text": "<span class=\"term\">본 논문의 contribution</span> — three-phased method: (1) flapping-flight controller (pitch-yaw-altitude), (2) close-range correction system (vision-based), (3) passive perching appendage (bistable claw + active leg). 700 g · 1.5 m wingspan 로봇에서 첫 indoor autonomous branch perching 시연."}]}, "related_works": {"content": [{"type": "bullet", "text": "<span class=\"term\">Fixed-wing perching to walls (Lussier 2009 [13])</span>: spike 기반 wall attachment. 전이가 가능하지만 branch 가 아니라 평면."}, {"type": "bullet", "text": "<span class=\"term\">Surface attachment 의 4 흐름</span>: (a) micro-spines ([14,15] dry adhesive 영감), (b) macro-spines ([16] biological), (c) fiber-based adhesive ([17] gecko 모방), (d) nature-inspired mechanical grippers ([18,19])."}, {"type": "bullet", "text": "<span class=\"term\">Multirotor branch hanging ([20])</span>: 가지에 passively hang. 다양 직경 가능. 단 활동적 perching 이 아닌 정적 매달림."}, {"type": "bullet", "text": "<span class=\"term\">Multirotor passive sitting ([21])</span>: 가지에 위에서 앉음. multi-rotor 의 hover 가능성이 핵심 활용."}, {"type": "bullet", "text": "<span class=\"term\">Quadcopter bistable clamping ([22])</span>: beam 아래 hang. 본 연구의 bistable claw 와 메커니즘적 유사성 — 그러나 multi-rotor."}, {"type": "bullet", "text": "<span class=\"term\">Localized perching with vision ([23,24])</span>: hover-capable multi-rotor + 비전 기반 feature 검출. 정확한 위치 도달 가능. FWFR 는 hover 불가라 직접 적용 불가."}, {"type": "bullet", "text": "<span class=\"term\">Roderick et al. [25] — bird-inspired multi-joint claw on multirotor</span>: tendon-driven locking + 다관절 claw 디자인. 인상적인 graspability — 그러나 multirotor platform."}, {"type": "bullet", "text": "<span class=\"term\">Fixed-wing catapult perching (Stewart et al. [26], Science Robotics)</span>: catapult 로 7.4 m/s 까지 grasping. fixed-wing 의 영역 확장 — 그러나 free flight 에서의 perching 은 여전히 미해결."}, {"type": "bullet", "text": "<span class=\"term\">FWFR 영역의 perching 부재</span>: insect-scale RoboBee [27] 가 100 mg, flat ceiling 에 electrostatic adhesion 으로 perching. 다른 scale 문제 — 가지 perching 은 미시연. <span class=\"term\">large flapping-wing robots 영역에서 가지 perching 은 본 연구 이전 0편</span>."}, {"type": "bullet", "text": "<span class=\"term\">본 연구의 위치</span>: large-scale FWFR + 가지 perching 의 첫 사례. 위 multi-rotor·fixed-wing·insect-scale 의 어느 흐름도 직접 적용 불가능 — 새로운 통합 (bistable claw + active leg + close-range vision + pitch-yaw-altitude controller) 이 필요."}]}, "method": {"content": [{"type": "bullet", "text": "<span class=\"term\">P-Flap 플랫폼</span>: E-Flap 기반 ([30] Zufferey 2021). 150 cm wingspan, 500 g empty + 200 g claw mechanism = 700 g 총 무게, 100% payload capacity, 16 N/m² wing loading. Stable flight 3 m/s+, perching 4 m/s 까지."}, {"type": "bullet", "text": "<span class=\"term\">Bistable claw 의 핵심 아이디어</span>: 스프링 저장 에너지로 fast + strong grasp 동시 달성. 직접 DC drive 는 (a) 무게 부담, (b) perching 후에도 power consumption 발생 — long-duration manipulation 에 부적합. <span class=\"term\">Bistable topology</span> 가 self-locking 으로 power 없이 grip 유지."}, {"type": "bullet", "text": "<span class=\"term\">Claw geometry 최적화</span>: 직선 segment $D_s$ + radius $D_r$ 의 둥근 부분이 contact line. $R_c$ 반경 = 가지 직경 + 약간 — spike 와 가지의 contact 보장. claw 회전점 사이 거리 $D_e = 50$ mm 가 최소 가지 직경 결정. 6 cm 가지 직경 기준 설계, 4-7 cm 범위에서 10% 이내 성능 변동, 11 cm 까지 작동."}, {"type": "formula", "label": "식 — Bistable claw scaling", "latex": "F_{\\text{grip}} \\sim L^2, \\quad E_{\\text{kinetic}} \\sim L^3 v^2 \\implies L v^2 \\sim 1", "description": "Grasping appendage 강도는 cross-sectional area ($L^2$) 에 비례하지만 비행체 kinetic energy 는 $L^3 v^2$ 로 더 빠르게 증가. 이로부터 $L v^2 \\sim 1$ — 큰 로봇일수록 landing speed 가 더 느려야 함. 그러나 $v$ 의 lower bound 는 비행 유지를 위해 존재 — 본 연구 P-Flap (1.5 m wingspan, 4 m/s perching) 이 그 trade-off 의 한 점."}, {"type": "bullet", "text": "<span class=\"term\">Bistable 동작 sequence</span>: (i) Open 위치 ($\\Psi_2 = -4°$, 스프링이 회전중심 뒤) — 안정. (ii) 가지가 protrusion 이나 claw 끝 충격. (iii) 스프링이 회전중심 앞으로 이동하며 closing 가속. (iv) 충격 시 스프링이 shock absorber 역할 — 측면 plate 부담 감소. (v) Closed 후 56.8 N 지속 force at contact point."}, {"type": "bullet", "text": "<span class=\"term\">Claw locking & re-opening</span>: locking torque 는 interface material 의존 — Spike + Ecoflex soft pad 조합이 hard tip + soft toe 의 새 모방으로 최고 friction. Re-opening 은 200 N pull-leadscrew 메커니즘으로 20 초 내 (motor 평균 3 W). End switch 가 motor stop, 그 다음 carriage 후퇴, tendon 풀어짐 — claw 는 bistable 로 open 유지."}, {"type": "bullet", "text": "<span class=\"term\">Active leg with PSO 최적화</span>: 두 평행 carbon-fiber plate 사이 34 g servo motor 가 회전 운동. 0° (vertical down) ~ 90° (horizontal) 회전. Diagonal spring 이 충격 에너지 흡수. <span class=\"term\">Particle Swarm Optimization (PSO)</span> 으로 servo stress + angular momentum (gear tooth stress) + leg mass 의 cost function 최소화."}, {"type": "bullet", "text": "<span class=\"term\">Line-scan branch detection</span>: TSL1401 sensor (1 × 128 pixel, contrast-based detection [32]). 가지 6 cm 직경을 190 cm 거리까지 검출. <span class=\"term\">Single-row pixel array</span> — 3D vision 보다 가벼움, motion blur 거의 없음 (1D 이므로). Future: stereo CMOS 또는 event camera 로 outdoor 확장."}, {"type": "bullet", "text": "<span class=\"term\">Close-range correction loop</span>: 가지의 pixel offset → PD controller → elbow servo position. 결과: claw 와 sensor 가 동시 이동하여 가지 추적, 비행 ±10-15 cm 오차를 5 cm 정확도로 보정. 2 Hz · 4 Hz oscillation, launcher 2.5 m/s 다양한 동작에서 검증."}, {"type": "bullet", "text": "<span class=\"term\">Avionics</span>: 1.6 mm full-body PCB (구조 부품 겸용). NanoPi Neo Air companion computer (high-level trajectory) + 커스텀 uC (low-level 120 Hz control). 3 parallel control loop: pitch $\\Theta$, yaw $\\Psi$, height $Z$. Actuation: $\\delta_e$ (elevator), $\\delta_r$ (rudder), $\\Xi_F$ (flapping freq). 4S LiPo, BLDC + ESC, IR LED tracking."}, {"type": "bullet", "text": "<span class=\"term\">Flight controller 설계 4 단계</span>: (1) launching speed 별 flight envelope 분석, (2) saturation/stability margin 없는 trajectory 선택 (max 3 m height 증가, 14 m testbed 안에서), (3) PID flight loop tuning, (4) leg-claw approach phase tuning. (1)(2) 가 critical — PID 로 maneuver 가능한 envelope 안에 머물게 함."}, {"type": "bullet", "text": "<span class=\"term\">Altitude dynamics 한계</span>: tailed ornithopter 가 passively stable 이지만 perching 시 정확한 위치 어려움. <span class=\"eng\">Non-minimum phase</span> altitude dynamics (fixed-wing 과 유사) 가 settling time 한계 부여. flapping 자체가 vertical oscillation 유발 — close-range correction 의 정당화."}]}, "experiment": {"content": [{"type": "bullet", "text": "<span class=\"term\">실험 환경</span>: 14 m × ? × ? indoor testbed, 2 m altitude wooden branch (직경 6 cm, 80 cm 길이, 검은색 도장), 45° aluminum profile 로 safety net 통과. Motion capture system 으로 ground truth + pose feedback (실시간 wireless stream)."}, {"type": "bullet", "text": "<span class=\"term\">Step 1 — Launcher 실험 (claw 단독)</span>: 50 cm rail launcher 가 robot mass equivalent 를 가속, 20 cm 의 air phase 후 force-sensor 가 부착된 가지 충돌. High-speed video 기록. <span class=\"term\">100% 성공 4 m/s 까지</span>, 구조적 손상 없음."}, {"type": "bullet", "text": "<span class=\"term\">Claw lock time 측정</span>: 25 ms 안에 lock — 예상 20 ms 보다 약간 느리지만 perching 에 충분. 충격 시작부터 bounce 시작까지 50 ms — 빠른 reaction 가능."}, {"type": "bullet", "text": "<span class=\"term\">Force 측정</span>: 4 m/s 에서 vertical misalignment $z$ 에 따른 force, 모두 150 N 이하 유지. 충격 시 spring 이 absorber 역할 — peak force 가 50 N 수준에서 short pulse."}, {"type": "bullet", "text": "<span class=\"term\">Yaw deviation tolerance</span>: 가지에 perpendicular 가 아닐 때, leg pitch 각도 (45-75°) 에 따라 ±10-20° tolerance. 90° = horizontal leg. 4 m/s 에서도 적정 tolerance 내 perching 성공."}, {"type": "bullet", "text": "<span class=\"term\">Leg pitch vs 속도</span>: low velocity → high CoM offset → backward fall 위험; high velocity → high angular momentum → forward fall. 적정 zone 이 \"perched\" 영역. 본 연구의 35-80° leg angle, 1.5-3.5 m/s 영역에 perched zone 분포."}, {"type": "bullet", "text": "<span class=\"term\">Step 2 — Flight only</span>: 가지 없이 flight controller 단독 검증. 통신·전자·in-flight 검증."}, {"type": "bullet", "text": "<span class=\"term\">Step 3 — Soft branch</span>: 검은 foam cylinder, detachable velcro strap. 활동 중 leg tuning + 충격 회피. claw 가 반복적으로 soft branch 도달."}, {"type": "bullet", "text": "<span class=\"term\">Step 4 — Full perching (real branch)</span>: 실제 나무 가지. Pitch 30° (2.5-3 m/s 속도), altitude 2 m, lateral deviation < 0.6 m (가지 0.8 m 폭 내 거의 항상). Approach phase 시작은 가지로부터 150 cm — line sensor 활성화."}, {"type": "bullet", "text": "<span class=\"term\">Perching sequence</span>: (a) Launcher 가속 → (b) controlled flapping flight (pitch 30°, yaw 0°) → (c) 150 cm 도달 시 detection 활성화 → (d) leg servo 가 angle 보정 → (e) 20 cm 에서 flapping 정지 → (f) 충격 + claw lock."}, {"type": "bullet", "text": "<span class=\"term\">결과 — 9 회 시도 중 6 회 성공 (67%)</span>. 실패 3 회는 모두 가지를 narrow 하게 miss — 손상 없음. Successful flights 에서도 손상 없음. 두 번째 로봇 (제조 차이 있음, wing camber 없음) 도 controller/parameter 수정 없이 재현 — robustness."}, {"type": "bullet", "text": "<span class=\"term\">Reference 변동량</span>: $V_x$ 2.07-2.8 m/s, $\\psi$ -8.3°-4°, $\\theta$ 23.6°-31.8°, $Y$ -0.23-0.02 m, $Z$ 1.95-2.06 m. 6 회 성공 실험에서 변동량 작아 controller + leg-claw 조합이 inaccuracy 보상함을 입증."}]}, "discussion": {"content": [{"type": "bullet", "text": "<span class=\"term\">3 모듈 통합의 가치</span> — 어느 한 모듈도 단독으로는 perching 불가. flight controller 가 위치 정밀도 ±10-15 cm, close-range correction 이 5 cm 까지, claw 의 mechanical tolerance 가 그 이상을 흡수. <span class=\"term\">계층적 정확도 향상</span>이 핵심 design pattern."}, {"type": "bullet", "text": "<span class=\"term\">Bistable claw 의 fail-safe 우수성</span> — closing 이 \"외부 sensor + actuator + control\" 없이 가지 충격 단독으로 발동. 즉 sensing 실패 / actuator 고장 / 통신 끊김 시에도 closing 작동. 이것이 실용성의 enabler."}, {"type": "bullet", "text": "<span class=\"term\">Stored mechanical energy 의 이점</span> — 25 ms 안에 closing 가능한 high-speed actuation 을 motor 만으로는 불가. 스프링 저장 에너지가 기계적으로 폭발적 release. 새의 tendon-stored energy 와 본질적으로 동일 메커니즘."}, {"type": "bullet", "text": "<span class=\"term\">Hard tip + Soft pad 의 교훈</span> — 새 claw 의 디자인 직접 모방. Spike (carbon-fiber) + Ecoflex pad 조합이 PLA 단독·Ecoflex 단독·Spike 단독보다 friction 우수. Future: 새 claw 보다 더 부드러운 재료로 가지 다양성 대응 가능."}, {"type": "bullet", "text": "<span class=\"term\">Line-scan vision 의 trade-off</span> — 1D pixel array 가 (a) motion blur 거의 없음, (b) 가벼움, (c) 처리 빠름의 강점. 단점: <span class=\"term\">3D 정보 부재, cluttered 환경 부적합</span>. Outdoor 확장 시 stereo CMOS / event camera 로 교체 필요."}, {"type": "bullet", "text": "<span class=\"term\">Pitch 30° trade-off</span> — Pitch 가 높을수록 속도 낮춰 충격 force 감소, 그러나 flapping freq 가 5.5 Hz 한계로 인해 40°+ 에서 lateral control 상실. 30° 가 충격력과 control authority 의 sweet spot."}, {"type": "bullet", "text": "<span class=\"term\">Non-minimum phase altitude</span> — fixed-wing 과 동일 한계, settling time 본질적 lower bound. 이것이 close-range correction 의 정당화 — controller 만으로는 ±10-15 cm 정확도 불가."}, {"type": "bullet", "text": "<span class=\"term\">67% success rate 의 의미</span> — 첫 시연으로는 인상적이지만 실용 응용 (sample 회수·long-term observation) 에는 부족. 90%+ 가 실용 threshold. Nekoo 2024 (후속 논문) 가 88.3% 까지 향상 — 점진적 progress."}, {"type": "bullet", "text": "<span class=\"term\">Indoor + motion capture 의존</span> — outdoor 확장이 가장 큰 challenge. GPS 정확도 부족, wind disturbance, 가지 외 nearby obstacle, 다양 가지 종류·표면. 본 연구는 \"controlled lab\" 의 첫 시연 — outdoor 는 미해결."}, {"type": "bullet", "text": "<span class=\"term\">Future — Outdoor perching</span>: stereo CMOS/event camera 로 vision 강화, GPS+IMU+VIO 융합 navigation, wind disturbance robust controller (예: MPC 또는 RL), 다양 가지 적응형 claw (soft material 추가)."}, {"type": "bullet", "text": "<span class=\"term\">Future — Long-term manipulation</span>: perching 후 tool use, branch surface analysis, leaf sample 회수, solar charging 등 응용 잠재력. 현재 perching 자체만 시연 — \"perching 이 enabler\" 인 응용 layer 가 다음 연구."}]}, "conclusion": {"content": [{"type": "bullet", "text": "<span class=\"term\">First branch perching of a flapping-wing robot</span> — large-scale (1.5 m wingspan) FWFR 의 가지 perching 첫 시연. RoboBee 의 ceiling-flat-electrostatic 사례와 본질적으로 다른 영역."}, {"type": "bullet", "text": "<span class=\"term\">3 모듈 통합 architecture</span>: (a) flight controller 가 within ±10-15 cm 위치 도달, (b) close-range correction 이 5 cm 까지 보정, (c) bistable claw 가 mechanical 5 cm contact zone 안에서 grasp 발동. 계층적 정확도 향상이 design pattern."}, {"type": "bullet", "text": "<span class=\"term\">Bistable carbon-fiber claw</span> — 25 ms grasp time, 56.8 N 지속 grip, 11.4 N release force (kinematic threshold), spring-loaded mechanical 단독 발동. <span class=\"term\">외부 sensing/actuation 불필요</span> 로 fail-safe."}, {"type": "bullet", "text": "<span class=\"term\">Active leg + line-scan vision</span> — TSL1401 sensor + PD controller + elbow servo 로 비행 마지막 5-15 cm 의 inaccuracy 보상. 6 cm 가지를 190 cm 거리에서 detection."}, {"type": "bullet", "text": "<span class=\"term\">Pitch-yaw-altitude controller</span> — 120 Hz C++ autopilot, 3 parallel control loop. Tail 의 high pitch authority 가 30° pitch 유지 가능케 함. 추가 leg-claw control loop 가 approach phase 에서 활성."}, {"type": "bullet", "text": "<span class=\"term\">4 단계 개발 프로세스</span> (launcher → flight only → soft branch → real branch) 가 high-speed perching maneuver (<4 sec) 의 안전한 iterative 개발을 가능케 함. 후속 large-scale FWFR 연구의 method template."}, {"type": "bullet", "text": "<span class=\"term\">Experimental robustness</span> — 6/9 (67%) 성공률 + 두 번째 로봇 (manufacturing 차이, wing camber 없음) 으로 controller/parameter 수정 없이 재현. Robustness 입증."}, {"type": "bullet", "text": "<span class=\"term\">P-Flap 플랫폼 의의</span> — E-Flap (Zufferey 2021) 의 100% payload capacity 가 perching mechanism (200 g) 추가를 가능케 함. payload-to-weight ratio 가 FWFR 응용 확장의 enabler."}, {"type": "bullet", "text": "<span class=\"term\">Application potential</span>: bird observation (조용·propeller-less), branch surface microscopic analysis, leaf sample 회수, 인프라 contact inspection (pipe·power line), solar 충전 long-range mission. 모두 perching 위에서 가능."}, {"type": "bullet", "text": "<span class=\"term\">Future work</span>: outdoor perching (stereo / event camera, robust controller), claw 재료 다양화 (soft material 추가로 가지 종류 확장), longer mission (solar charging integration), perched 상태 manipulation (post-landing tool use)."}]}};
+
+        function openModal(key) {
+            const detail = SECTION_DETAIL[key];
+            if (!detail) return;
+            document.getElementById('modal-title').innerText = SECTION_TITLES[key] || key;
+
+            let html = '';
+            html += (detail.content || []).map(item => {
+                if (item.type === 'bullet') {
+                    return `<div class="bullet">${item.text}</div>`;
+                } else if (item.type === 'formula') {
+                    return `<div class="formula-block">
+                        <div class="formula-label">${item.label}</div>
+                        <div class="formula-latex">$$${item.latex}$$</div>
+                        <div class="formula-desc">${item.description}</div>
+                    </div>`;
+                }
+                return '';
+            }).join('');
+
+            const body = document.getElementById('modal-body');
+            body.innerHTML = html;
+            body.scrollTop = 0;
+            document.getElementById('modal-overlay').classList.add('active');
+
+            // Re-render KaTeX in the new content
+            if (window.renderMathInElement) {
+                renderMathInElement(body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$',  right: '$',  display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
