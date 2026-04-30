@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Design of the High-Payload Flapping Wing Robot E-Flap</title>
+    <meta name="keywords" content="E-Flap, flapping-wing robot, ornithopter, high payload, eagle-inspired, bird-scale, lightweight design, aero-elastic wing, modular design, autonomous flight platform, GRIFFIN ERC, physical interaction">
+    <meta name="paper-authors" content="Raphael Zufferey, Jesús Tormo-Barbero, M. Mar Guzmán, Fco. Javier Maldonado, Ernesto Sanchez-Laulhe, Pedro Grau, Martín Pérez, José Ángel Acosta, Anibal Ollero">
+    <meta name="paper-journal" content="IEEE Robotics and Automation Letters, Vol. 6, No. 2, April 2021, pp. 3097-3104 · DOI: 10.1109/LRA.2021.3061373">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$',  right: '$',  display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Noto Sans KR', 'Arial', sans-serif;
+            margin: 0; padding: 0;
+            background: #f5f5f5;
+            color: #333;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
+        }
+        .slide {
+            width: min(1680px, 98vw);
+            height: 96vh;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            overflow: hidden;
+        }
+        .header {
+            background: #005b96;
+            color: white;
+            padding: 26px 38px;
+        }
+        .title { font-size: 32px; font-weight: bold; margin-bottom: 10px; line-height: 1.3; }
+        .authors { font-size: 17px; margin-bottom: 5px; }
+        .journal { font-size: 15px; opacity: 0.9; }
+
+        .summary-container {
+            background: #f0f5fa;
+            padding: 18px 38px;
+            border-bottom: 1px solid #e1e5e8;
+        }
+        .summary-title {
+            font-size: 19px; font-weight: bold; margin-bottom: 8px; color: #005b96;
+        }
+        .summary { font-size: 17px; line-height: 1.65; }
+        .keywords {
+            margin-top: 10px;
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .keyword-chip {
+            font-size: 12px;
+            padding: 3px 10px;
+            background: white;
+            color: #005b96;
+            border: 1px solid #c6dbed;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 14px;
+            padding: 14px 18px;
+            overflow: hidden;
+        }
+        .section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,91,150,0.18);
+            border-color: #005b96;
+        }
+        .section-title {
+            color: #005b96;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 9px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #005b96;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .click-hint {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+        .section-summary {
+            font-size: 15px;
+            line-height: 1.6;
+            flex: 1;
+            overflow: hidden;
+        }
+        .term { font-weight: bold; color: #005b96; }
+        .eng { color: #666; font-style: italic; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            justify-content: center; align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.18s ease-out;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: white;
+            width: min(1100px, 90vw);
+            height: min(800px, 88vh);
+            border-radius: 10px;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .modal-header {
+            background: #005b96;
+            color: white;
+            padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 22px; font-weight: bold; }
+        .modal-close {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px; line-height: 1;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.2); }
+        .modal-body {
+            padding: 24px 32px;
+            overflow-y: auto;
+            font-size: 15.5px;
+            line-height: 1.75;
+        }
+        .modal-body .bullet {
+            margin-bottom: 10px;
+            padding-left: 18px;
+            text-indent: -18px;
+        }
+        .modal-body .bullet:before {
+            content: "▸ ";
+            color: #005b96;
+            font-weight: bold;
+        }
+        .modal-body .formula-block {
+            background: #f8f9fb;
+            border-left: 4px solid #005b96;
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 4px;
+        }
+        .modal-body .formula-label {
+            font-size: 12px;
+            color: #005b96;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .modal-body .formula-desc {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+        .modal-body h4 {
+            color: #005b96;
+            margin-top: 22px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="header">
+            <div class="title">Design of the High-Payload Flapping Wing Robot E-Flap</div>
+            <div class="authors">Raphael Zufferey, Jesús Tormo-Barbero, M. Mar Guzmán, Fco. Javier Maldonado, Ernesto Sanchez-Laulhe, Pedro Grau, Martín Pérez, José Ángel Acosta, Anibal Ollero</div>
+            <div class="journal">IEEE Robotics and Automation Letters, Vol. 6, No. 2, April 2021, pp. 3097-3104 · DOI: 10.1109/LRA.2021.3061373</div>
+        </div>
+
+        <div class="summary-container">
+            <div class="summary-title">논문 요약</div>
+            <div class="summary">이 논문은 GRVC Sevilla 의 <span class="term">E-Flap (Eagle-inspired Flapping-wing) — 510 g 본체 + 520 g 페이로드 (100% of empty weight)</span> 의 large-scale ornithopter 플랫폼 설계 보고. 1.5 m wingspan, 2-6 m/s 비행속도, GRIFFIN ERC Advanced Grant (2017-2024) 로 개발. 핵심 기술 혁신 4 가지: (a) 표준 lab 장비만으로 3 시간 안에 wing 제작하는 manufacturing 방법, (b) low-level driver + Linux companion 통합 lightweight 전자 framework, (c) optional camber 가능한 새 wing skeleton, (d) structure/wing/tail modular 설계. <span class="term">94 회 indoor + 100+ outdoor manual 비행 검증</span>으로 신뢰성 입증. 후속 연구 (Free as a Bird, Zufferey 2022 perching, Xu 2023 leader-follower 의 platform reference) 의 모든 enabler.</div>
+            <div class="keywords"><span class="keyword-chip">E-Flap</span><span class="keyword-chip">flapping-wing robot</span><span class="keyword-chip">ornithopter</span><span class="keyword-chip">high payload</span><span class="keyword-chip">eagle-inspired</span><span class="keyword-chip">bird-scale</span><span class="keyword-chip">lightweight design</span><span class="keyword-chip">aero-elastic wing</span><span class="keyword-chip">modular design</span><span class="keyword-chip">autonomous flight platform</span><span class="keyword-chip">GRIFFIN ERC</span><span class="keyword-chip">physical interaction</span></div>
+        </div>
+
+        <div class="content">
+            <div class="section" onclick="openModal('introduction')">
+                <div class="section-title">Introduction: 연구 동기 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">Flapping-wing robot 은 propeller 부재로 인한 안전성·근접 인간/환경 상호작용 가능성·perching 가능성으로 매력적이지만, 기존 "large-scale ornithopter" 들은 대부분 demonstration 또는 bird-deterrent 목적으로 설계되어 <span class="term">physical interaction 에 필요한 high computational power + low flight speed + 충분한 payload</span> 를 동시 만족하지 않았다. E-Flap 은 GRIFFIN ERC Advanced Grant 의 자율 비행 + 조작 capability 요구를 충족하는 첫 platform — 510 g 본체 + 100% payload + 2-6 m/s 비행 + 95% modular 설계.</div>
+            </div>
+            <div class="section" onclick="openModal('related_works')">
+                <div class="section-title">Related Works: 관련 연구 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">Ornithopter 영역은 size scale 별로 분명한 흐름: (1) milligram (Robobee, Wood Lab), (2) gram-scale (KuBeetle-S Park, BatBot Hutchinson), (3) medium 200-350 g (Dove NPU, ThunderI), (4) large 200-700 g (RoboRaven Maryland), (5) very large kg (Robird Falcon, SmartBird Festo). 각 카테고리는 다른 목적 — Robobee 가 insect biomechanics, RoboRaven 이 solar autonomy, Robird 가 bird deterrent 등. <span class="term">E-Flap 만이 "physical interaction + 자율 + payload + 안전성" 동시 추구</span>.</div>
+            </div>
+            <div class="section" onclick="openModal('method')">
+                <div class="section-title">Method: 새로운 접근 방법 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">E-Flap 은 <span class="term">aero-elastic 전체 시스템 통합 설계</span>: 1.5 m elliptical wing (aspect ratio 5), 1.5 mm chord rod 로 passive 90° phase wing twist, quarter-chord spar 위치, 82 g wing 무게 (55 g/m). Powertrain: brushless 모터 + transmission 71 g, 5.6 Hz max 비행. Lightweight 통합 electronics: low-level driver + Linux companion 컴퓨터. Modular 설계로 wing/tail/structure 모두 교체 가능. 표준 3D 프린터 + 2D 플레이트 cutter 만으로 robot 전체 2일 안에 조립 가능 — lab replication enabler.</div>
+            </div>
+            <div class="section" onclick="openModal('experiment')">
+                <div class="section-title">Experiment: 실험 방법과 결과 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">검증은 두 환경에서: (1) <span class="term">Indoor 28-카메라 Optitrack 추적</span> 환경에서 mass·power 분포, flight envelope, camber 효과, lateral maneuverability 정량 측정. (2) <span class="term">Outdoor manual flight 100+ 회</span> 로 signal logging + 신뢰성 검증. 주요 결과: <span class="term">최대 페이로드 520 g (100% body weight)</span>, flight envelope $\gamma_{ss,max} = 40°$ at $\theta_{ss} = 59°$, $V_{ss,max} = 5.63$ m/s, 최대 climb rate 1.79 m/s, 최대 turn rate 2.08 rad/s, 추가 93 g 배터리로 비행시간 5→15 분.</div>
+            </div>
+            <div class="section" onclick="openModal('discussion')">
+                <div class="section-title">Discussion: 결과의 해석 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">E-Flap 은 <span class="term">large-scale FWFR 연구의 platform 표준</span>으로 자리잡음. 세 핵심 design 결정이 후속 연구를 가능케 함: (a) 100% payload capacity 가 perching/manipulation/event camera/onboard 처리의 hardware 부담 흡수, (b) modular 설계가 wing camber/perching appendage/event camera 추가 등 다양 실험 enabler, (c) 표준 lab 장비 manufacturing 이 lab 간 replication 가능. 한계: 본 논문은 design 보고 위주로 자율 비행 자체는 indoor 추적 + outdoor manual 만 — 완전 자율 outdoor 비행은 후속 연구. Future work: closed-loop outdoor (vision sensor + onboard image processing), perching, obstacle avoidance, manipulation, human interaction.</div>
+            </div>
+            <div class="section" onclick="openModal('conclusion')">
+                <div class="section-title">Conclusion: 최종 요약 <span class="click-hint">클릭하여 자세히 ▸</span></div>
+                <div class="section-summary">E-Flap 은 <span class="term">large-scale FWFR 의 platform 표준</span>을 정의 — 510 g empty + 520 g payload (100% empty weight) + 1.5 m wingspan + 2-6 m/s 비행 + modular 설계 + 표준 lab 장비 manufacturing. 94 indoor + 100+ outdoor 비행으로 신뢰성 입증, 5 분 → 15 분 비행시간 (배터리 추가) 등 mission 능력 검증. 후속 GRVC 연구 (Free as a Bird, Zufferey 2022 perching) 의 모든 hardware 토대. Future: closed-loop outdoor + perching + obstacle avoidance + manipulation + human interaction.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title"></div>
+                <button class="modal-close" onclick="closeModal()" aria-label="닫기">×</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const SECTION_TITLES = {
+            introduction: "Introduction — 연구 동기",
+            related_works: "Related Works — 관련 연구",
+            method: "Method — 새로운 접근 방법",
+            experiment: "Experiment — 실험 방법과 결과",
+            discussion: "Discussion — 결과의 해석",
+            conclusion: "Conclusion — 최종 요약"
+        };
+
+        const SECTION_DETAIL = {"introduction": {"content": [{"type": "bullet", "text": "<span class=\"term\">Flapping-wing 의 core advantage</span> — propeller 부재로 (a) 사람·구조물 안전성 압도적, (b) 조용함, (c) 충돌해도 잘 깨지지 않음 → perching·근접 비행에 적합."}, {"type": "bullet", "text": "<span class=\"term\">Flapping flight 의 본질적 challenge</span> — (a) 1 kg 급에서 wing 동작이 propeller 보다 느리지만 high torque 필요, (b) airflow 가 highly turbulent → modeling/control 어려움, (c) 단순 oscillation 으로는 thrust 부족 → wing twist 필요 (active 또는 passive elastic)."}, {"type": "bullet", "text": "<span class=\"term\">소형 ornithopter 의 발전</span> — milligram (Robobee), gram (KuBeetle-S, BatBot) 스케일에서 hovering 가능. Engineering 은 인상적이지만 <span class=\"term\">payload 부족으로 real-world 응용 한계</span>. 큰 스케일로 extrapolation 도 Reynolds 수·구조 응력 차이로 어려움."}, {"type": "bullet", "text": "<span class=\"term\">Medium-scale (200-350 g, half-meter wingspan)</span> — Dove (NPU), ThunderI 가 ~10 m/s 비행. Dove 는 100 g payload 로 custom 전자 + camera 1개 미션 — 추가 payload 매우 제한."}, {"type": "bullet", "text": "<span class=\"term\">Large-scale (200-700 g)</span> — RoboRaven I-IV 가 6 m/s 까지 비행, 독특한 onboard solar panel 로 power 절반 공급. 그러나 physical interaction 미고려."}, {"type": "bullet", "text": "<span class=\"term\">Bird-deterrent class</span> — Robird Falcon 16 m/s, Robird Bald Eagle (2.1 kg, 1 kg payload, 18 m/s), Festo SmartBird (450 g, remote pilot demonstrator). 모두 demonstrator/deterrent — physical interaction 부재, computational power 부족."}, {"type": "bullet", "text": "<span class=\"term\">기존 design 의 공통 한계</span>: 각자 목적에는 맞지만 <span class=\"term\">physical interaction + 자율 + payload + 안전 비행속도</span> 의 4 요건 동시 충족 없음. E-Flap 이 이 갭을 채움."}, {"type": "bullet", "text": "<span class=\"term\">GRIFFIN ERC Advanced Grant 2017</span> — General compliant aerial Robotic manipulation system Integrating Fixed and Flapping wings to INcrease range and safety. 자율 + manipulation 의 두 capability 요구 — flapping-wing 영역에서 새로운 도전."}, {"type": "bullet", "text": "<span class=\"term\">E-Flap 의 4 가지 challenging requirement</span> 충족: (1) on-board reliable perception 용 hardware + 전력 (event camera 포함), Beyond Visual Line of Sight 안전 비행 가능, (2) 0.5 kg empty + 100% payload, (3) min 2 m/s 로 환경 physical interaction 가능, (4) 1.5 m wingspan 으로 indoor testbed 사용 가능, (5) modular 설계로 다양 실험 적응."}, {"type": "bullet", "text": "<span class=\"term\">기술적 4 contribution</span>: (a) 표준 lab 장비만으로 rapid manufacturing, (b) lightweight 통합 electronic framework, (c) optional camber wing skeleton, (d) structure/wing/tail modular design. 모두 lab replication 가능 — 후속 연구 활발의 enabler."}]}, "related_works": {"content": [{"type": "bullet", "text": "<span class=\"term\">Insect-scale: Robobee (Malka 2014, Wood Lab) [1]</span> — milligram, microscale flexure hinge 설계. Hovering 가능. 응용 한정 — 매우 작은 payload, 짧은 비행 시간."}, {"type": "bullet", "text": "<span class=\"term\">Gram-scale insect-like: KuBeetle-S (Phan 2019) [2]</span> — tailless, hover-capable, low-torque control. 곤충 모방."}, {"type": "bullet", "text": "<span class=\"term\">Gram-scale bat-like: Bat Bot B2 (Ramezani 2016) [3]</span> — 박쥐 inspired, 굴곡진 wing 모방. 자율 비행 capability 제한적."}, {"type": "bullet", "text": "<span class=\"term\">Tailless hover: Nano Hummingbird (Keennon 2012) [4]</span> — hover-capable tailless design 의 대표적 사례."}, {"type": "bullet", "text": "<span class=\"term\">Medium 200-350 g: Dove (NPU, Yang 2018) [5]</span> — 100 g payload 로 SOTA 였으나 1 mission 용 (camera) 으로 추가 payload 제한. ThunderI 도 유사 영역."}, {"type": "bullet", "text": "<span class=\"term\">Large 200-700 g: RoboRaven I-IV (Maryland, Gerdes 2014) [7,8]</span> — 6 m/s 까지 비행, 독립 제어 wing. Solar panel onboard (Perez-Rosado 2016) — power 의 절반 공급. 그러나 physical interaction 미설계."}, {"type": "bullet", "text": "<span class=\"term\">Very large class: Robird Falcon (Folkertsma 2017)</span> — 16 m/s 빠른 비행으로 공항 새 deterrent. Robird Bald Eagle (2.1 kg, 1 kg payload, 18 m/s) — payload 우수하지만 demonstrator 위주. <span class=\"term\">Festo SmartBird (450 g)</span> — remote pilot science demonstrator."}, {"type": "bullet", "text": "<span class=\"term\">기존 design 의 공통 결핍</span> — physical interaction 가능성이 없거나 제한적. 멀티로터/fixed-wing 의 기준에서 보면 충분히 큰 payload 와 충분히 낮은 속도 (2 m/s 미만 hover 어려움) 가 동시에 충족되는 ornithopter 부재."}, {"type": "bullet", "text": "<span class=\"term\">Maldonado 2020 [11] (선행 연구)</span> — adaptive nonlinear control for perching of bioinspired ornithopter. E-Flap 의 직접 prequel — 이 perching 연구가 E-Flap design 의 motivation."}, {"type": "bullet", "text": "<span class=\"term\">Aerodynamic theoretical 기반</span>: Garrick 1936 NACA TR567 [13] (기본 propulsion theory), Platzer 2008 AIAA [14] (progress and challenges), Smits 2019 [15] (undulatory/oscillatory swimming). DeLaurier 1993 [17] (efficient ornithopter wing). Heathcote-Gursul 2007 [18] (flexible flapping airfoil low Re). 이 이론적 토대 위에 E-Flap 설계."}]}, "method": {"content": [{"type": "bullet", "text": "<span class=\"term\">전체 design 철학</span>: maximum payload 가 robot 사이즈에 비례 증가 — wingspan 을 1.5 m (indoor testbed 한계) 로 bound. 총 design mass 1 kg = 500 g 로봇 + 100% payload. 비행속도 5 m/s 목표."}, {"type": "bullet", "text": "<span class=\"term\">Wing area 산정</span> — Steady level powered flight 식 $\\rho C_L v^2 S = 2 M g$ 에서 $C_L = 1.3$ (CFD), $v = 5$ m/s 로 $S = 0.52$ m² 도출."}, {"type": "formula", "label": "식 — Wing area 산정 (steady level flight)", "latex": "\\rho\\, C_L\\, v^2\\, S = 2\\, M\\, g \\implies S = \\frac{2 M g}{\\rho C_L v^2}", "description": "$\\rho$ 는 air density, $C_L = 1.3$ 은 CFD 로 얻은 lift coefficient, $v = 5$ m/s 는 target velocity, $M = 1$ kg 은 총 무게 (payload 포함). 결과: $S = 0.52$ m². 이로부터 wingspan 1.5 m + aspect ratio $b^2/S = 5$ → root chord 0.36 m, mean chord 0.29 m."}, {"type": "bullet", "text": "<span class=\"term\">Elliptical wing shape</span> — aerodynamic 측면 wing tip loss 감소 + 무게 분포 측면 wing inertia 감소 (root 가까이 무게 집중). Aspect ratio $b^2/S = 5$ — bird 와 유사."}, {"type": "bullet", "text": "<span class=\"term\">Wing 구조 — chord-wise flexibility 로 passive pitching</span>: Pure oscillation 만으로는 thrust 부족 [13-15]. Active twist mechanism 은 mechanical complexity ↑. 본 연구는 <span class=\"term\">chord-wise elasticity 로 passive twist</span> — aerodynamic load 가 90° phasing 의 wing deformation 자동 유발 [17, 18]."}, {"type": "bullet", "text": "<span class=\"term\">Chord rod 직경 = 1.5 mm</span> — modular design 으로 다양 직경 실험 후 선택. 충분한 wing deformation 으로 50° flight path angle 가능 (steady flight)."}, {"type": "bullet", "text": "<span class=\"term\">Spar 위치 = quarter-chord (1/4)</span> — leading-edge spar 와 대조적. 장점: torsion 부담 감소 (spar 에서), bending 부담 감소 (chord rod 에서) → 더 가는 직경 가능 → 더 가벼운 구조. Hinge mechanism 의 root stress 도 감소."}, {"type": "bullet", "text": "<span class=\"term\">Wing 제작 — 표준 lab 장비만으로 3 시간</span>: 3D 프린팅 + 2D 플레이트 cutter. 결과 wing 82 g (1.5 m wingspan + 36 cm chord) = 55 g/meter — 기존 design 보다 경량. 재현성 + 신속 교체."}, {"type": "bullet", "text": "<span class=\"term\">Wing weighs 15% of total mass</span> — flapping inertia 최소화. Tail (2 servo + structure) + powertrain (모터+transmission 71 g) + electronics + battery 의 균형."}, {"type": "bullet", "text": "<span class=\"term\">Powertrain</span>: brushless 모터 (20 g) + transmission (총 71 g). 4S battery, 16 V. Hall sensor 로 onboard power 측정. 5.6 ± 0.2 Hz flapping at 100% throttle (4-cell battery)."}, {"type": "bullet", "text": "<span class=\"term\">Electronics framework</span> — low-level driver + Linux-based companion 컴퓨터 통합. 자율 비행 가능한 packaged 솔루션 — onboard event camera, high-end computing board, proximity sensor 모두 수용 가능 (extra payload 안에서)."}, {"type": "bullet", "text": "<span class=\"term\">Modular 설계</span> — structure, wings, tail 각각 detachable. wing camber 옵션, chord rod 직경 변경 가능, tail 형태 교체 가능. 다양 과학 실험에 적응 가능 — 후속 연구의 enabler."}]}, "experiment": {"content": [{"type": "bullet", "text": "<span class=\"term\">실험 환경</span>: GRVC indoor testbed (28-camera Optitrack 모션 캡처, IR LED 추적). Outdoor 자유비행 (GPS/IMU VN200 으로 데이터 기록, 90 Hz)."}, {"type": "bullet", "text": "<span class=\"term\">Mass 분포 (510 g empty)</span>: Wing 82 g (16%), Powertrain 71 g (motor 20 g + transmission), Tail 30 g (servo 2× 15 g), Electronics, Battery, Structure 등. Tracking electronics 10 g 포함."}, {"type": "bullet", "text": "<span class=\"term\">Power 소비</span>: 16 V 에서 onboard Hall sensor 로 측정. Calibrated 자유비행 측정. 최대 throttle 에서 5.6 ± 0.2 Hz flapping 가능 (4S 배터리)."}, {"type": "bullet", "text": "<span class=\"term\">Payload 검증</span> — XZ trajectory 추적으로 다양 무게 비행. <span class=\"term\">최대 520 g 페이로드 (100% empty weight)</span> 까지 비행 가능 — 단 maneuverability + climb rate 한계 도달. 100% throttle 5.6 Hz, 4 cell 배터리에서 측정."}, {"type": "bullet", "text": "<span class=\"term\">비행 시간 — 배터리 capacity 효과</span>: 추가 93 g 배터리 → 비행 시간 5 분 → 15 분 (3배 향상). 페이로드 capacity 가 직접 mission 능력으로 이어짐을 입증."}, {"type": "bullet", "text": "<span class=\"term\">Flight envelope (170 g 페이로드 기준)</span>: pitch 10-60° parametric sweep at 100% throttle. 결과: $\\gamma_{ss,max} = 40.18°$ at $\\theta_{ss} = 58.92°$, $V_{ss,max} = 5.63$ m/s at $\\theta_{ss} = 9.80°$, 최대 climb rate $\\dot{z}_{ss,max} = 1.79$ m/s at $\\theta_{ss} = 37.86°$. 비선형 관계 $\\dot{z}_{ss} = -V_{ss}\\sin\\gamma_{ss}$ 로 climb rate optimal pitch 가 중간값."}, {"type": "bullet", "text": "<span class=\"term\">Controller 정확도</span> — 평균 pitch error 3° 이내. 실험 mean pitch 와 reference 의 일치 입증."}, {"type": "bullet", "text": "<span class=\"term\">Wing camber 효과</span> — Flat vs cambered wing 비교 in 3 flight conditions. (a) Gliding: glide ratio 30° → 20° (cambered 가 더 평평한 글라이딩), (b) 65% throttle: level flight → 5.89° climb, (c) 70% throttle: 12.8° → 15.6° climb. Camber 가 lift coefficient 증가 + wing fabric tension 증가 (drag 감소)."}, {"type": "bullet", "text": "<span class=\"term\">Lateral maneuverability</span> — 최대 turn rate $\\dot{\\Psi}_{max} = 2.08$ rad/s. Vertical tail deflection 으로 heading 제어, horizontal tail 로 pitch 제어. Initial heading $\\chi_0 = 50°$ 에서 시작. yaw vs roll 비교: roll 이 trajectory 와 더 강한 correlation — future improvement direction 으로 \"vertical tail 대신 roll 제어 변수\" 추가 제안."}, {"type": "bullet", "text": "<span class=\"term\">Outdoor manual flight 100+ 회</span>: VN200 GPS/IMU 로 trajectory 기록. 90 Hz LLA (geodetic) 좌표, 변환 후 NED reference frame. 지속 비행 + 데이터 logging 가능 입증. 100+ 회 모두 손으로 던져 안전 발사 — multirotor 와 대조."}, {"type": "bullet", "text": "<span class=\"term\">Robustness — 94 indoor + 100+ outdoor flights, minor damage</span>: 대부분 비행이 ground/구조물 충격으로 끝났음에도 minor damage. 표준 부품으로 빠른 교체 가능 — 모듈러 design 의 검증."}]}, "discussion": {"content": [{"type": "bullet", "text": "<span class=\"term\">100% payload 가 후속 연구의 enabler</span> — Free as a Bird (Rodriguez-Gomez 2022) 의 event camera + Khadas VIM3 + INS, Zufferey 2022 perching 의 200 g claw mechanism, Xu 2023 leader-follower 의 multi-sensor 모두 E-Flap 의 payload 위에서 가능. 본 논문이 \"hardware platform 의 표준화\" 라는 메타 contribution."}, {"type": "bullet", "text": "<span class=\"term\">Modular 설계의 가치</span> — wing camber 가 \"있어도 되고 없어도 되는\" optional parameter. perching appendage (Zufferey 2022), event camera (Free as a Bird), 다양 sensor 추가가 platform 자체를 재설계하지 않고 가능. 후속 연구 가속화의 결정적."}, {"type": "bullet", "text": "<span class=\"term\">표준 lab 장비 manufacturing</span> — 3D 프린터 + 2D 플레이트 cutter 만으로 wing 3 시간, 전체 robot 2 일 조립. Lab 간 replication 의 본질적 장벽 제거 → \"GRVC 외 그룹도 E-Flap 과 같은 robot 만들 수 있음\" → field-wide acceleration."}, {"type": "bullet", "text": "<span class=\"term\">Quarter-chord spar 의 통찰</span> — leading-edge spar 와의 대조. torsion + bending 부담 분산으로 더 가는 chord rod (1.5 mm) 가능 → wing inertia 감소 → flapping 효율 향상. 작은 design 결정이지만 누적 효과 큼."}, {"type": "bullet", "text": "<span class=\"term\">Passive elastic twist 의 trade-off</span> — active mechanism 보다 단순/가벼움. 그러나 chord rod 직경에 의존하여 fine-tune 어려움. active mechanism 은 더 큰 payload 가 가능해야 정당화됨 — E-Flap 같은 large-scale 가능 영역."}, {"type": "bullet", "text": "<span class=\"term\">Flight envelope 의 의미</span> — 170 g 페이로드에서 climb rate 1.79 m/s 가 최대. 더 무거운 payload (~ 520 g) 에서는 climb 거의 불가능. 즉 \"max payload\" 와 \"max maneuverability\" 가 별개의 capability 영역."}, {"type": "bullet", "text": "<span class=\"term\">Tail 제어의 본질적 한계</span> — vertical tail deflection 이 yaw 가 아니라 roll 을 통해 trajectory 영향. <span class=\"term\">roll 이 trajectory 와 더 강한 correlation</span>. Future: vertical tail deflection 대신 roll 을 제어 변수로. 이는 Free as a Bird 의 horizontal/vertical tail deflection 분리와 일관."}, {"type": "bullet", "text": "<span class=\"term\">Camber 효과의 정량화</span> — gliding 30° → 20°, climb 12.8° → 15.6° 등 모두 camber 가 유리. CFD 기반 lift coefficient 증가 + wing fabric 의 wrinkle 제거가 원인. <span class=\"term\">Future aerodynamic study</span> 가 optimum camber amount 결정 필요."}, {"type": "bullet", "text": "<span class=\"term\">Outdoor 검증의 한계</span> — 본 논문은 outdoor manual flight 100+ 회. closed-loop outdoor 는 \"soon\" 으로 언급. <span class=\"term\">vision sensor + onboard image processing</span> 통합이 다음 milestone — Free as a Bird (event camera) 가 이 약속을 일부 지킴."}, {"type": "bullet", "text": "<span class=\"term\">GRVC 그룹의 GRIFFIN 로드맵 위치</span> — E-Flap 이 \"hardware platform\" 단계, Free as a Bird 가 \"동적 회피\" 단계, Zufferey 2022 가 \"자율 perching\" 단계. 모두 같은 ERC Advanced Grant (2017-2024) 위에서 systematic 진전 — single-paper 가 아니라 grant-scale 연구 프로그램."}]}, "conclusion": {"content": [{"type": "bullet", "text": "<span class=\"term\">High-payload flapping-wing robot E-Flap</span> — 510 g empty, 520 g payload (100% empty weight), 1.5 m wingspan, 2-6 m/s 비행속도. propellerless safety + 자율 가능 hardware platform."}, {"type": "bullet", "text": "<span class=\"term\">4 가지 기술적 contribution</span>: (a) 표준 lab 장비 (3D 프린터 + 2D plate cutter) 만으로 wing 3 시간, robot 2 일 fabrication, (b) low-level driver + Linux companion 통합 lightweight electronic framework, (c) optional camber wing skeleton, (d) structure/wing/tail modular 설계."}, {"type": "bullet", "text": "<span class=\"term\">Aero-elastic wing 설계</span> — elliptical 1.5 m wingspan, aspect ratio 5, quarter-chord spar, 1.5 mm chord rod 로 passive 90° phase pitching. 82 g wing (55 g/m) — flapping inertia 최소화."}, {"type": "bullet", "text": "<span class=\"term\">Powertrain</span> — brushless 모터 + transmission 71 g, 4S 배터리, 5.6 Hz max flapping. Hall sensor onboard power 측정."}, {"type": "bullet", "text": "<span class=\"term\">Indoor flight envelope</span> — $\\gamma_{ss,max} = 40°$ at $\\theta_{ss} = 59°$, $V_{ss,max} = 5.63$ m/s, climb rate 1.79 m/s. controller pitch error <3°."}, {"type": "bullet", "text": "<span class=\"term\">Wing camber 효과</span> — gliding 30°→20°, level flight→5.89° climb (65% throttle), 12.8°→15.6° climb (70% throttle). 모두 lift coefficient + drag reduction 효과."}, {"type": "bullet", "text": "<span class=\"term\">Lateral maneuverability</span> — max turn rate 2.08 rad/s. Roll 이 trajectory 와 더 강한 correlation 발견 → future control variable improvement direction."}, {"type": "bullet", "text": "<span class=\"term\">100+ flights, minor damage 검증</span> — 94 indoor + 100+ outdoor, 대부분 ground/structure 충격으로 끝났음에도 신뢰성 유지. modular 부품 교체 용이."}, {"type": "bullet", "text": "<span class=\"term\">93 g 추가 배터리 → 비행시간 5 분 → 15 분</span>. payload 가 직접 mission 능력으로 변환됨을 정량 검증."}, {"type": "bullet", "text": "<span class=\"term\">Future work</span>: closed-loop outdoor (vision sensor + onboard image processing) — 후속 Free as a Bird 가 이 약속 달성. 추가로 perching (Zufferey 2022 달성), obstacle avoidance, manipulation, human interaction. 모두 본 design 의 modularity + payload 위에서 가능."}]}};
+
+        function openModal(key) {
+            const detail = SECTION_DETAIL[key];
+            if (!detail) return;
+            document.getElementById('modal-title').innerText = SECTION_TITLES[key] || key;
+
+            let html = '';
+            html += (detail.content || []).map(item => {
+                if (item.type === 'bullet') {
+                    return `<div class="bullet">${item.text}</div>`;
+                } else if (item.type === 'formula') {
+                    return `<div class="formula-block">
+                        <div class="formula-label">${item.label}</div>
+                        <div class="formula-latex">$$${item.latex}$$</div>
+                        <div class="formula-desc">${item.description}</div>
+                    </div>`;
+                }
+                return '';
+            }).join('');
+
+            const body = document.getElementById('modal-body');
+            body.innerHTML = html;
+            body.scrollTop = 0;
+            document.getElementById('modal-overlay').classList.add('active');
+
+            // Re-render KaTeX in the new content
+            if (window.renderMathInElement) {
+                renderMathInElement(body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$',  right: '$',  display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
