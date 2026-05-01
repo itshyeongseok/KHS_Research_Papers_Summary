@@ -117,8 +117,6 @@
         .term { font-weight: bold; color: #005b96; }
         .eng { color: #666; font-style: italic; }
         .tier-badge { display: inline-block; }
-
-        /* Critical insights panel */
         .slide > div:last-of-type ul {
             margin: 4px 0;
             padding-left: 18px;
@@ -207,14 +205,78 @@
             border-bottom: 1px solid #e0e0e0;
             padding-bottom: 4px;
         }
+
+        /* Conclusion-modal Insights block (한계 / 향후 연구 / 동기 vs 해결도) */
+        .conclusion-insights {
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 2px dashed #c5cdd6;
+        }
+        .modal-body .lim-list,
+        .modal-body .future-list {
+            padding-left: 20px;
+            margin: 0 0 16px;
+        }
+        .modal-body .lim-list li,
+        .modal-body .future-list li {
+            margin-bottom: 6px;
+            line-height: 1.6;
+        }
+        .motivation-block {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin-top: 8px;
+        }
+        @media (min-width: 900px) {
+            .motivation-block { grid-template-columns: repeat(3, 1fr); }
+        }
+        .mot-problems h5,
+        .mot-addressed h5,
+        .mot-remaining h5 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .mot-problems h5  { color: #c62828; }
+        .mot-addressed h5 { color: #2e7d32; }
+        .mot-remaining h5 { color: #ef6c00; }
+        .mot-problems ul,
+        .mot-addressed ul,
+        .mot-remaining ul {
+            padding-left: 18px;
+            margin: 0;
+        }
+        .mot-problems li,
+        .mot-addressed li,
+        .mot-remaining li {
+            margin-bottom: 6px;
+            line-height: 1.55;
+            font-size: 14.5px;
+        }
+        .insights-section-title {
+            color: #005b96;
+            margin: 20px 0 10px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 4px;
+            font-size: 17px;
+        }
+        .insights-section-title:first-child { margin-top: 0; }
+
+        .tier-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-weight: 600; font-size: 14px; margin-left: 16px; vertical-align: middle; }
+        .tier-0 { background: #d32f2f; color: white; }
+        .tier-1 { background: #f57c00; color: white; }
+        .tier-2 { background: #fbc02d; color: black; }
+        .tier-3 { background: #757575; color: white; }
     </style>
 </head>
 <body>
     <div class="slide">
         <div class="header">
-            <div class="title">
-                Reaching the limit in autonomous racing: Optimal control versus reinforcement learning
-                <span class="tier-badge" style="background:#fbc02d;color:#000;padding:4px 12px;border-radius:12px;font-weight:600;font-size:14px;margin-left:16px;">Tier 2 — 비교 baseline</span>
+            <div class="header-row">
+                <div class="title">Reaching the limit in autonomous racing: Optimal control versus reinforcement learning</div>
+                <span class="tier-badge tier-2">Tier 2 — 비교 baseline</span>
             </div>
             <div class="authors">Yunlong Song, Angel Romero, Matthias Müller, Vladlen Koltun, Davide Scaramuzza</div>
             <div class="journal">Science Robotics, Vol. 8, eadg1462 (2023) · DOI: 10.1126/scirobotics.adg1462</div>
@@ -253,30 +315,6 @@
             </div>
         </div>
 
-        <div style="grid-column: 1 / -1; background: #fffde7; border: 2px solid #fbc02d; border-radius: 8px; padding: 16px 22px; margin-top: 2px;">
-            <div style="font-size: 18px; font-weight: bold; color: #f57f17; margin-bottom: 12px; border-bottom: 2px solid #fbc02d; padding-bottom: 6px;">
-                Critical Insights — Tier 2 비교 baseline 분석
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; font-size: 14px; line-height: 1.65;">
-                <div>
-                    <h4 style="color: #e65100; margin: 0 0 6px 0; font-size: 15px;">Limitations (저자 기술)</h4>
-                    <ul><li>All experiments conducted indoors with a VICON motion capture system providing perfect state estimation at 400 Hz — outdoor or GPS-denied environments remain untested.</li><li>The superhuman comparison relies on structural advantages for the RL agent including motion-capture-based state estimation and lower sensorimotor latency than human pilots.</li><li>Sim-to-real transfer depends on careful system identification of the physical platform; sensitivity to identification errors is not systematically characterized.</li><li>Only single-drone time-trial scenarios are evaluated — multi-agent racing with opponent interaction or dynamic obstacles is not addressed.</li><li>The approach assumes known gate positions provided externally; onboard perception-based gate detection and its associated latency are outside the scope.</li></ul>
-                </div>
-                <div>
-                    <h4 style="color: #e65100; margin: 0 0 6px 0; font-size: 15px;">Future Works (저자 기술)</h4>
-                    <ul><li>Extend RL-based agile flight to outdoor environments with GPS-denied navigation and wind disturbances.</li><li>Replace motion capture with onboard sensing (cameras, IMUs) for fully autonomous state estimation during agile maneuvers.</li><li>Investigate multi-drone competitive racing where opponent modeling and collision avoidance add complexity.</li><li>Explore hybrid OC+RL architectures that combine OC's interpretability with RL's task-level objective flexibility.</li><li>Apply the task-level objective design principle to other agile robotic platforms beyond quadrotors.</li></ul>
-                    <h4 style="color: #e65100; margin: 12px 0 6px 0; font-size: 15px;">Motivating Problems</h4>
-                    <ul><li>OC and RL have both achieved impressive agile flight results, but no systematic analysis exists explaining WHY one outperforms the other in extreme regimes.</li><li>The planning-control decomposition in OC creates an information bottleneck through intermediate trajectory representations, but this structural limitation has not been formally identified or quantified.</li><li>Sim-to-real transfer for agile quadrotor flight at the physical limits (>10g, >100 km/h) has not been demonstrated with zero-shot deployment.</li><li>Whether autonomous systems can match or exceed expert human pilots in physical agile tasks remains an open question.</li></ul>
-                </div>
-                <div>
-                    <h4 style="color: #e65100; margin: 0 0 6px 0; font-size: 15px;">Addressed by This Work</h4>
-                    <ul><li>Provided a controlled 2-axis experimental framework (optimization method x optimization objective) isolating the core factor — optimization objective, not method, drives RL's advantage.</li><li>Demonstrated that trajectory tracking's intermediate representation restricts the policy's behavioral range, causing catastrophic failure under model mismatch (0% success in realistic sim).</li><li>Achieved zero-shot sim-to-real transfer on a TWR-12 drone reaching 108 km/h and 12.58g using PPO + domain randomization + system delay modeling.</li><li>Demonstrated superhuman performance against three professional pilots including a DRL world champion.</li></ul>
-                    <h4 style="color: #c62828; margin: 12px 0 6px 0; font-size: 15px;">Remaining Unresolved (incl. FWAV gaps)</h4>
-                    <ul><li>Outdoor agile flight under wind disturbances and without external motion-capture state estimation remains unaddressed.</li><li>Multi-agent competitive scenarios with dynamic obstacle avoidance and opponent interaction are unexplored.</li><li>RL-based agile control has not been demonstrated on flapping-wing platforms where unsteady aerodynamics and low thrust-to-weight ratios pose fundamentally different challenges than quadrotor dynamics.</li><li>The sim-to-real gap for FWAV is substantially larger than for quadrotors due to wing flexibility, stroke-cycle-dependent force generation, and clap-and-fling effects — whether domain randomization alone can bridge this gap is an open question.</li><li>Task-level objective design (analogous to gate progress) for FWAV-specific missions such as perching, obstacle navigation in confined spaces, or sustained forward flight has not been formulated.</li></ul>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <!-- Modal -->
@@ -292,12 +330,12 @@
 
     <script>
         const SECTION_TITLES = {
-            introduction: "Introduction — 연구 동기",
-            related_works: "Related Works — 관련 연구",
-            method: "Method — 새로운 접근 방법",
-            experiment: "Experiment — 실험 방법과 결과",
-            discussion: "Discussion — 결과의 해석",
-            conclusion: "Conclusion — 최종 요약"
+            introduction:  "Introduction: 연구 동기",
+            related_works: "Related Works: 관련 연구",
+            method:        "Method: 새로운 접근 방법",
+            experiment:    "Experiment: 실험 방법과 결과",
+            discussion:    "Discussion: 결과의 해석",
+            conclusion:    "Conclusion: 최종 요약"
         };
 
         const SECTION_DETAIL = {
@@ -501,6 +539,54 @@
   }
 };
 
+
+        const INSIGHTS_DATA = {"limitations": ["모든 실험이 실내 VICON 모션캡처(400 Hz의 완벽한 상태 추정)에 의존 — 야외 또는 GPS-denied 환경 미검증.", "Superhuman 비교는 RL 에이전트가 모션캡처 기반 상태 추정 + 인간 파일럿 대비 낮은 sensorimotor latency라는 구조적 우위에 의존.", "Sim-to-real 전이가 물리 플랫폼의 정밀한 system identification에 의존 — identification 오차에 대한 민감도가 체계적으로 분석되지 않음.", "단일 드론 time-trial 시나리오만 평가 — opponent와의 상호작용 또는 동적 장애물이 있는 다중 에이전트 racing은 미다룸.", "외부에서 제공되는 알려진 gate 위치를 가정 — onboard perception 기반 gate 검출과 그에 따른 latency는 scope 밖."], "future_works": ["RL 기반 agile 비행을 GPS-denied navigation과 바람 외란이 있는 야외 환경으로 확장.", "모션캡처를 onboard 센서(카메라, IMU)로 대체하여 agile 기동 중 완전 자율 상태 추정 구현.", "Opponent 모델링과 충돌 회피 복잡도가 추가되는 다중 드론 경쟁 racing 연구.", "OC의 해석 가능성과 RL의 task-level objective 유연성을 결합하는 hybrid OC+RL 아키텍처 탐색.", "Quadrotor를 넘어 다른 agile 로봇 플랫폼에 task-level objective 설계 원리 적용."], "motivation_resolution": {"motivating_problems": ["OC와 RL 모두 인상적인 agile 비행 성과를 냈으나, 극한 영역에서 어느 쪽이 왜 더 나은지 체계적 분석이 부재.", "OC의 planning-control 분해가 intermediate trajectory representation을 통한 정보 bottleneck을 만들지만, 이 구조적 한계가 공식적으로 식별·정량화된 적 없음.", "물리 한계(>10g, >100 km/h)에서의 agile quadrotor 비행에서 zero-shot deployment를 시연한 sim-to-real 전이 미달성.", "자율 시스템이 물리적 agile 작업에서 전문가 인간 파일럿을 매칭하거나 능가할 수 있는지가 미해결 질문."], "addressed_by_this_work": ["통제된 2축 실험 framework(optimization method × optimization objective)로 핵심 요인 분리 — RL 우위는 method가 아닌 objective에서 발생함을 입증.", "Trajectory tracking의 intermediate representation이 정책의 행동 범위를 제한 → 모델 불일치 하 catastrophic 실패(현실적 sim에서 성공률 0%) 시연.", "PPO + domain randomization + 시스템 지연 모델링으로 TWR-12 드론에서 108 km/h · 12.58g zero-shot sim-to-real 전이 달성.", "DRL 세계 챔피언을 포함한 3명의 프로 파일럿을 능가하는 superhuman 성능 시연."], "remaining_unresolved": ["외부 모션캡처 상태 추정 없이 바람 외란 하 야외 agile 비행은 미해결.", "동적 장애물 회피 + opponent 상호작용을 포함한 다중 에이전트 경쟁 시나리오는 미탐구.", "FWAV 이식: RL 기반 agile 제어가 flapping-wing 플랫폼에서 시연된 적 없음 — unsteady aerodynamics와 낮은 thrust-to-weight ratio가 quadrotor와 근본적으로 다른 도전 제기.", "FWAV 이식: FWAV의 sim-to-real gap이 quadrotor 대비 훨씬 큼 — 날개 유연성 + stroke-cycle 의존 force generation + clap-and-fling 효과 → domain randomization만으로 가교 가능한지 미해결.", "FWAV 이식: FWAV 특화 임무(perching, 좁은 공간 장애물 회피, 지속 전진 비행)에 대한 task-level objective 설계(gate progress의 FWAV 등가물)가 정식화되지 않음."]}};
+        const INSIGHTS_LABELS = {
+            limitations:    "한계",
+            future_works:   "향후 연구",
+            motivation:     "동기 vs 해결도",
+            mot_problems:   "동기 (해결 대상)",
+            mot_addressed:  "본 연구가 해결",
+            mot_remaining:  "미해결"
+        };
+
+        function renderInsightsBlock() {
+            const d = INSIGHTS_DATA || {};
+            const L = INSIGHTS_LABELS;
+            const limItems = (d.limitations || []).map(s => `<li>${s}</li>`).join('');
+            const futItems = (d.future_works || []).map(s => `<li>${s}</li>`).join('');
+            const mr = d.motivation_resolution || {};
+            const motProb = (mr.motivating_problems    || []).map(s => `<li>${s}</li>`).join('');
+            const motAddr = (mr.addressed_by_this_work || []).map(s => `<li>${s}</li>`).join('');
+            const motRem  = (mr.remaining_unresolved   || []).map(s => `<li>${s}</li>`).join('');
+
+            return `
+                <div class="conclusion-insights">
+                    <h4 class="insights-section-title">${L.limitations}</h4>
+                    <ul class="lim-list">${limItems}</ul>
+
+                    <h4 class="insights-section-title">${L.future_works}</h4>
+                    <ul class="future-list">${futItems}</ul>
+
+                    <h4 class="insights-section-title">${L.motivation}</h4>
+                    <div class="motivation-block">
+                        <div class="mot-problems">
+                            <h5>${L.mot_problems}</h5>
+                            <ul>${motProb}</ul>
+                        </div>
+                        <div class="mot-addressed">
+                            <h5>${L.mot_addressed}</h5>
+                            <ul>${motAddr}</ul>
+                        </div>
+                        <div class="mot-remaining">
+                            <h5>${L.mot_remaining}</h5>
+                            <ul>${motRem}</ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         function openModal(key) {
             const detail = SECTION_DETAIL[key];
             if (!detail) return;
@@ -519,6 +605,11 @@
                 }
                 return '';
             }).join('');
+
+            // Conclusion 모달 끝에 한계 / 향후 연구 / 동기 vs 해결도 블록 추가
+            if (key === 'conclusion') {
+                html += renderInsightsBlock();
+            }
 
             const body = document.getElementById('modal-body');
             body.innerHTML = html;

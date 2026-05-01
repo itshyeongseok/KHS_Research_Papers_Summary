@@ -142,20 +142,12 @@
         .tier-2 { background: #fbc02d; color: black; }
         .tier-3 { background: #757575; color: white; }
 
-        /* Critical Insights modal */
-        .insights-trigger {
-            margin-top: 8px;
-            display: inline-block;
-            padding: 4px 12px;
-            border: 1px solid white;
-            border-radius: 14px;
-            font-size: 12px;
-            color: white;
-            background: rgba(255,255,255,0.08);
-            cursor: pointer;
-            transition: background 0.15s;
+        /* Conclusion-modal Insights block (한계 / 향후 연구 / 동기 vs 해결도) */
+        .conclusion-insights {
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 2px dashed #c5cdd6;
         }
-        .insights-trigger:hover { background: rgba(255,255,255,0.22); }
 
         .modal-body .lim-list,
         .modal-body .future-list {
@@ -314,7 +306,6 @@
             </div>
             <div class="authors">Haifeng Huang, Wei He, Qiang Fu, Xiuyu He, Changyin Sun</div>
             <div class="journal">IEEE/CAA Journal of Automatica Sinica, Vol. 9, No. 12, December 2022, pp. 2138–2150 · DOI: 10.1109/JAS.2022.106040</div>
-            <div class="insights-trigger" onclick="openInsights()">핵심 인사이트 ▸</div>
         </div>
 
         <div class="summary-container">
@@ -375,9 +366,8 @@
         const FIG_PREFIX = "그림";
 
         const SECTION_DETAIL = {"introduction": {"content": [{"type": "bullet", "text": "<span class=\"term\">에어드롭의 배경과 UAV 활용</span>: 에어드롭은 2차 대전 이래 물자 수송의 핵심 수단이다. 최근 회전익 UAV 가 드론 택배 등에 활용되고 있으나, 은밀 통신 장비 배달이나 소형 탄약 근접 투하처럼 <span class=\"term\">소음·위장</span>이 중요한 시나리오에서는 회전익의 높은 소음과 에너지 소비가 장애물이 된다."}, {"type": "bullet", "text": "<span class=\"term\">날갯짓 로봇의 에어드롭 잠재력</span>: FWAR 은 저주파 날갯짓으로 소음이 낮고, 자연 조류와 유사한 외형으로 위장이 용이하며, 소형화·기동성에서 우위를 가진다. 이 특성들은 회전익이 부적합한 특수 에어드롭 시나리오에서 FWAR 을 유력한 대안으로 만든다."}, {"type": "bullet", "text": "기존 FWAR 중 bat-like·insect-like (RoboBee, DelFly Nimble, KUBeetle-S) 은 기동성이 우수하나 적재 용량과 야외 안정성이 부족하다. Bird-like (SmartBird, Dove, E-Flap) 은 야외 비행에 적합하나 <span class=\"term\">단일 모터 대칭 구동</span>으로 기동성이 제한되고, glide 같은 날갯짓 중단 기동이 불가능하다."}, {"type": "bullet", "text": "<span class=\"term\">RoboRaven</span>은 서보로 양 날개를 독립 구동하는 선구적 설계이지만, 꼬리 액추에이터에 의존하여 제어력을 생성하므로 payload 제약이 증가한다. USTBird-I 는 꼬리 러더 없이 <span class=\"term\">날개 운동학 조절만으로 heading 제어</span>를 달성한다."}, {"type": "bullet", "text": "날갯짓 비행 중 기체 진동으로 항공 영상이 흔들리는 문제는 에어드롭 정확도에 직결된다. PAN/TILT 같은 기존 방진 장치는 추가 무게를 부과한다. 본 연구는 <span class=\"term\">활공(gliding) 중 에어드롭</span>을 수행함으로써 자세 안정성 확보와 무게 절감을 동시에 달성하는 접근을 택한다."}, {"type": "bullet", "text": "알바트로스·독수리 등 활공에 능한 조류는 <span class=\"term\">cambered wing (캠버 날개)</span>를 공유하며, 활공 중 날개를 약간 올려(rising angle) 기류에 적응한다. 본 논문은 이 두 생체 특성을 USTBird-I 에 도입하고, CFD 와 비행 시험으로 활공 성능 향상을 정량 검증한다."}, {"type": "bullet", "text": "본 연구의 세 가지 기여: (1) 서보 구동 + 캠버 날개 + dihedral angle 조절로 bird-like 활공 최적화, (2) CFD 시뮬레이션과 야외 시험으로 camber·dihedral 이 활공 양항비에 미치는 영향 분석, (3) <span class=\"term\">세계 최초 FWAR 야외 자율 에어드롭</span> 시연."}]}, "related_works": {"content": [{"type": "bullet", "text": "<span class=\"term\">구동 방식 비교</span>: 압전(piezoelectric) 구동은 micro FWAR 에 적합하나 출력이 제한된다. 전자기 모터(motor) 구동은 bird-scale 에서 널리 사용되나, 단일 모터로 양 날개를 동기·대칭 구동하면 가변 진폭이 불가능하다. <span class=\"term\">서보(servo) 구동</span>은 위치·속도 모두 제어 가능하여 자연 조류의 날갯짓에 가장 근접하며, gear 전동 설계의 반복 시행착오를 회피한다."}, {"type": "bullet", "text": "<span class=\"term\">SmartBird (Festo)</span>: 450 g, 2 m wingspan, 갈매기 모방. Active articulated torsion drive 로 생체모방도가 높으나, 자율비행 사례가 거의 없다. <span class=\"term\">Dove</span>: 220 g, waypoint tracking 비행 달성. <span class=\"term\">E-Flap</span>: 높은 적재 용량. 세 로봇 모두 모터 대칭 구동 → 기동성·활공 제한."}, {"type": "bullet", "text": "<span class=\"term\">USTBird (1세대)</span>: 본 연구진의 이전 연구 [47] 에서 wingspan 80 cm, 83.2 g 의 평판 날개(plane wing) 서보 구동 FWAR. 3축 독립 제어와 aerobatic maneuver 를 시연했으나, 캠버 날개 미적용으로 활공 성능이 제한적이었다."}, {"type": "bullet", "text": "<span class=\"term\">캠버 날개와 활공</span>: 선행 연구 [40, 49, 50] 에서 캠버가 flapping 시 양력·추력 계수를 높이는 효과는 보고되었으나, <span class=\"term\">활공(gliding) 시 양항비에 미치는 영향</span>은 체계적으로 조사되지 않았다. 또한 조류가 활공 중 날개를 올리는 행동(rising angle / dihedral)이 공기역학적으로 어떤 효과를 주는지도 미규명이었다."}, {"type": "bullet", "text": "<span class=\"term\">영상 품질과 에어드롭 정확도</span>: 날갯짓 진동이 항공 영상의 PSNR (peak signal-to-noise ratio) 을 저하시키는 문제는 PAN/TILT [38, 39] 로 대응해 왔으나 추가 무게가 부담. 본 연구는 <span class=\"term\">활공 중 촬영</span>으로 진동을 근본적으로 회피하고, DITF (difference of inter-frame transformation fidelity) 지표로 캠버 날개가 영상 안정성도 개선함을 정량 입증한다."}, {"type": "bullet", "text": "<span class=\"term\">UAV 에어드롭 선행 연구</span>: 회전익 UAV 의 에어드롭은 상업화 단계(드론 택배)에 접근했으나, <span class=\"term\">날갯짓 로봇의 에어드롭은 전례가 없다</span>. 호버링 불가·제한된 적재·불안정한 자세가 주요 장벽이며, 본 연구가 이 공백을 처음 메운다."}]}, "method": {"content": [{"type": "bullet", "text": "<span class=\"term\">기체 구조</span>: front spar (3 mm), sub rib (1 mm), laser-cut 탄소 main rib + inclined strut 로 날개 골격 구성. Main rib 이 포물선+직선 형상으로 <span class=\"term\">camber ratio h/c</span> 를 결정 — quarter-chord 위치에서 최대 높이 $h$ 를 chord length $c$ 로 정규화. 5종 (0, 1/4, 1/3, 5/12, 1/2) 비교."}, {"type": "bullet", "text": "<span class=\"term\">활공 역학 기본 관계</span>: 안정 활공 시 $L \\sin\\theta = D \\cos\\theta$ 이므로 양항비 $L/D = d/h'$ — 같은 고도에서 양항비가 클수록 활공 거리가 길어진다. 따라서 단순한 양력 극대화가 아닌 <span class=\"term\">양항비(L/D) 극대화</span>가 활공 설계의 핵심 목표이다."}, {"type": "formula", "label": "식 (6) — 활공 양항비와 거리 관계", "latex": "\\frac{L}{D} = \\frac{1}{\\tan\\theta} = \\frac{d}{h'}", "description": "$L$: 양력, $D$: 항력, $\\theta$: 활공각, $d$: 수평 활공 거리, $h'$: 고도 손실. 양항비가 클수록 동일 고도 손실에서 더 긴 수평 거리를 활공할 수 있다."}, {"type": "bullet", "text": "<span class=\"term\">CFD 시뮬레이션 설계</span>: COMSOL 가상 풍동 (2 m × 1.5 m × 1 m), 풍속 3 m/s. AOA 0°–25° (5° 간격), dihedral 0°–10° (2° 간격), camber ratio 5종 → 총 180 조건. 각 조건에서 3축 힘·토크를 산출하고, <span class=\"term\">moment equilibrium (토크 = 0)</span> 상태의 AOA 와 dihedral 을 곡면 피팅으로 추출한다."}, {"type": "bullet", "text": "<span class=\"term\">CFD 결과</span>: 각 camber ratio 별로 토크–AOA–dihedral 3D 곡면을 피팅하고, 토크 = 0 교선에서의 양항비를 산출. <span class=\"term\">h/c = 5/12 · dihedral 2°</span>에서 양항비 최대값을 달성. 명시적인 해석적 법칙은 발견되지 않았으나, camber 와 dihedral 모두 활공 성능에 직접적 영향을 미침을 확인."}, {"type": "bullet", "text": "<span class=\"term\">양력 모델 (활공)</span>: 활공 시 좌우 대칭이면 $F_L = F_R = \\frac{1}{2}\\rho C_L S V^2$ — 캠버에 따라 $C_L$ 이 달라지고, 이것이 양항비를 결정한다. SOLIDWORKS flow simulation 으로 활공 속도 3 m/s, h/c = 1/4 에서의 압력 분포를 확인하여 캠버 날개의 upper surface 저압 영역이 확대됨을 시각적으로 검증."}, {"type": "formula", "label": "식 (3) — 활공 양력", "latex": "F_L = F_R = \\frac{1}{2}\\rho C_L S V^2", "description": "$\\rho$: 공기 밀도, $C_L$: 양력 계수 (camber 에 의존), $S$: 날개 면적, $V$: 비행 속도. 캠버가 클수록 $C_L$ 이 증가하나 항력 계수 $C_D$ 도 증가하므로 양항비 극대화에는 최적 캠버가 존재한다."}, {"type": "bullet", "text": "<span class=\"term\">Vision pipeline</span>: 원본 영상 → 왜곡 제거 → RGB→HSV 변환 → 적색 마스크 → 이진화 → morphological opening (salt-and-pepper noise 제거) → Canny edge detection → 타원 검출 (면적비 threshold) → contour labeling. 목표 영역은 반경 1 m 적색 원형 카펫."}, {"type": "bullet", "text": "<span class=\"term\">충격점 예측</span>: 강구 투하 후 자유 낙하 (수직) + 등속 운동 (수평). 시간 지연 $t_1 = 0.23$ s (카메라 수신 0.12 s + 서보 응답 0.11 s) 를 보상하여 예측 충격점 좌표를 pixel plane 에 투영한다. World→camera→pixel 좌표 변환에 yaw angle 과 카메라 내부 파라미터를 사용."}, {"type": "formula", "label": "식 (9)–(10) — 강구 충격점 수평·수직 변위", "latex": "x_w = v_x t, \\quad y_w = v_y t, \\quad v_z t_0 + \\tfrac{1}{2}g t_0^2 = h' + v_z t_1", "description": "$v_x, v_y$: GPS 수평 속도, $v_z$: 수직 속도 (altimeter), $t = t_0 + t_1$ (자유 낙하 + 시간 지연), $h'$: 고도, $g = 9.8$ m/s². 시간 지연 동안 로봇이 현재 속도로 이동한다고 가정하여 수평 변위를 보정한다."}, {"type": "bullet", "text": "<span class=\"term\">Bang-bang 투하 제어</span>: 예측 충격점 $(u_p, v_p)$ 가 trust region $\\Omega'_p$ (목표 영역보다 작은 안전 영역) 내부에 있으면 서보 암을 90° 회전하여 강구 투하 (Case 1), 외부이면 대기 (Case 2). Trust region 은 센서 오차와 풍란에 의한 편차를 흡수하기 위한 보수적 설계."}]}, "experiment": {"content": [{"type": "bullet", "text": "<span class=\"term\">활공 비교 실험</span>: 캠버 날개 vs 평판 날개 로봇을 5일간 야외에서 비교. Day 1 기준 — 캠버: 고도 18 m 에서 39 s 활공 (h'/t = 0.462 m/s), 평판: 고도 19 m 에서 21 s 활공 (h'/t = 0.904 m/s). 5일 모두 캠버 날개가 <span class=\"term\">2배 이상 긴 활공 시간</span>과 약 절반의 하강 속도를 기록."}, {"type": "bullet", "text": "<span class=\"term\">영상 안정성 평가 (DITF)</span>: 활공·날갯짓 비행 모두에서 캠버 날개의 DITF 평균·표준편차가 평판 날개보다 낮음. 캠버가 기체 자세 변동을 줄여 항공 영상 품질을 개선하며, 이는 에어드롭 시 목표 인식 정확도 향상에 직결된다."}, {"type": "formula", "label": "식 (7)–(8) — PSNR 및 DITF 정의", "latex": "\\text{PSNR}(I_t, I_{t-1}) = 10 \\log \\frac{255^2}{\\text{MSE}(I_t, I_{t-1})}, \\quad \\text{DITF}(I_t) = |\\text{PSNR}(I_{t-1}, I_t) - \\text{PSNR}(I_t, I_{t+1})|", "description": "PSNR: 인접 프레임 간 신호 대 잡음비 — MSE 가 작을수록 안정. DITF: 연속 3프레임의 PSNR 변화 절대값 — DITF 가 작을수록 프레임 간 변동이 적어 영상이 안정적이다. 이동 카메라 환경에서 PSNR 보다 DITF 가 더 적절한 영상 안정성 지표."}, {"type": "bullet", "text": "<span class=\"term\">Monte Carlo 에어드롭 시뮬레이션</span>: 초기 위치·속도·고도를 랜덤 설정 ($x_0, y_0 \\in [-50, 50]$ m, $h' \\in [1, 7]$ m, $v_x, v_y \\in [-10, 10]$ m/s, $v_z \\in [-2, 6]$ m/s), 속도·위치·시간지연에 Gaussian noise 추가. 800회 반복에서 성공률 약 <span class=\"term\">90%</span> — trust region 설계가 센서 오차를 효과적으로 흡수."}, {"type": "bullet", "text": "<span class=\"term\">야외 실제 에어드롭</span>: USTBird-I 에 FPV 카메라 + 투하 장치를 탑재, 손 던지기로 이륙 후 원격 조종으로 목표 상공 접근. 활공 모드 전환 시 프로그램이 자동으로 목표 인식·충격점 예측·bang-bang 투하 실행. 반경 1 m 적색 카펫에 8 mm 강구를 성공적으로 투하 — <span class=\"term\">세계 최초 FWAR 야외 에어드롭</span>."}, {"type": "bullet", "text": "<span class=\"term\">실제 성공률 < 시뮬레이션</span>: 야외 실험의 성공률은 90% 에 크게 미달. 원인은 두 가지: (1) 호버링 불가 + 고유 선회 반경으로 매번 목표 상공을 통과하기 어려움, (2) 야외 풍란이 활공 궤적을 불규칙하게 변화시켜 카메라 포착 자체가 실패하는 경우가 빈번."}, {"type": "bullet", "text": "<span class=\"term\">투하 장치</span>: PZ-15320 서보 (1.7 g) + 3D 프린팅 PLA 컨테이너, 강구 포함 총 6 g. 기체 공기역학 중심에 고정하여 비행 성능 영향 최소화. 서보 암 90° 회전으로 강구 방출 — 구조가 단순하고 가벼우며 확실한 작동."}, {"type": "bullet", "text": "<span class=\"term\">USTBird-I 비행 성능</span>: 에어드롭 임무에 필요한 모든 전자 장비 (GPS, FPV, transmitter, 제어 보드 등) 탑재 상태에서 <span class=\"term\">10분 이상 체공</span>. Flapping frequency 2–4 Hz, 저소음. 날갯짓 없는 활공 시 에어드롭 수행 → 진동 회피 + 안정 영상 확보."}, {"type": "bullet", "text": "<span class=\"term\">좌표 변환 검증</span>: 카메라 내부 파라미터(calibration), 회전 행렬(yaw angle 만 — 활공 시 pitch·roll 은 무시 가능), 번역 벡터(GPS 위치 + altimeter 고도)로 world→pixel 변환. 실측 대비 충격점 예측 오차는 시뮬레이션 조건에서 목표 영역(반경 1 m) 내에 안정적으로 수렴."}]}, "discussion": {"content": [{"type": "bullet", "text": "<span class=\"term\">캠버 날개의 이중 효과</span>: (1) 활공 양항비 극대화로 활공 거리·시간 증가 → 에어드롭 기회 창(window) 확대, (2) 기체 자세 변동 감소 → 항공 영상 DITF 저감 → 목표 인식 정확도 향상. 두 효과가 결합되어 에어드롭 임무 수행 능력을 체계적으로 개선한다."}, {"type": "bullet", "text": "<span class=\"term\">생체 역학적 함의</span>: CFD 결과는 <span class=\"term\">조류가 캠버 날개를 가지면서 활공 중 rising angle 을 능동 조절하는 행동</span>이 양항비 최적화를 위한 전략일 수 있음을 시사한다. 특정 camber-dihedral 조합에서 양항비가 극대화되므로, 종(species)별 최적 날개 형태와 활공 자세가 존재할 가능성을 제기한다."}, {"type": "bullet", "text": "<span class=\"term\">실제 성공률과 시뮬레이션의 괴리</span>: 시뮬레이션 90% vs 실제 훨씬 낮음. 핵심 원인은 (1) USTBird-I 가 호버링 불가하여 목표 상공 통과 자체가 확률적, (2) 야외 풍란이 활공 궤적을 불예측적으로 변화, (3) 시뮬레이션에서 가정한 균일 속도 유지가 실제와 괴리."}, {"type": "bullet", "text": "<span class=\"term\">GPS 고도 정확도 한계</span>: GPS 는 수평 위치·속도만 정확히 제공하고, 고도는 altimeter(기압계)에 의존한다. 기압계의 고도 오차가 충격점 예측에 직접 영향을 미치며, 특히 저고도 에어드롭에서 상대 오차가 크다."}, {"type": "bullet", "text": "<span class=\"term\">시간 지연 보상의 한계</span>: 카메라 수신 지연 0.12 s + 서보 응답 0.11 s = 총 0.23 s. 이 지연 동안 로봇이 등속 직선 운동한다는 가정은 활공 중에는 합리적이나, 돌풍이나 자세 변화 시 오차가 증폭된다. 지연을 줄이거나 예측 모델을 개선하는 것이 정확도 향상의 핵심."}, {"type": "bullet", "text": "<span class=\"term\">FPV 카메라 품질 제약</span>: 적재 제한으로 8 g 저해상도 미니 카메라를 사용. 날갯짓 진동이 영상을 추가로 열화시켜 활공 모드에서만 안정적 목표 인식이 가능하다. 더 가볍고 고해상도인 카메라의 탑재가 향후 성능 향상의 관건."}, {"type": "bullet", "text": "<span class=\"term\">향후 연구</span>: (1) 비행 안정성·기동성 향상으로 목표 상공 접근 성공률 제고, (2) 고도 제어 통합으로 에어드롭 정밀도 향상, (3) 폐루프 heading 제어의 robust 화 — 이 세 방향이 에어드롭 실용화의 필수 과제."}]}, "conclusion": {"content": [{"type": "bullet", "text": "<span class=\"term\">캠버 날개 도입의 핵심 가치</span>: 평판 날개 대비 활공 시간 약 2배 증가, 고도 하강 속도 약 절반 감소. 조류의 캠버 날개 구조를 로봇 공학에 성공적으로 전사한 사례로, bird-like FWAR 설계의 새로운 표준을 제시한다."}, {"type": "bullet", "text": "<span class=\"term\">CFD 기반 설계 최적화</span>: COMSOL 가상 풍동에서 180회 시뮬레이션으로 camber ratio·dihedral angle 의 양항비 영향을 체계적으로 분석. h/c = 5/12, dihedral 2° 최적 조합을 도출하여 실험적 반복 설계의 비효율을 크게 줄임."}, {"type": "bullet", "text": "<span class=\"term\">영상 안정성 개선</span>: 캠버 날개가 활공뿐 아니라 날갯짓 비행에서도 DITF 를 저감시킴을 정량 입증. 에어드롭 정확도와 직결되는 항공 영상 품질을 추가 하드웨어 없이 날개 설계만으로 개선한 점이 실용적."}, {"type": "bullet", "text": "<span class=\"term\">Vision-based 자율 에어드롭</span>: HSV 색상 검출 + 타원 검출 + bang-bang 투하 제어로 활공 중 목표 영역에 강구 투하 성공. 세계 최초 FWAR 야외 에어드롭으로, 날갯짓 로봇의 응용 범위를 은밀 배달·근접 투하 시나리오로 확장."}, {"type": "bullet", "text": "<span class=\"term\">생물학적 함의</span>: 캠버 날개와 rising angle 의 조합이 활공 양항비를 최적화한다는 결과는, 알바트로스·독수리 등이 캠버 날개 + 능동 dihedral 조절로 활공 효율을 극대화한다는 생물학적 가설의 공학적 근거를 제공한다."}, {"type": "bullet", "text": "<span class=\"term\">USTBird-I 시스템 통합</span>: 151.7 g 기체에 GPS·IMU·FPV·제어 보드·투하 장치를 모두 탑재하고 10분 이상 체공. Flapping frequency 2–4 Hz 의 저소음 비행으로 은밀 임무에 적합한 플랫폼 완성도를 달성."}, {"type": "bullet", "text": "<span class=\"term\">한계와 향후 연구</span>: 실제 에어드롭 성공률이 시뮬레이션(90%)에 크게 미달하며, 호버링 불가·풍란·센서 오차가 주요 원인. 비행 안정성·자율성 향상과 투하 정확도 개선이 실용화의 핵심 과제로 남는다."}]}};
-        const INSIGHTS_DATA = {"limitations": ["Actual outdoor airdrop success rate is significantly below the Monte Carlo simulation result of 90%, due to inability to hover and wind disturbance.", "GPS provides only horizontal position/velocity; altitude relies on a barometric altimeter with limited accuracy at low altitudes.", "Time-delay compensation assumes constant velocity during the 0.23 s delay, which breaks down under gusts or attitude changes.", "The 8 g low-resolution FPV camera limits target recognition quality; only gliding mode provides stable enough imagery.", "CFD simulation did not yield an explicit analytical design rule relating camber ratio and dihedral to lift-drag ratio."], "future_works": ["Improve flight stability and maneuverability to increase the probability of passing over the target area.", "Integrate altitude control for more precise airdrop delivery.", "Robustify the heading control loop against stronger wind disturbances."], "motivation_resolution": {"motivating_problems": ["No FWAR has demonstrated outdoor autonomous airdrop — rotary-wing UAVs dominate but are noisy and conspicuous.", "The effect of cambered wings on gliding lift-drag ratio for bird-like FWARs is unexplored.", "The aerodynamic effect of dihedral angle (wing rising angle) during gliding is not systematically studied.", "Flapping-induced vibration degrades aerial imagery, limiting vision-based airdrop accuracy.", "Bird-scale FWARs lack the gliding endurance needed for mission windows like airdrop."], "addressed_by_this_work": ["First-ever FWAR outdoor autonomous airdrop is demonstrated using vision-based bang-bang control during gliding.", "CFD (180 simulations) systematically analyzes camber ratio effect on gliding L/D, identifying h/c = 5/12 as optimal.", "Dihedral angle of 2 degrees is identified as optimal for moment-equilibrium gliding via CFD surface fitting.", "Gliding-mode airdrop avoids flapping vibration entirely; DITF analysis confirms cambered wings further improve image stability.", "Cambered wings double gliding time (46 s vs 23 s) compared to flat wings, extending the airdrop opportunity window."], "remaining_unresolved": ["Hovering is physically impossible for this platform, fundamentally limiting target overflight probability.", "Altitude control is not integrated, reducing airdrop precision.", "Real-world success rate remains far below simulation predictions due to wind and trajectory uncertainty."]}};
+        const INSIGHTS_DATA = {"limitations": ["실제 야외 airdrop 성공률이 호버링 불가와 바람 외란으로 인해 Monte Carlo 시뮬레이션 90%에 비해 크게 낮음.", "GPS는 수평 위치·속도만 제공하고, 고도는 저고도 정확도가 낮은 기압 고도계에 의존.", "0.23초 시간 지연 보상은 정속 가정으로, 돌풍·자세 변화 시 무너짐.", "8 g 저해상도 FPV 카메라가 타겟 인식 품질을 제약 — 활공 모드만 안정적 영상 제공.", "CFD 시뮬레이션이 camber ratio·dihedral과 양항비를 잇는 명시적 해석적 설계 규칙을 도출 못 함."], "future_works": ["타겟 영역 통과 확률 향상을 위한 비행 안정성·기동성 개선.", "더 정밀한 airdrop 투하를 위한 고도 제어 통합.", "강한 바람 외란에 대한 heading 제어 루프 강건화."], "motivation_resolution": {"motivating_problems": ["야외 자율 airdrop을 시연한 FWAR 부재 — 회전익 UAV가 주류이나 시끄럽고 노출됨.", "Bird-like FWAR의 활공 양항비에 대한 cambered wing 효과 미연구.", "활공 중 dihedral angle(날개 상승각)의 공력 효과가 체계적으로 연구되지 않음.", "날갯짓 진동이 항공 영상을 열화 → 비전 기반 airdrop 정확도 제약.", "Bird-scale FWAR가 airdrop 같은 임무 윈도우에 필요한 활공 지속 시간 부족."], "addressed_by_this_work": ["활공 중 비전 기반 bang-bang 제어로 FWAR 야외 자율 airdrop을 세계 최초 실증.", "CFD(180 시뮬레이션)로 활공 L/D에 대한 camber ratio 효과를 체계 분석 — 최적 h/c = 5/12 도출.", "CFD surface fitting으로 모멘트 평형 활공의 최적 dihedral angle 2도 도출.", "활공 모드 airdrop이 날갯짓 진동을 완전히 회피 — DITF 분석으로 cambered wing이 영상 안정성을 추가 개선 확인.", "Cambered wing이 활공 시간을 평면 날개 대비 2배(46초 vs 23초)로 연장하여 airdrop 기회 윈도우 확대."], "remaining_unresolved": ["본 플랫폼은 호버링이 물리적으로 불가 — 타겟 통과 확률을 근본적으로 제한.", "고도 제어 미통합 — airdrop 정밀도 저하.", "바람과 궤적 불확실성으로 실제 성공률이 시뮬레이션 예측치보다 크게 낮음."]}};
         const INSIGHTS_LABELS = {
-            panel_title:    "핵심 인사이트",
             limitations:    "한계",
             future_works:   "향후 연구",
             motivation:     "동기 vs 해결도",
@@ -394,6 +384,43 @@
                 chipHtml = `<span class="fig-ref">[${FIG_PREFIX} ${item.figure_refs.join(", ")}]</span>`;
             }
             return `<div class="bullet">${item.text}${chipHtml}</div>`;
+        }
+
+        function renderInsightsBlock() {
+            const d = INSIGHTS_DATA || {};
+            const L = INSIGHTS_LABELS;
+            const limItems = (d.limitations || []).map(s => `<li>${s}</li>`).join('');
+            const futItems = (d.future_works || []).map(s => `<li>${s}</li>`).join('');
+            const mr = d.motivation_resolution || {};
+            const motProb = (mr.motivating_problems    || []).map(s => `<li>${s}</li>`).join('');
+            const motAddr = (mr.addressed_by_this_work || []).map(s => `<li>${s}</li>`).join('');
+            const motRem  = (mr.remaining_unresolved   || []).map(s => `<li>${s}</li>`).join('');
+
+            return `
+                <div class="conclusion-insights">
+                    <h4 class="insights-section-title">${L.limitations}</h4>
+                    <ul class="lim-list">${limItems}</ul>
+
+                    <h4 class="insights-section-title">${L.future_works}</h4>
+                    <ul class="future-list">${futItems}</ul>
+
+                    <h4 class="insights-section-title">${L.motivation}</h4>
+                    <div class="motivation-block">
+                        <div class="mot-problems">
+                            <h5>${L.mot_problems}</h5>
+                            <ul>${motProb}</ul>
+                        </div>
+                        <div class="mot-addressed">
+                            <h5>${L.mot_addressed}</h5>
+                            <ul>${motAddr}</ul>
+                        </div>
+                        <div class="mot-remaining">
+                            <h5>${L.mot_remaining}</h5>
+                            <ul>${motRem}</ul>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function openModal(key) {
@@ -414,6 +441,11 @@
                 return '';
             }).join('');
 
+            // Conclusion 모달 끝에 한계 / 향후 연구 / 동기 vs 해결도 블록 추가
+            if (key === 'conclusion') {
+                html += renderInsightsBlock();
+            }
+
             const body = document.getElementById('modal-body');
             body.innerHTML = html;
             body.scrollTop = 0;
@@ -430,47 +462,6 @@
                     throwOnError: false
                 });
             }
-        }
-
-        function openInsights() {
-            const d = INSIGHTS_DATA;
-            const L = INSIGHTS_LABELS;
-            document.getElementById('modal-title').innerText = L.panel_title;
-
-            const limItems = (d.limitations || []).map(s => `<li>${s}</li>`).join('');
-            const futItems = (d.future_works || []).map(s => `<li>${s}</li>`).join('');
-            const mr = d.motivation_resolution || {};
-            const motProb  = (mr.motivating_problems   || []).map(s => `<li>${s}</li>`).join('');
-            const motAddr  = (mr.addressed_by_this_work|| []).map(s => `<li>${s}</li>`).join('');
-            const motRem   = (mr.remaining_unresolved  || []).map(s => `<li>${s}</li>`).join('');
-
-            const html = `
-                <h4 class="insights-section-title">${L.limitations}</h4>
-                <ul class="lim-list">${limItems}</ul>
-
-                <h4 class="insights-section-title">${L.future_works}</h4>
-                <ul class="future-list">${futItems}</ul>
-
-                <h4 class="insights-section-title">${L.motivation}</h4>
-                <div class="motivation-block">
-                    <div class="mot-problems">
-                        <h5>${L.mot_problems}</h5>
-                        <ul>${motProb}</ul>
-                    </div>
-                    <div class="mot-addressed">
-                        <h5>${L.mot_addressed}</h5>
-                        <ul>${motAddr}</ul>
-                    </div>
-                    <div class="mot-remaining">
-                        <h5>${L.mot_remaining}</h5>
-                        <ul>${motRem}</ul>
-                    </div>
-                </div>
-            `;
-            const body = document.getElementById('modal-body');
-            body.innerHTML = html;
-            body.scrollTop = 0;
-            document.getElementById('modal-overlay').classList.add('active');
         }
 
         function closeModal() {

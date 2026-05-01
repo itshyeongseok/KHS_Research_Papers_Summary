@@ -69,25 +69,6 @@
             border-radius: 999px;
             font-weight: 500;
         }
-
-        .critical-insights {
-            background: #fff8e1;
-            border-left: 4px solid #fbc02d;
-            padding: 14px 38px;
-            border-bottom: 1px solid #e1e5e8;
-        }
-        .critical-insights-title {
-            font-size: 17px; font-weight: bold; margin-bottom: 8px; color: #f57f17;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .critical-insights ul {
-            margin: 0; padding-left: 20px;
-            font-size: 14.5px; line-height: 1.65;
-        }
-        .critical-insights li {
-            margin-bottom: 6px;
-        }
-
         .content {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -215,12 +196,73 @@
             border-bottom: 1px solid #e0e0e0;
             padding-bottom: 4px;
         }
+
+        /* Conclusion-modal Insights block (한계 / 향후 연구 / 동기 vs 해결도) */
+        .conclusion-insights {
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 2px dashed #c5cdd6;
+        }
+        .modal-body .lim-list,
+        .modal-body .future-list {
+            padding-left: 20px;
+            margin: 0 0 16px;
+        }
+        .modal-body .lim-list li,
+        .modal-body .future-list li {
+            margin-bottom: 6px;
+            line-height: 1.6;
+        }
+        .motivation-block {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin-top: 8px;
+        }
+        @media (min-width: 900px) {
+            .motivation-block { grid-template-columns: repeat(3, 1fr); }
+        }
+        .mot-problems h5,
+        .mot-addressed h5,
+        .mot-remaining h5 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .mot-problems h5  { color: #c62828; }
+        .mot-addressed h5 { color: #2e7d32; }
+        .mot-remaining h5 { color: #ef6c00; }
+        .mot-problems ul,
+        .mot-addressed ul,
+        .mot-remaining ul {
+            padding-left: 18px;
+            margin: 0;
+        }
+        .mot-problems li,
+        .mot-addressed li,
+        .mot-remaining li {
+            margin-bottom: 6px;
+            line-height: 1.55;
+            font-size: 14.5px;
+        }
+        .insights-section-title {
+            color: #005b96;
+            margin: 20px 0 10px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 4px;
+            font-size: 17px;
+        }
+        .insights-section-title:first-child { margin-top: 0; }
     </style>
 </head>
 <body>
     <div class="slide">
         <div class="header">
-            <div class="title">CCM-SLAM: Robust and efficient centralized collaborative monocular simultaneous localization and mapping for robotic teams <span class="tier-badge tier-2" style="background:#fbc02d;color:#000;padding:4px 12px;border-radius:12px;font-weight:600;font-size:14px;margin-left:16px;">Tier 2 — 비교 baseline</span></div>
+            <div class="header-row">
+                <div class="title">CCM-SLAM: Robust and efficient centralized collaborative monocular simultaneous localization and mapping for robotic teams</div>
+                <span class="tier-badge tier-2">Tier 2 — 비교 baseline</span>
+            </div>
             <div class="authors">Patrik Schmuck, Margarita Chli</div>
             <div class="journal">Journal of Field Robotics, Vol. 36, 763-781 (2019) · DOI: 10.1002/rob.21854</div>
         </div>
@@ -230,17 +272,6 @@
             <div class="summary">이 논문은 <span class="term">다수 MAV (소형 무인 항공기) 를 위한 중앙집중식 협력 단안 SLAM 프레임워크 CCM-SLAM</span>을 제시한 ETH Zurich Vision for Robotics Lab 의 Journal of Field Robotics 발표. 각 에이전트는 제한된 연산 자원으로 <span class="term">실시간 Visual Odometry 를 onboard 수행</span>하여 자율성을 보장하고, 중앙 서버가 <span class="term">place recognition · map fusion · global Bundle Adjustment · redundancy detection</span> 등 계산 집약적 작업을 담당. 핵심은 <span class="term">양방향 통신</span> — 서버가 에이전트에게 다른 에이전트의 경험을 전달하여 local map 을 보강하고, 통신 지연·메시지 손실에도 robust 하게 작동하며 연결 완전 끊김 시에도 에이전트 자율성 유지. EuRoC · Irchel 데이터셋 분석과 <span class="term">이종 센서·연산 장비의 3대 UAV 동시 비행 실험</span>으로 실용성 입증. <span class="eng">[Tier 2 비교 baseline]</span> Drone collaborative SLAM 의 현재 수준을 보여주는 프레임워크로, FWAV 스웜 자율 항법 연구 시 아키텍처·통신·확장성 설계의 참조점.</div>
             <div class="keywords"><span class="keyword-chip">collaborative slam</span><span class="keyword-chip">multi-robot slam</span><span class="keyword-chip">centralized architecture</span><span class="keyword-chip">monocular visual odometry</span><span class="keyword-chip">map fusion</span><span class="keyword-chip">place recognition</span><span class="keyword-chip">keyframe management</span><span class="keyword-chip">bundle adjustment</span><span class="keyword-chip">communication robustness</span><span class="keyword-chip">micro aerial vehicle</span></div>
         </div>
-
-        <div class="critical-insights">
-            <div class="critical-insights-title">Critical Insights — FWAV Cross-Domain 이식 분석</div>
-            <ul>
-                <li>CCM-SLAM 의 <span class="term">lightweight agent + server offloading 아키텍처</span>는 payload 제한적인 FWAV 에 구조적으로 가장 적합한 패턴이나, ORB feature 기반 VO front-end 는 FWAV 날개 진동·motion blur·wing occlusion 으로 직접 이식 불가 — <span class="term">event camera 또는 IMU tight coupling front-end 교체 필수</span>.</li>
-                <li><span class="term">양방향 통신</span> 패턴 (서버가 cross-agent 경험을 local map 에 주입) 은 FWAV 스웜에 직접 이식 가능: 먼저 비행한 FWAV 의 map 으로 후속 FWAV 보조.</li>
-                <li>통신 bandwidth 가정 (~0.37 MB/s, 55 KB/KF) 은 FWAV 스웜의 고속 비행 + 동적 상대 위치 변화 + 극소 payload 통신 하드웨어 제약 하에서 유지 불가능할 수 있음.</li>
-                <li>현재 FWAV 는 단일 로봇 onboard SLAM 조차 미성숙 (motion capture 의존); multi-agent FWAV SLAM 은 (a) 단일 로봇 SLAM 성숙, (b) flapping 특화 feature extraction, (c) 극소 payload 통신 모듈 — <span class="term">세 가지 전제 조건 선행 필요</span>.</li>
-            </ul>
-        </div>
-
         <div class="content">
             <div class="section" onclick="openModal('introduction')">
                 <div class="section-title">Introduction: 연구 동기 <span class="click-hint">클릭하여 자세히 ▸</span></div>
@@ -292,6 +323,54 @@
 
         const SECTION_DETAIL = {"introduction":{"content":[{"type":"bullet","text":"<span class=\"term\">연구 동기 — 단일 로봇 SLAM 의 성숙과 멀티 로봇 확장</span>: 단일 로봇 SLAM (ORB-SLAM, LSD-SLAM 등) 이 robustness 와 map size 면에서 성숙. 이제 다수 로봇이 하나의 global map 에서 collaborative localization + mapping 을 동시 수행하는 단계로 진화 필요. <span class=\"eng\">[Tier 2]</span> Drone 분야는 이미 multi-robot SLAM 단계 — FWAV 는 아직 단일 로봇 onboard SLAM 조차 미성숙."},{"type":"bullet","text":"<span class=\"term\">멀티 로봇 시스템의 핵심 과제</span>: (1) 시간 지연 처리, (2) 네트워크 연결성 보장, (3) 에이전트 간 투명한 정보 접근 — 이 세 가지가 collaborative SLAM 의 consistency 를 좌우. 기존 연구 대부분은 에이전트→서버 단방향 통신만 구현."},{"type":"bullet","text":"<span class=\"term\">CCM-SLAM 의 핵심 설계</span>: 소형 UAV 다수 + 중앙 서버. 각 에이전트는 단안 카메라 + 소형 CPU 로 <span class=\"term\">VO 를 onboard 실행</span> (자율성 보장). 서버는 더 큰 연산 능력으로 모든 에이전트의 경험을 수집·병합·최적화하고 <span class=\"term\">양방향 통신</span>으로 필요한 정보를 에이전트에 전달."},{"type":"bullet","text":"<span class=\"term\">주요 기여 5가지</span>: (1) 효율적 에이전트/서버 분리 아키텍처, (2) 통신 robustness (지연·메시지 손실 대처), (3) 양방향 정보 공유, (4) KF redundancy detection 으로 확장성 확보, (5) 이종 장비 3대 UAV 실세계 비행 시연."},{"type":"bullet","text":"<span class=\"term\">Feature-based vs Direct SLAM</span>: CCM-SLAM 은 feature-based (ORB-SLAM 기반) 방식 채택 — 2D keypoint + descriptor 만 교환하여 <span class=\"term\">네트워크 트래픽을 ~55 KB/KF 로 제한</span>. Direct method (LSD-SLAM) 는 이미지 전체 교환 필요 → 멀티 에이전트에서 비현실적."},{"type":"bullet","text":"<span class=\"term\">최초 시연</span>: 양방향 통신을 지원하는 collaborative SLAM 시스템이 <span class=\"term\">3대 UAV 실세계 비행에서 시연된 것은 CCM-SLAM 이 최초</span> — drone collaborative perception 의 capability frontier 를 정의."}]},"related_works":{"content":[{"type":"bullet","text":"<span class=\"term\">멀티 로봇 localization</span>: Martinelli (2005) EKF 기반 상대 위치, Achtelik (2011) flexible stereo rig, Piasco (2016) distributed stereo-vision. 공통 한계: <span class=\"term\">map 공유 없음</span> → collaborative mission 에 제한적."},{"type":"bullet","text":"<span class=\"term\">멀티 로봇 mapping — Forster et al. (2013)</span>: 각 에이전트의 KF 를 서버에 전송, 서버에서 correspondence 검출 + global optimization. 그러나 <span class=\"term\">서버→에이전트 통신 없음</span> — 에이전트가 collaborative estimation 의 혜택을 못 받음."},{"type":"bullet","text":"<span class=\"term\">중앙집중식 SLAM — C2TAM (Riazuelo 2014)</span>: RGB-D 카메라, 서버가 전체 map 반복 전송. 한계: (a) 서버 의존 (연결 끊기면 작동 불가), (b) 전체 map 전송은 대규모 환경에서 비현실적, (c) PTAM 기반 (현 SOTA 대비 열세)."},{"type":"bullet","text":"<span class=\"term\">MOARSLAM (Morrison 2016)</span>: 각 에이전트가 full SLAM 실행, 서버는 단순 저장·공유. 한계: <span class=\"term\">서버의 연산 능력을 활용하지 못함</span> — 에이전트 측 연산 부담 과중. FWAV 의 극소 payload 에서 onboard full SLAM 은 더욱 비현실적."},{"type":"bullet","text":"<span class=\"term\">분산형 (decentralized) 접근</span>: DDF-SAM (Cunningham 2013), Dong et al. (2015). 장점: 중앙 서버 불필요. 단점: (a) 데이터 일관성 어려움, (b) 연산 집약 작업을 에이전트에서 수행, (c) <span class=\"term\">대부분 시뮬레이션 데이터만 평가</span>."},{"type":"bullet","text":"<span class=\"term\">CCM-SLAM 의 차별점 종합</span>: (1) 에이전트는 VO 만 onboard, (2) 서버가 BA·place recognition·redundancy detection 담당, (3) <span class=\"term\">양방향 통신</span>으로 cross-agent 경험 주입, (4) 통신 장애 시 VO fallback 자율성 보장 — 기존 어느 시스템도 이 4가지를 동시 구현하지 못함."}]},"method":{"content":[{"type":"bullet","text":"<span class=\"term\">에이전트 측 — KF-based VO</span>: ORB-SLAM front-end 사용. Tracking thread (frame-to-frame motion estimation) + Mapping thread (KF 생성·MP triangulation) 병렬 실행. 각 KF 에 globally unique ID 부여. <span class=\"eng\">[FWAV 이식성]</span> feature-based VO 는 FWAV 의 심한 진동과 날개 가림(wing occlusion)으로 feature tracking 품질이 크게 저하될 수 있음 — event camera 나 IMU 보조 필수."},{"type":"bullet","text":"<span class=\"term\">Local map $\\mathcal{L}$ 과 covisibility graph</span>: 에이전트 인근 $N$ 개 KF + 관련 MP 로 구성. Covisibility graph (15+ shared MP 이상인 KF 쌍을 edge 로 연결). $N$ 초과 시 trimming — KF$_{\\text{ref}}$ + $N-1$ 개 최근 KF 유지 (서버 수신 확인 후). 이 <span class=\"term\">lightweight local map 전략</span>은 연산 자원이 극히 제한적인 FWAV 에이전트에 구조적으로 적합."},{"type":"bullet","text":"<span class=\"term\">Server map stack + Map fusion</span>: 에이전트별 server map 보유 (크기 무제한). Map matching 성공 시 두 server map 을 <span class=\"term\">Sim(3) 변환</span>으로 병합 → 새 server map 생성. Monocular 이므로 7-DOF (rotation + translation + scale) 정렬 필요."},{"type":"bullet","text":"<span class=\"term\">Relative coordinate scheme</span>: 절대 좌표 대신 이전 KF 대비 상대 좌표 전송. Global BA 후 map 변경되어도 새 KF 가 이미 최적화된 KF 기준으로 자동 정렬 — <span class=\"term\">loop closure 시 alignment 불일치 방지</span>. 이 방식은 FWAV 의 고빈도 자세 변화 환경에서도 유효."},{"type":"bullet","text":"<span class=\"term\">통신 효율 설계</span>: 새 KF = 2D keypoint + descriptor + MP 포함 ~55 KB (최대 1000 features). 이후 업데이트는 pose 만 ~148 bytes (KF) / ~52 bytes (MP). New data vs update 구분으로 <span class=\"term\">평균 0.37 MB/s 트래픽</span> 달성 (구분 없을 시 ~10 MB/s). FWAV 스웜에서 통신 하드웨어 무게 제약 시 이 수준의 bandwidth 최적화는 critical."},{"type":"bullet","text":"<span class=\"term\">양방향 서버↔에이전트 통신</span>: 서버가 KF$_{\\text{ref}}$ 인근 covisibility edge 가 가장 강한 $k$ 개 KF + 관련 MP 를 에이전트에 전송 — 생성자 무관. <span class=\"term\">한 에이전트의 경험이 다른 에이전트의 local map 보강</span>에 사용되어 실질적 collaboration 실현."},{"type":"bullet","text":"<span class=\"term\">Place recognition (DBoW2) + Loop closure</span>: Bag-of-Words 기반 inverted file index 로 (1) intra-map 재방문 검출 → loop closure, (2) inter-map overlap 검출 → map fusion 트리거. <span class=\"term\">이종 카메라 파라미터 간에도 매칭 가능</span> — 다양한 FWAV 플랫폼 혼용 시 유리."},{"type":"bullet","text":"<span class=\"term\">Global BA + KF redundancy detection</span>: g2o Levenberg-Marquardt 로 reprojection error 최소화. Essential graph (covisibility $w \\ge 100$) 로 pose-graph optimization 선행 → timing 개선. KF$_k$ 의 MP 중 $\\theta$% (=98%) 이상이 3개+ 다른 KF 에서도 관측되면 제거 → BA 시간 18% 절감, RMSE 증가 무시 가능 → <span class=\"term\">large-scale mission 확장성</span>."}]},"experiment":{"content":[{"type":"bullet","text":"<span class=\"term\">실험 플랫폼</span>: 서버 = ThinkPad T460s (2.6 GHz ×4, 20 GB RAM). Agent 1, 2 = AscTec Neo (Intel NUC, 8 GB RAM). Agent 3 = AscTec Hummingbird (Atom 1.91 GHz, 4 GB RAM). 무선 라우터 (TL-WR802N). <span class=\"eng\">[비교]</span> Hummingbird 급 소형 UAV 의 연산 자원 (Atom 1.91 GHz, 4 GB) 도 현재 FWAV 대비 압도적으로 풍부."},{"type":"bullet","text":"<span class=\"term\">통신 robustness</span>: 인위적 delay + message loss 주입 실험. Delay 0.5 s 까지 트래픽 변화 없음. $P_{\\text{loss}} = 0.2$: 약간의 트래픽 증가, 안정 대처. $P_{\\text{loss}} = 0.5$: 트래픽 2배 + buffer overflow 위험. 최악에도 에이전트는 VO fallback 유지."},{"type":"bullet","text":"<span class=\"term\">Network delay 의 영향</span>: delay 증가 → 서버가 에이전트의 과거 위치 기준으로 정보 전송 → 도착 시 현재 위치와 불일치 → trajectory error 증가. 그러나 <span class=\"term\">collaboration 품질에만 영향, 에이전트 자율성에는 영향 없음</span>."},{"type":"bullet","text":"<span class=\"term\">Local map $N$ 파라미터</span>: $N = 50$: 정확도 vs 연산 비용의 sweet spot (tracking 28 ms, mapping 208 ms). $N = 100$ 추가 개선 미미. 소형 FWAV 보드에서는 $N = 10$-30 으로도 VO fallback 자율성 유지 가능."},{"type":"bullet","text":"<span class=\"term\">에이전트 수 확장성</span>: 1, 2, 3 에이전트에서 개별 에이전트 timing 불변 (tracking ~27 ms, mapping ~270 ms). 에이전트→서버 트래픽은 에이전트 수에 선형 비례 — <span class=\"term\">서버 연산 + bandwidth 가 유일한 bottleneck</span>."},{"type":"bullet","text":"<span class=\"term\">Collaborative SLAM 정확도 향상</span>: Irchel 3 에이전트 — 상대 오차 0.15% → 0.06%. EuRoC 3 에이전트 — 0.076% → 0.03%. 절대 오차 유사하나 <span class=\"term\">trajectory 길이 대비 상대 오차 50%+ 개선</span> — collaborative estimation 의 명확한 이점."},{"type":"bullet","text":"<span class=\"term\">VINS-mono 비교</span>: monocular-inertial VINS-mono vs monocular-only CCM-SLAM. EuRoC 유사 (0.074 vs 0.077 m), Irchel CCM-SLAM 우위 (0.21 vs 0.36 m). <span class=\"term\">IMU 없이도 collaborative estimation 으로 inertial-aided 단일 로봇과 경쟁적</span> — multi-agent 접근의 가치 입증."},{"type":"bullet","text":"<span class=\"term\">3대 UAV 실세계 비행 + SAR 시나리오</span>: 도심 (~30 m × 7 m) 3대 동시 비행, 이종 플랫폼 통합. 200 m × 100 m SAR 훈련 마을 2대 탐색 (1,336 KF · 46,413 MP). 표준 Wi-Fi + 노트북 서버로 실시간 운용 — <span class=\"term\">drone collaborative SLAM 이 실용 단계에 도달</span>했음을 시연."}]},"discussion":{"content":[{"type":"bullet","text":"<span class=\"term\">에이전트 자율성의 가치</span>: C2TAM 은 서버 연결 끊기면 작동 불가. CCM-SLAM 은 worst case 에서도 <span class=\"term\">VO + limited local map 으로 독립 비행</span>. SAR 임무에서 통신 불안정은 필연적 — FWAV 운용에서도 통신 불안정 시 자율성 보장은 필수."},{"type":"bullet","text":"<span class=\"term\">양방향 통신의 핵심 가치</span>: 서버→에이전트 통신으로 <span class=\"term\">한 에이전트가 다른 에이전트가 이미 탐색한 영역을 재방문할 때 local map 보강</span> — 실질적 collaboration. FWAV 스웜 탐색에서도 이 패턴은 유효: 먼저 비행한 FWAV 의 map 으로 후속 FWAV 보조."},{"type":"bullet","text":"<span class=\"term\">Relative coordinate scheme 의 우수성</span>: global BA 후 absolute coordinate 변경 시에도 자동 정렬. Loop closure 빈번한 대규모 환경에서 essential. FWAV 의 고빈도 자세 변화 환경에서도 robustness 유지 기대."},{"type":"bullet","text":"<span class=\"term\">Scalability bottleneck</span>: BA 시간 $\\propto$ KF$^3$ — 1,000 KF 가 표준 노트북 상한. 네트워크 bandwidth 는 에이전트 수에 선형 증가. FWAV 스웜 (10+ 대) 에서는 이 bottleneck 이 더욱 심화 — <span class=\"term\">cloud/edge computing 또는 분산 BA 로의 발전이 필수</span>."},{"type":"bullet","text":"<span class=\"term\">Monocular 한계와 visual-inertial 확장</span>: scale ambiguity → Sim(3) 변환 (7 DOF) 필요, metric scale 미보장. Karrer et al. (2018) 의 visual-inertial 확장이 해결. FWAV 에서는 IMU 가 flapping 진동 보상에도 필수이므로 <span class=\"term\">VI-SLAM 확장이 FWAV 이식의 전제 조건</span>."},{"type":"bullet","text":"<span class=\"term\">Feature-based 접근의 trade-off</span>: ORB feature 기반이라 texture-less 환경에서 약세. 그러나 multi-agent 환경에서는 <span class=\"term\">통신 효율이 정확도보다 우선</span> — feature descriptor 만 교환 (55 KB/KF vs 전체 이미지 MB 급)."},{"type":"bullet","text":"<span class=\"term\">FWAV 이식 제약 — Quadrotor vs FWAV 의 SLAM 적합성</span>: Quadrotor 는 hover 가능 → (a) 정지 상태 feature-rich 이미지 획득, (b) 느린 속도 motion blur 최소화, (c) 안정적 platform. FWAV 는 (a) forward velocity 유지 필수, (b) flapping 진동으로 이미지 품질 저하, (c) pitch/yaw oscillation → <span class=\"term\">visual SLAM 에 본질적으로 더 어려운 환경</span>."},{"type":"bullet","text":"<span class=\"term\">FWAV 이식 전망 — Lightweight agent 패턴의 적합성</span>: FWAV 는 단일 로봇 SLAM 조차 미성숙 (motion capture 의존). Multi-agent FWAV SLAM 은 (a) 단일 로봇 onboard SLAM 성숙, (b) flapping 특화 feature extraction (event camera 등), (c) 극소 payload 통신 모듈 — 세 조건 선행 필요. 그러나 CCM-SLAM 의 <span class=\"term\">lightweight agent + server offloading 아키텍처</span>는 payload 제한적인 FWAV 에 구조적으로 가장 적합한 패턴."}]},"conclusion":{"content":[{"type":"bullet","text":"<span class=\"term\">핵심 아키텍처 — 에이전트/서버 분리</span>: 에이전트 (VO + limited local map + communication) + 서버 (map stack + place recognition + map fusion + global BA + KF rejection). <span class=\"term\">Navigation-critical 작업은 onboard, 계산 집약 작업은 서버</span> — FWAV 스웜에서도 이 분리 원칙은 동일하게 적용 가능."},{"type":"bullet","text":"<span class=\"term\">양방향 통신</span>: 기존 단방향 시스템 대비 결정적 차별점. 서버가 에이전트에 KF$_{\\text{ref}}$ 인근 $k$ 개 KF + MP 전달 → <span class=\"term\">다른 에이전트의 과거 경험으로 현재 에이전트의 local map 보강</span>."},{"type":"bullet","text":"<span class=\"term\">통신 robustness</span>: relative coordinate scheme + new data vs update 구분 + buffer 관리. Delay 0.5 s, $P_{\\text{loss}} = 0.2$ 까지 안정 운용. 완전 끊김 시 VO fallback — <span class=\"term\">에이전트 자율성 항시 보장</span>."},{"type":"bullet","text":"<span class=\"term\">정확도 향상</span>: collaborative SLAM 으로 상대 trajectory error 50%+ 감소 (Irchel 0.15% → 0.06%). Monocular-only 로도 monocular-inertial VINS-mono 와 경쟁적 — <span class=\"term\">multi-agent 접근이 sensor complexity 를 대체 가능</span>함을 시사."},{"type":"bullet","text":"<span class=\"term\">확장성</span>: KF redundancy detection ($\\theta = 98\\%$) 으로 BA 시간 18% 절감. 에이전트 수 증가 시 개별 에이전트 timing 불변 — bandwidth 와 서버 연산이 유일한 제한."},{"type":"bullet","text":"<span class=\"term\">실세계 시연 — Drone SLAM 의 현재 수준</span>: 3대 이종 UAV 도심 동시 비행 + 200 m × 100 m SAR 탐색. 표준 노트북 + Wi-Fi 로 실시간 운용 — <span class=\"term\">drone collaborative SLAM 이 특수 인프라 없이 실용 가능한 수준에 도달</span>."},{"type":"bullet","text":"<span class=\"term\">Open-source (ccm_slam)</span>: GitHub 공개. ORB-SLAM front-end 기반이라 VO 모듈 교체 가능 — FWAV 특화 VO (event camera, VI-SLAM) 로 front-end 만 교체하여 아키텍처 재활용 가능성."},{"type":"bullet","text":"<span class=\"term\">미래 방향</span>: information value 기반 데이터 선별 공유, visual-inertial 확장, 더 큰 환경 + 더 많은 에이전트 확장. FWAV 연구에서 이 방향들은 모두 관련: <span class=\"term\">VI 확장은 FWAV 이식의 전제, 정보 선별은 payload 제약 FWAV 스웜에서 더욱 critical</span>."}]}};
 
+
+        const INSIGHTS_DATA = {"limitations": ["Monocular SLAM의 scale ambiguity — Sim(3) 변환(7-DOF, scale 포함)은 가능하나 metric scale 미보장.", "ORB feature 기반이라 texture-less 환경에서 약세 — 영상 정보가 부족한 환경에서 tracking 손실 가능.", "서버 측 Bundle Adjustment의 시간복잡도 ~ KF³ — 1,000 KF가 표준 노트북 처리 상한, 대규모 환경 확장 제약.", "에이전트→서버 통신 트래픽이 에이전트 수에 선형 증가 — 서버 연산·bandwidth가 시스템 bottleneck.", "에이전트 자체는 onboard VO만 수행 — full SLAM(loop closure 등)은 서버 의존이라 통신 단절 시 collaborative 이점 손실."], "future_works": ["에이전트 간 공유할 정보의 가치 정량화 — efficiency vs accuracy의 trade-off를 구조적으로 다루기.", "Visual-Inertial 확장 (Karrer et al. 2018 후속) — IMU 통합으로 metric scale 회복 + 진동 환경 강건성 향상.", "더 큰 환경 + 더 많은 에이전트로의 확장 — cloud/edge computing 또는 분산 BA로의 발전 필요."], "motivation_resolution": {"motivating_problems": ["단일 로봇 SLAM(ORB-SLAM, LSD-SLAM 등)이 성숙기에 진입하여 multi-robot collaborative 단계로 진화 필요.", "기존 multi-robot 연구는 단방향 통신(에이전트→서버)만 구현 — cross-agent 경험 공유 부재.", "C2TAM(Riazuelo)은 서버 의존이 강해 통신 단절 시 작동 불가 + 전체 map 반복 전송이 대규모 환경에 비현실적.", "MOARSLAM(Morrison)은 에이전트 측 full SLAM으로 onboard 연산 부담 과중 — 소형 UAV에 부적합.", "분산형 접근(DDF-SAM 등)은 데이터 일관성 어려움 + 대부분 시뮬레이션 평가에 머무름."], "addressed_by_this_work": ["에이전트(VO + 제한 local map) / 서버(map fusion + global BA + place recognition + KF redundancy) 분리 — navigation-critical 작업은 onboard, 계산 집약은 서버.", "양방향 통신으로 서버가 KF_ref 인근 cross-agent 경험을 에이전트에 전달 → local map 보강.", "Relative coordinate scheme + new data vs update 구분으로 평균 0.37 MB/s 트래픽 달성 + loop closure 후 자동 정렬.", "KF redundancy detection(θ=98%)으로 BA 시간 18% 절감 — 대규모 임무 확장성 확보.", "3대 이종 UAV 도심 동시 비행 + 200 m × 100 m SAR 탐색을 표준 Wi-Fi + 노트북 서버로 실시간 시연 — drone collaborative SLAM 실용 단계 진입."], "remaining_unresolved": ["FWAV 이식: ORB feature 기반 VO front-end는 FWAV의 날개 진동 · motion blur · wing occlusion으로 직접 이식 불가 — event camera 또는 IMU tight-coupling front-end 교체 필수.", "FWAV 이식: ~0.37 MB/s · 55 KB/KF의 통신 가정은 FWAV 스웜의 고속 비행 + 동적 상대 위치 변화 + 극소 payload 통신 하드웨어 제약 하에서 유지 불가능할 수 있음.", "FWAV 이식: 현재 FWAV는 단일 로봇 onboard SLAM조차 미성숙(motion capture 의존) — multi-agent FWAV SLAM은 (a) 단일 로봇 SLAM 성숙, (b) flapping 특화 feature extraction, (c) 극소 payload 통신 모듈 — 세 가지 전제 조건 선행 필요.", "Quadrotor는 hover로 안정 feature 취득 가능하나 FWAV는 forward velocity 유지 필수 + 진동 → visual SLAM에 본질적으로 더 어려운 환경.", "더 큰 환경에서는 BA cubic complexity와 bandwidth 선형 증가가 동시에 critical bottleneck."]}};
+        const INSIGHTS_LABELS = {
+            limitations:    "한계",
+            future_works:   "향후 연구",
+            motivation:     "동기 vs 해결도",
+            mot_problems:   "동기 (해결 대상)",
+            mot_addressed:  "본 연구가 해결",
+            mot_remaining:  "미해결"
+        };
+
+        function renderInsightsBlock() {
+            const d = INSIGHTS_DATA || {};
+            const L = INSIGHTS_LABELS;
+            const limItems = (d.limitations || []).map(s => `<li>${s}</li>`).join('');
+            const futItems = (d.future_works || []).map(s => `<li>${s}</li>`).join('');
+            const mr = d.motivation_resolution || {};
+            const motProb = (mr.motivating_problems    || []).map(s => `<li>${s}</li>`).join('');
+            const motAddr = (mr.addressed_by_this_work || []).map(s => `<li>${s}</li>`).join('');
+            const motRem  = (mr.remaining_unresolved   || []).map(s => `<li>${s}</li>`).join('');
+
+            return `
+                <div class="conclusion-insights">
+                    <h4 class="insights-section-title">${L.limitations}</h4>
+                    <ul class="lim-list">${limItems}</ul>
+
+                    <h4 class="insights-section-title">${L.future_works}</h4>
+                    <ul class="future-list">${futItems}</ul>
+
+                    <h4 class="insights-section-title">${L.motivation}</h4>
+                    <div class="motivation-block">
+                        <div class="mot-problems">
+                            <h5>${L.mot_problems}</h5>
+                            <ul>${motProb}</ul>
+                        </div>
+                        <div class="mot-addressed">
+                            <h5>${L.mot_addressed}</h5>
+                            <ul>${motAddr}</ul>
+                        </div>
+                        <div class="mot-remaining">
+                            <h5>${L.mot_remaining}</h5>
+                            <ul>${motRem}</ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         function openModal(key) {
             const detail = SECTION_DETAIL[key];
             if (!detail) return;
@@ -310,6 +389,11 @@
                 }
                 return '';
             }).join('');
+
+            // Conclusion 모달 끝에 한계 / 향후 연구 / 동기 vs 해결도 블록 추가
+            if (key === 'conclusion') {
+                html += renderInsightsBlock();
+            }
 
             const body = document.getElementById('modal-body');
             body.innerHTML = html;
