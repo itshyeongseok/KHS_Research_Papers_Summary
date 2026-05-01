@@ -6,6 +6,7 @@
     <meta name="keywords" content="multi-agent UAV, ReAct paradigm, vision-language model, mission planning, pixel-pointing, satellite imagery grounding, fire detection, Qwen2.5VL, smolagents, LLM-driven autonomy">
     <meta name="paper-authors" content="Oleg Sautenkov, Yasheerah Yaqoot, Muhammad Ahsan Mustafa, Faryal Batool, Jeffrin Sam, Artem Lykov, Chih-Yung Wen, Dzmitry Tsetserukou">
     <meta name="paper-journal" content="arXiv:2505.07236, May 2025 (preprint)">
+    <meta name="paper-tier" content="3">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -116,6 +117,112 @@
         .term { font-weight: bold; color: #005b96; }
         .eng { color: #666; font-style: italic; }
 
+        /* Tier badge */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 10px;
+        }
+        .tier-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: white;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+        }
+        .tier-0 { background: #d32f2f; color: white; }
+        .tier-1 { background: #f57c00; color: white; }
+        .tier-2 { background: #fbc02d; color: black; }
+        .tier-3 { background: #757575; color: white; }
+
+        /* Critical Insights modal */
+        .insights-trigger {
+            margin-top: 8px;
+            display: inline-block;
+            padding: 4px 12px;
+            border: 1px solid white;
+            border-radius: 14px;
+            font-size: 12px;
+            color: white;
+            background: rgba(255,255,255,0.08);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .insights-trigger:hover { background: rgba(255,255,255,0.22); }
+
+        .modal-body .lim-list,
+        .modal-body .future-list {
+            padding-left: 20px;
+            margin: 0 0 16px;
+        }
+        .modal-body .lim-list li,
+        .modal-body .future-list li {
+            margin-bottom: 6px;
+            line-height: 1.6;
+        }
+        .motivation-block {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin-top: 8px;
+        }
+        @media (min-width: 900px) {
+            .motivation-block { grid-template-columns: repeat(3, 1fr); }
+        }
+        .mot-problems h5,
+        .mot-addressed h5,
+        .mot-remaining h5 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .mot-problems h5  { color: #c62828; }
+        .mot-addressed h5 { color: #2e7d32; }
+        .mot-remaining h5 { color: #ef6c00; }
+        .mot-problems ul,
+        .mot-addressed ul,
+        .mot-remaining ul {
+            padding-left: 18px;
+            margin: 0;
+        }
+        .mot-problems li,
+        .mot-addressed li,
+        .mot-remaining li {
+            margin-bottom: 6px;
+            line-height: 1.55;
+            font-size: 14.5px;
+        }
+        .insights-section-title {
+            color: #005b96;
+            margin: 20px 0 10px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 4px;
+            font-size: 17px;
+        }
+        .insights-section-title:first-child { margin-top: 0; }
+
+        /* Figure-ref chip */
+        .fig-ref {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1px 8px;
+            font-size: 11px;
+            font-variant: small-caps;
+            color: #555;
+            background: #eef2f7;
+            border: 1px solid #d0d8e0;
+            border-radius: 999px;
+            vertical-align: middle;
+        }
+
         /* Modal */
         .modal-overlay {
             position: fixed; inset: 0;
@@ -166,7 +273,7 @@
             text-indent: -18px;
         }
         .modal-body .bullet:before {
-            content: "▸ ";
+            content: "\25B8 ";
             color: #005b96;
             font-weight: bold;
         }
@@ -201,41 +308,45 @@
 <body>
     <div class="slide">
         <div class="header">
-            <div class="title">UAV-CodeAgents: Scalable UAV Mission Planning via Multi-Agent ReAct and Vision-Language Reasoning</div>
+            <div class="header-row">
+                <div class="title">UAV-CodeAgents: Scalable UAV Mission Planning via Multi-Agent ReAct and Vision-Language Reasoning</div>
+                <span class="tier-badge tier-3">Tier 3 &mdash; &#48372;&#51312;</span>
+            </div>
             <div class="authors">Oleg Sautenkov, Yasheerah Yaqoot, Muhammad Ahsan Mustafa, Faryal Batool, Jeffrin Sam, Artem Lykov, Chih-Yung Wen, Dzmitry Tsetserukou</div>
             <div class="journal">arXiv:2505.07236, May 2025 (preprint)</div>
+            <div class="insights-trigger" onclick="openInsights()">&#54645;&#49900; &#51064;&#49324;&#51060;&#53944; &#48372;&#44592;</div>
         </div>
 
         <div class="summary-container">
-            <div class="summary-title">논문 요약</div>
-            <div class="summary">이 논문은 <span class="term">UAV-CodeAgents</span> — <span class="term">LLM/VLM 기반 multi-agent 프레임워크</span>로, <span class="term">ReAct (Reason + Act) 패러다임</span>을 통해 자연어 지시 + 위성 이미지에서 자율적 UAV 미션을 생성. <span class="term">Airspace Management Agent (AMA)</span> 가 Qwen2.5-72B 로 고수준 계획을, <span class="term">UAV Agent</span> 가 Qwen2.5VL-32B 로 시각 인식 + 실시간 재평가를 수행하며, <span class="term">pixel-pointing 메커니즘</span> (Qwen2.5VL-7B fine-tuning, 9,000 위성 이미지) 으로 언어 참조 객체를 픽셀 좌표로 정밀 접지. 화재 탐지 case study 에서 <span class="term">temperature 0.5 설정 시 93% 성공률, 평균 96.96초 미션 생성 시간</span> 달성. <span class="eng">smolagents</span> 프레임워크 기반 모듈형 설계로 agent 동적 추가/제거·이종 모델 배치·sim2real 전환을 지원하며, UAV 자율 미션 플래닝에 LLM/VLM 을 체계적으로 적용한 최신 사례.</div>
+            <div class="summary-title">&#45436;&#47928; &#50836;&#50557;</div>
+            <div class="summary"><span class="term">UAV-CodeAgents</span>&#45716; &#50948;&#49457; &#50689;&#49345;&#44284; &#51088;&#50672;&#50612; &#47749;&#47161;&#51004;&#47196;&#48512;&#53552; &#51088;&#50984;&#51201; UAV &#51076;&#47924; &#49373;&#49457;&#51012; &#50948;&#54644; LLM&#44284; VLM&#51012; <span class="term">ReAct (Reason + Act)</span> &#54056;&#47084;&#45796;&#51076; &#54616;&#50640; &#53685;&#54633;&#54620; &#54869;&#51109; &#44032;&#45733;&#54620; &#45796;&#51473; &#50640;&#51060;&#51204;&#53944; &#54532;&#47112;&#51076;&#50892;&#53356;&#51060;&#45796;. &#51060; &#49884;&#49828;&#53596;&#51008; &#49345;&#50948; &#44228;&#54925;&#51012; &#45812;&#45817;&#54616;&#45716; <span class="term">&#50689;&#44277;&#44288;&#51228; &#50640;&#51060;&#51204;&#53944;(Airspace Management Agent)</span>(Qwen2.5-72B)&#50752; &#49884;&#44033;&#51201; &#51064;&#51648;&#47484; &#45812;&#45817;&#54616;&#45716; UAV &#50640;&#51060;&#51204;&#53944;(Qwen2.5VL-32B)&#47196; &#44396;&#49457;&#46104;&#47728;, <span class="eng">smolagents</span> &#54532;&#47112;&#51076;&#50892;&#53356;&#47484; &#53685;&#54644; &#50672;&#44208;&#46108;&#45796;. 9,000&#51109;&#51032; &#50948;&#49457; &#50689;&#49345;&#51004;&#47196; &#48120;&#49464; &#51312;&#51221;&#46108;(Qwen2.5VL-7B SFT) <span class="term">&#54589;&#49472; &#54252;&#51064;&#54021; &#47700;&#52964;&#45768;&#51608;</span>&#51012; &#53685;&#54644; &#51032;&#48120;&#51201; &#45824;&#49345;&#51032; &#54589;&#49472; &#49688;&#51456; &#51221;&#48128; &#50948;&#52824; &#54028;&#50501;&#51060; &#44032;&#45733;&#54616;&#45796;. 30&#51109;&#51032; &#51060;&#48120;&#51648;&#47196; &#44396;&#49457;&#46108; &#54868;&#51116; &#53456;&#51648; &#48292;&#52824;&#47560;&#53356;&#50640;&#49436; &#54217;&#44032;&#54620; &#44208;&#44284;, &#50728;&#46020; 0.5 &#49444;&#51221;&#50640;&#49436; <span class="term">93% &#49457;&#44277;&#47456;, &#54217;&#44512; 96.96&#52488; &#51076;&#47924; &#49373;&#49457; &#49884;&#44036;</span>&#51012; &#45804;&#49457;&#54616;&#50688;&#45796;. &#51060; &#50672;&#44396;&#45716; &#54028;&#50868;&#45936;&#51060;&#49496; &#47784;&#45944;&#51012; UAV &#51088;&#50984;&#49457;&#50640; &#51201;&#50857;&#54616;&#45716; &#49888;&#55141; &#54868;&#47448;&#47484; &#45824;&#54364;&#54616;&#47728;, &#45216;&#44060;&#52839; &#52264;&#47049;&#51012; &#54252;&#54632;&#54620; &#54637;&#44277; &#47196;&#48391; &#54540;&#47019;&#54268;&#50640; LLM &#44592;&#48152; &#52628;&#47200;&#51012; &#53685;&#54633;&#54624; &#51104;&#51116;&#51201; &#44032;&#45733;&#49457;&#51012; &#49884;&#49324;&#54620;&#45796;.</div>
             <div class="keywords"><span class="keyword-chip">multi-agent UAV</span><span class="keyword-chip">ReAct paradigm</span><span class="keyword-chip">vision-language model</span><span class="keyword-chip">mission planning</span><span class="keyword-chip">pixel-pointing</span><span class="keyword-chip">satellite imagery grounding</span><span class="keyword-chip">fire detection</span><span class="keyword-chip">Qwen2.5VL</span><span class="keyword-chip">smolagents</span><span class="keyword-chip">LLM-driven autonomy</span></div>
         </div>
 
         <div class="content">
             <div class="section" onclick="openModal('introduction')">
-                <div class="section-title">Introduction: 연구 동기 <span class="click-hint">클릭하여 자세히 ▸</span></div>
-                <div class="section-summary">자율 UAV 시스템은 환경 모니터링·재난 대응 등 복잡 미션을 수행하지만, 기존 파이프라인은 사전 정의 맵·수동 waypoint·hand-engineered heuristics 에 의존하여 <span class="term">적응성과 확장성이 제한</span>. LLM/VLM 의 발전이 비정형 언어·이미지 입력 기반 추론의 가능성을 열었으나, 기존 프레임워크는 <span class="term">단일 에이전트·폐쇄 환경</span>에 국한. UAV-CodeAgents 는 <span class="term">ReAct 패러다임 + multi-agent 협업 + pixel-level grounding</span> 으로 이 갭을 메우며, 모호한 자연어 지시에서 실행 가능한 UAV 궤적을 생성하는 확장 가능 프레임워크를 제안.</div>
+                <div class="section-title">&#49436;&#47200; <span class="click-hint">&#53364;&#47533;&#54616;&#50668; &#49345;&#49464; &#48372;&#44592;</span></div>
+                <div class="section-summary">&#51204;&#53685;&#51201;&#51064; UAV &#44228;&#54925; &#54028;&#51060;&#54532;&#46972;&#51064;&#51008; &#49324;&#51204; &#51221;&#51032;&#46108; &#51648;&#46020;&#50752; &#49688;&#46041; &#49444;&#51221;&#50640; &#51032;&#51316;&#54616;&#50668; &#51201;&#51025;&#49457;&#51060; &#51228;&#54620;&#46108;&#45796;. LLM/VLM &#48156;&#51204;&#51008; &#48708;&#44396;&#51312;&#51201; &#51077;&#47141;&#50640; &#45824;&#54620; &#52628;&#47200;&#51012; &#44032;&#45733;&#54616;&#44172; &#54616;&#51648;&#47564;, &#44592;&#51316; &#54532;&#47112;&#51076;&#50892;&#53356;&#45716; &#45800;&#51068; &#50640;&#51060;&#51204;&#53944; &#46608;&#45716; &#54224;&#49604;&#54805; &#54872;&#44221;&#50640; &#47672;&#47932;&#47084; &#51080;&#45796;. UAV-CodeAgents&#45716; &#49345;&#50948; &#50616;&#50612; &#51060;&#54644;&#50752; &#54616;&#50948; &#51648;&#47532;&#44277;&#44036; &#49892;&#54665;&#51012; &#50672;&#44208;&#54616;&#44592; &#50948;&#54644; &#54589;&#49472; &#49688;&#51456; &#44536;&#46972;&#50868;&#46377;&#51012; &#44054;&#52632; <span class="term">&#45796;&#51473; &#50640;&#51060;&#51204;&#53944; ReAct &#54532;&#47112;&#51076;&#50892;&#53356;</span>&#47484; &#51228;&#50504;&#54620;&#45796;.</div>
             </div>
             <div class="section" onclick="openModal('related_works')">
-                <div class="section-title">Related Works: 관련 연구 <span class="click-hint">클릭하여 자세히 ▸</span></div>
-                <div class="section-summary">관련 연구는 3 흐름으로 분류: (1) <span class="term">기초 VLM/VLA + 항법</span> — ViT, CLIP, GPT-4o 등 멀티모달 모델이 AerialVLN·EmbodiedCity 등 UAV 언어 항법의 토대, (2) <span class="term">인지적 추론 + 미션 플래닝</span> — CognitiveDrone 의 2-tier VLA (77.2% 성공률), UAV-VLA/VLPA*/VLRR 의 궤적 최적화·NMPC 통합, RaceVLA 의 end-to-end 속도·yaw 예측, (3) <span class="term">확장성·multi-agent·RAG</span> — OpenVLA/MiniVLA 의 오픈소스 생태계, SwarmGPT/FlockGPT 의 LLM 기반 군집 조율, WildfireGPT 의 RAG 기반 산불 분석. UAV-CodeAgents 는 이 3 흐름을 <span class="term">ReAct 반복 추론 + pixel-level 접지 + multi-agent 협업</span>으로 통합.</div>
+                <div class="section-title">&#44288;&#47144; &#50672;&#44396; <span class="click-hint">&#53364;&#47533;&#54616;&#50668; &#49345;&#49464; &#48372;&#44592;</span></div>
+                <div class="section-summary">&#44288;&#47144; &#50672;&#44396;&#45716; &#49464; &#44032;&#51648; &#55120;&#47492;&#50640; &#44152;&#52432; &#51080;&#45796;: (1) UAV &#49884;&#44033;-&#50616;&#50612; &#45236;&#48708;&#44172;&#51060;&#49496;&#51012; &#44032;&#45733;&#54616;&#44172; &#54616;&#45716; &#44592;&#52488; VLM(ViT, CLIP, GPT-4o), (2) &#49345;&#50948; &#51064;&#51648;&#50752; &#54616;&#50948; &#51228;&#50612;&#47484; &#48516;&#47532;&#54616;&#45716; &#51064;&#51648; &#52628;&#47200; &#49884;&#49828;&#53596;(CognitiveDrone, UAV-VLA &#44228;&#50676;), (3) &#45796;&#51473; &#50640;&#51060;&#51204;&#53944; &#51312;&#51221; &#48143; RAG &#44592;&#48152; &#46020;&#47700;&#51064; &#51648;&#49885; &#51452;&#51077;&#51012; &#50948;&#54620; &#54869;&#51109;&#49457; &#54532;&#47112;&#51076;&#50892;&#53356;(SwarmGPT, FlockGPT, WildfireGPT). UAV-CodeAgents&#45716; &#54589;&#49472; &#49688;&#51456; &#44536;&#46972;&#50868;&#46377;&#44284; &#54632;&#44760; ReAct &#48152;&#48373;&#51201; &#52628;&#47200;&#51012; &#53685;&#54644; &#49464; &#44032;&#51648;&#47484; &#53685;&#54633;&#54620;&#45796;.</div>
             </div>
             <div class="section" onclick="openModal('method')">
-                <div class="section-title">Method: 새로운 접근 방법 <span class="click-hint">클릭하여 자세히 ▸</span></div>
-                <div class="section-summary">시스템은 <span class="term">3 핵심 컴포넌트</span>로 구성: (1) <span class="term">Airspace Management Agent (AMA)</span> — Qwen2.5-72B 기반 중앙 추론 에이전트로 자연어 파싱·위성 이미지 분석·공간 접지 미션 계획 생성, (2) <span class="term">UAV Agent</span> — 할당된 미션을 실행하며 경량 추론으로 실시간 재평가, (3) <span class="term">ReAct loop (Observe→Describe→Reason→Decide→Act)</span> 로 모호한 입력에 반복적 반성·수정. <span class="term">Pixel-pointing</span> 은 Qwen2.5VL-7B 을 9,000 위성 이미지 SFT 로 fine-tune 하여 언어 참조 객체의 픽셀 좌표 추출. 화재 탐지 case study 로 30 RGB 이미지 (도시·산업·산불·복합) 벤치마크 구성, 2D 시뮬레이션 환경에서 waypoint 보간·뷰 crop·GIF 생성으로 UAV 비행 시각화.</div>
+                <div class="section-title">&#48169;&#48277;&#47200; <span class="click-hint">&#53364;&#47533;&#54616;&#50668; &#49345;&#49464; &#48372;&#44592;</span></div>
+                <div class="section-summary">&#50500;&#53412;&#53581;&#52376;&#45716; &#49464; &#44032;&#51648; &#54645;&#49900; &#44396;&#49457; &#50836;&#49548;&#47196; &#51060;&#47336;&#50612;&#51652;&#45796;: &#51089;&#50629; &#48516;&#54644;&#50752; &#44277;&#44036; &#44536;&#46972;&#50868;&#46377;&#51012; &#50948;&#54620; Qwen2.5-72B &#44592;&#48152; <span class="term">&#50689;&#44277;&#44288;&#51228; &#50640;&#51060;&#51204;&#53944;(AMA)</span>, &#44221;&#47049; VLM &#52628;&#47200;&#51012; &#53685;&#54620; &#51076;&#47924; &#49892;&#54665;&#51012; &#50948;&#54620; <span class="term">UAV &#50640;&#51060;&#51204;&#53944;</span>, &#44536;&#47532;&#44256; &#48152;&#48373;&#51201; &#44228;&#54925; &#44060;&#49440;&#51012; &#50948;&#54620; <span class="term">ReAct &#47336;&#54532;</span>(&#44288;&#52272; &rarr; &#49444;&#47749; &rarr; &#52628;&#47200; &rarr; &#44208;&#51221; &rarr; &#54665;&#46041;). &#54589;&#49472; &#54252;&#51064;&#54021;&#51008; 9,000&#51109;&#51032; &#50948;&#49457; &#50689;&#49345;&#51004;&#47196; SFT &#48120;&#49464; &#51312;&#51221;&#46108; Qwen2.5VL-7B&#47484; &#49324;&#50857;&#54620;&#45796;.</div>
             </div>
             <div class="section" onclick="openModal('experiment')">
-                <div class="section-title">Experiment: 실험 방법과 결과 <span class="click-hint">클릭하여 자세히 ▸</span></div>
-                <div class="section-summary"><span class="term">2 종 실험</span>: (1) <span class="term">미션 플래닝 성능</span> — Qwen2.5-72B (AMA) + Qwen2.5VL-32B (UAV Agent) 로 30 화재 이미지 대상 temperature 0.5/0.7 비교. Temperature 0.5 에서 28/30 성공 (93%), 평균 96.96초. Temperature 0.7 은 26/30 성공, 평균 105.29초로 안정성·속도 모두 열위. (2) <span class="term">Pixel-pointing SFT</span> — Qwen2.5VL-7B 을 9,000 위성 이미지로 fine-tune. ponds (76.77 px)~sidewalks (8.52 px) 의 범주별 mean distance + mean coverage 측정. buildings·roads 등 정밀 범주는 낮은 거리 + 안정적 coverage, farmland·driveways 는 넓은 분포 + 높은 coverage → 맥락 인식 접지 입증.</div>
+                <div class="section-title">&#49892;&#54744; <span class="click-hint">&#53364;&#47533;&#54616;&#50668; &#49345;&#49464; &#48372;&#44592;</span></div>
+                <div class="section-summary">&#54217;&#44032;&#45716; 5&#44032;&#51648; &#49884;&#45208;&#47532;&#50724;(&#46020;&#49884;, &#49328;&#50629;, &#49328;&#47548;, &#48373;&#54633;, &#52264;&#47049; &#54868;&#51116;)&#50640; &#44152;&#52828; 30&#51109;&#51032; RGB &#51060;&#48120;&#51648;&#47196; &#44396;&#49457;&#46108; &#54868;&#51116; &#53456;&#51648; &#48292;&#52824;&#47560;&#53356;&#47484; &#49324;&#50857;&#54616;&#47728;, &#47784;&#54840;&#54620; &#51088;&#50672;&#50612; &#51656;&#51032;&#47196; &#53580;&#49828;&#53944;&#54616;&#50688;&#45796;. &#52628;&#47200;&#50640;&#45716; Qwen2.5-72B, &#51064;&#51648;&#50640;&#45716; Qwen2.5VL-32B&#47484; &#49324;&#50857;&#54616;&#50688;&#45796;. &#50728;&#46020; 0.5&#50640;&#49436; <span class="term">93% &#49457;&#44277;&#47456;, &#54217;&#44512; 96.96&#52488; &#51076;&#47924; &#49884;&#44036;</span>&#51012; &#45804;&#49457;&#54616;&#50668; &#50728;&#46020; 0.7&#51012; &#47784;&#46160; &#52488;&#44284;&#54616;&#50688;&#45796;.</div>
             </div>
             <div class="section" onclick="openModal('discussion')">
-                <div class="section-title">Discussion: 결과의 해석 <span class="click-hint">클릭하여 자세히 ▸</span></div>
-                <div class="section-summary">UAV-CodeAgents 의 핵심 의의는 <span class="term">LLM/VLM 을 UAV 미션 플래닝에 체계적으로 적용한 첫 multi-agent 프레임워크</span>라는 점. Temperature 실험은 <span class="term">생성 모델의 stochasticity 가 미션 크리티컬 UAV 조율에 직접적 영향</span>을 미침을 보여주며, 낮은 temperature 의 안정성이 safety-critical 응용에 필수임을 시사. Pixel-pointing SFT 는 일반 VLM 을 aerial 도메인에 특화시키는 비용 효율적 방법을 제시. 그러나 <span class="term">2D 시뮬레이션만 사용, 실제 비행 검증 부재, 물리 엔진 미반영</span> 등 sim2real gap 이 주요 한계. 향후 실제 UAV 군집, 실시간 텔레메트리, 추가 센서 통합이 필요.</div>
+                <div class="section-title">&#45436;&#51032; <span class="click-hint">&#53364;&#47533;&#54616;&#50668; &#49345;&#49464; &#48372;&#44592;</span></div>
+                <div class="section-summary">&#45230;&#51008; &#50728;&#46020;(0.5)&#44032; &#49457;&#44277;&#47456;&#44284; &#49892;&#54665; &#49884;&#44036; &#47784;&#46160;&#50640;&#49436; 0.7&#51012; &#51068;&#44288;&#46104;&#44172; &#52488;&#44284;&#54616;&#47728;, &#51076;&#47924; &#54645;&#49900;&#51201; UAV &#51312;&#51221;&#50640;&#49436;&#45716; &#44208;&#51221;&#47200;&#51201; &#52628;&#47200;&#51060; &#48148;&#46988;&#51649;&#54632;&#51012; &#49884;&#49324;&#54620;&#45796;. &#47784;&#46304; &#54217;&#44032;&#45716; &#49884;&#48044;&#47112;&#51060;&#49496;&#50640;&#49436;&#47564; &#49688;&#54665;&#46104;&#50632;&#51004;&#47728;, sim2real &#44201;&#52264;, &#49892;&#49884;&#44036; &#53588;&#47112;&#47700;&#53944;&#47532; &#53685;&#54633;, &#48516;&#54252; &#50808; &#51077;&#47141;&#50640; &#45824;&#54620; &#44053;&#44148;&#49457;&#51008; &#51064;&#51221;&#46104;&#50632;&#51004;&#45208; &#54644;&#44208;&#46104;&#51648; &#50506;&#51008; &#49345;&#53468;&#51060;&#45796;. &#48292;&#52824;&#47560;&#53356; &#44508;&#47784;(30&#51109; &#51060;&#48120;&#51648;)&#45716; &#51068;&#48152;&#54868; &#51452;&#51109;&#51012; &#51228;&#54620;&#54620;&#45796;.</div>
             </div>
             <div class="section" onclick="openModal('conclusion')">
-                <div class="section-title">Conclusion: 최종 요약 <span class="click-hint">클릭하여 자세히 ▸</span></div>
-                <div class="section-summary">UAV-CodeAgents 는 <span class="term">ReAct 패러다임 기반 LLM/VLM multi-agent 프레임워크</span>로, 위성 이미지 + 자연어에서 자율적 UAV 미션을 생성하는 확장 가능 시스템. <span class="term">Temperature 0.5 에서 93% 성공률·96.96초</span> 달성, pixel-pointing SFT 로 aerial 도메인 정밀 접지 입증. 모듈형 아키텍처로 agent 동적 추가·이종 모델·sim2real 전환 지원. 향후 <span class="term">실제 UAV 군집, 실시간 텔레메트리, 추가 센서 통합</span>으로 재난 대응·환경 모니터링의 실환경 배포를 목표.</div>
+                <div class="section-title">&#44208;&#47200; <span class="click-hint">&#53364;&#47533;&#54616;&#50668; &#49345;&#49464; &#48372;&#44592;</span></div>
+                <div class="section-summary">UAV-CodeAgents&#45716; LLM&#44284; VLM&#51060; ReAct &#49828;&#53440;&#51068; &#52628;&#47200;&#51012; &#53685;&#54644; &#45796;&#51473; &#50640;&#51060;&#51204;&#53944; UAV &#50868;&#50857;&#51012; &#54952;&#44284;&#51201;&#51004;&#47196; &#51312;&#51221;&#54624; &#49688; &#51080;&#51020;&#51012; &#48372;&#50668;&#51452;&#47728;, &#47784;&#46280;&#46972; &#50500;&#53412;&#53581;&#52376;&#47196; 93% &#49457;&#44277;&#47456;&#51012; &#45804;&#49457;&#54616;&#50688;&#45796;. &#51060; &#50672;&#44396;&#45716; <span class="term">LLM &#44592;&#48152; UAV &#51088;&#50984;&#49457;</span>&#51032; &#49888;&#55141; &#54056;&#47084;&#45796;&#51076;&#51012; &#51228;&#49884;&#54616;&#47728;, &#44400;&#51665; &#51312;&#51221;, &#49892;&#49884;&#44036; &#53588;&#47112;&#47700;&#53944;&#47532;, &#45796;&#51473; &#49468;&#49436; &#53685;&#54633;&#51004;&#47196;&#51032; &#54869;&#51109;&#51060; &#54693;&#54980; &#50672;&#44396; &#48169;&#54693;&#51012; &#51221;&#51032;&#54620;&#45796;.</div>
             </div>
         </div>
     </div>
@@ -245,7 +356,7 @@
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-title" id="modal-title"></div>
-                <button class="modal-close" onclick="closeModal()" aria-label="닫기">×</button>
+                <button class="modal-close" onclick="closeModal()" aria-label="닫기">&times;</button>
             </div>
             <div class="modal-body" id="modal-body"></div>
         </div>
@@ -253,25 +364,144 @@
 
     <script>
         const SECTION_TITLES = {
-            introduction: "Introduction — 연구 동기",
-            related_works: "Related Works — 관련 연구",
-            method: "Method — 새로운 접근 방법",
-            experiment: "Experiment — 실험 방법과 결과",
-            discussion: "Discussion — 결과의 해석",
-            conclusion: "Conclusion — 최종 요약"
+            introduction:  "서론",
+            related_works: "관련 연구",
+            method:        "방법론",
+            experiment:    "실험",
+            discussion:    "논의",
+            conclusion:    "결론"
         };
 
-        const SECTION_DETAIL = {"introduction": {"content": [{"type": "bullet", "text": "<span class=\"term\">기존 UAV 플래닝의 한계</span>: 사전 정의 맵, hand-engineered heuristics, 수동 waypoint 설정에 의존하여 동적 환경·대규모 미션에서 적응성과 확장성이 부족. 지형 변화·긴급 상황 대응에 실시간 재계획이 어려움."}, {"type": "bullet", "text": "<span class=\"term\">LLM/VLM 의 가능성과 현 프레임워크의 한계</span>: GPT-4o, Qwen2.5VL 등 멀티모달 AI 가 비정형 언어·이미지 추론을 가능하게 했으나, 기존 시스템은 <span class=\"term\">폐쇄 환경·단일 에이전트</span> 설정으로 collaborative reasoning 과 grounded spatial planning 의 잠재력을 활용하지 못함."}, {"type": "bullet", "text": "<span class=\"term\">UAV-CodeAgents 의 핵심 제안</span>: <span class=\"eng\">ReAct (Reason + Act)</span> 패러다임 기반 multi-agent 프레임워크. 위성 이미지 해석, 자연어 지시의 픽셀 수준 접지, 에이전트 간 협업적 궤적 생성을 하나의 시스템으로 통합."}, {"type": "bullet", "text": "<span class=\"term\">Reactive thinking loop</span>: 에이전트가 불확실하거나 모호한 정보에 대해 반복적으로 반성(reflect)·재질의(re-query)·수정(revise)하는 루프. 부분적으로 알려진 환경에서도 미션 제약에 적응하며 일반화 가능."}, {"type": "bullet", "text": "<span class=\"term\">Pixel-level grounding</span>: fine-tuned VLM 이 \"숲 옆 창고\" 같은 자연어 표현을 위성 이미지의 정확한 픽셀 좌표로 변환. 에이전트가 단순 경로 추종이 아닌 <span class=\"term\">\"무엇을, 왜 탐색하는지\" 이해</span>하는 고수준 자율성의 기반."}, {"type": "bullet", "text": "<span class=\"term\">6 가지 Contribution</span>: (1) LLM+VLM + ReAct multi-agent 프레임워크, (2) 의미적 접지·협업 플래닝 벤치마크, (3) 9,000 위성 이미지 pixel-pointing 데이터셋, (4) 반복적 시각 추론·불확실성 해소의 reactive thinking loop, (5) Qwen2.5VL-7B fine-tuning, (6) 동적 미션 적응."}, {"type": "bullet", "text": "<span class=\"term\">목표 응용 시나리오</span>: 산업·환경 화재 탐지를 1차 case study 로, 재난 대응·환경 모니터링으로 확장 지향. 모호한 쿼리 (\"우리 지역에 화재가 있다고 들었다\") 에서 공간 추론으로 화재 위치를 추정하는 능력 검증."}]}, "related_works": {"content": [{"type": "bullet", "text": "<span class=\"term\">ViT·CLIP → UAV 항법 기초</span>: Dosovitskiy [4] 의 Vision Transformer 와 Radford [5] 의 CLIP 이 확장 가능 멀티모달 표현 학습의 기초. GPT-4o [6] 가 통합 비전·언어·오디오 추론 가능. 이 아키텍처들이 AerialVLN [7] (자연어 기반 드론 항법), dialog 기반 UAV-인간 상호작용 [8] 등에 영감."}, {"type": "bullet", "text": "<span class=\"term\">UAV 시뮬레이션 벤치마크</span>: OpenUAV [9] 가 현실적 조건의 aerial autonomy 벤치마크, STMR [10] 이 semantic-topo-metric representation 으로 공간 이해 강화, EmbodiedCity [11] 가 도시 규모 VLN 시뮬레이션을 보행자·차량 데이터로 확장."}, {"type": "bullet", "text": "<span class=\"term\">CognitiveDrone — 인지 추론 분리</span>: Lykov [13] 의 2-tier VLA 아키텍처가 고수준 인지(기호 이해·논리 판단)와 저수준 제어를 분리. 인간 인식·기호 추론 등 인지 UAV 작업에서 77.2% 성공률 → <span class=\"term\">고수준 인지와 저수준 제어의 분리가 실시간 자율에 핵심</span>."}, {"type": "bullet", "text": "<span class=\"term\">UAV-VLA/VLPA*/VLRR 계열</span>: UAV-VLA [14] 와 UAV-VLPA* [15] 가 vision-language 이해 + A*·TSP solver 결합 궤적 최적화. UAV-VLRR [16] 이 onboard NMPC 와 결합하여 실시간 cluttered 환경 항법. RaceVLA [17] 가 자연어+시각 입력에서 직접 속도·yaw 예측 — end-to-end 가능성 입증."}, {"type": "bullet", "text": "<span class=\"term\">오픈소스 VLA 생태계</span>: OpenVLA [18] 과 MiniVLA [19] 가 커뮤니티 협업과 확장성 지원. 모델 접근성 향상이 UAV 연구의 재현성과 비교 실험을 촉진."}, {"type": "bullet", "text": "<span class=\"term\">LLM 기반 군집 조율</span>: SwarmGPT [20] 이 LLM 으로 로봇 choreography 설계, FlockGPT [21] 이 SDF 기반 공간 전략으로 UAV 군집 행동 조율 시연. 단일 에이전트를 넘어 <span class=\"term\">multi-agent LLM 조율의 가능성</span> 입증."}, {"type": "bullet", "text": "<span class=\"term\">RAG 기반 도메인 지식 통합 — WildfireGPT</span>: Xie [22] 의 WildfireGPT 가 사용자 프로파일링·메모리·전략 플래닝 모듈로 기후 데이터+학술 문헌을 LLM 추론에 주입, 산불 리스크 분석 정제. UAV-CodeAgents 가 이 아이디어를 ReAct 반복 추론으로 확장."}, {"type": "bullet", "text": "<span class=\"term\">UAV-CodeAgents 의 차별점</span>: 기존 연구가 (a) 단일 에이전트 또는 (b) 고수준 추론만 또는 (c) pixel-level grounding 미지원인 반면, 본 시스템은 <span class=\"term\">ReAct 반복 추론 + pixel-level geospatial grounding + 이종 multi-agent 협업</span>을 하나의 프레임워크에서 통합."}]}, "method": {"content": [{"type": "bullet", "text": "<span class=\"term\">Airspace Management Agent (AMA)</span>: Qwen2.5-72B 로 구동되는 중앙 추론 에이전트. (a) <span class=\"term\">Hierarchical Task Decomposition</span> — LLM 이 사용자 입력을 구조화 작업(search, localize, verify)으로 분해, (b) <span class=\"term\">Visual Scene Understanding</span> — VLM 으로 장면 요약·위험 구역 감지, (c) <span class=\"term\">Pixel-Level Grounding</span> — fine-tuned VLM 으로 자연어→픽셀 좌표 변환, (d) <span class=\"term\">Path Optimization</span> — 화재 확률 높은 객체 우선 방문 경로 생성."}, {"type": "bullet", "text": "<span class=\"term\">UAV Agent</span>: 시뮬 또는 실제 UAV 를 나타내는 실행 모듈. (a) Waypoint following 으로 AMA 계획 경로 비행, (b) 비행 중 고해상도 RGB 캡처 + VLM 추론으로 작업 상태 업데이트 (화재 확인, 객체 위치 등), (c) 관측·의미 요약·신뢰도 점수를 AMA 에 피드백 → 미션 계획 반복 정제."}, {"type": "bullet", "text": "<span class=\"term\">smolagents 기반 통신</span>: 경량 모듈형 multi-agent 조율 프레임워크 위에 구축. 에이전트 간 단순 메시지 패싱 인터페이스, 주기적 상태 보고 (위치·이미지·의미 주석). <span class=\"term\">장애 허용 + 비동기 운용</span> 지원."}, {"type": "bullet", "text": "<span class=\"term\">ReAct loop 5 단계</span>: (1) <span class=\"eng\">Observe</span> — UAV 이미지 또는 위성 스냅샷으로 현재 장면 포착, (2) <span class=\"eng\">Describe</span> — VLM 이 high-token-length 장면 캡션 생성, (3) <span class=\"eng\">Reason</span> — LLM 이 미션 쿼리 맥락에서 장면 설명 해석, (4) <span class=\"eng\">Decide</span> — waypoint 식별/갱신, UAV 역할 할당, 작업 우선순위 수정, (5) <span class=\"eng\">Act</span> — 갱신 지시를 해당 UAV 에이전트에 배포."}, {"type": "bullet", "text": "<span class=\"term\">Pixel-pointing grounding 메커니즘</span>: Qwen2.5VL-7B 을 9,000 주석 위성 이미지로 SFT (Supervised Fine-Tuning). 언어 참조 엔티티 (\"숲 옆 창고\") 를 위성 맵 위 픽셀 좌표로 정밀 접지. attention-weighted pixel-pointing 사용. <span class=\"term\">aerial·satellite 이미지 도메인 특화</span> fine-tuning 으로 일반 VLM 대비 정밀도 향상."}, {"type": "bullet", "text": "<span class=\"term\">Tool 기반 에이전트 인터페이스</span>: AMA 는 <span class=\"eng\">read_image, describe_satellite_image, pixel_point_objects, visualize_keypoints, final_answer</span> 5 tool 보유. UAV Agent 는 <span class=\"eng\">read_image_for_simulation, uav_simulation, detect_and_display, final_answer</span> 4 tool 보유. 각 tool 이 명확한 input/output 계약으로 모듈성 보장."}, {"type": "bullet", "text": "<span class=\"term\">확장성 설계</span>: (a) <span class=\"eng\">Plug-and-Play Agents</span> — 미션 중 UAV 동적 추가/제거, (b) <span class=\"eng\">Heterogeneous Models</span> — 드론에는 경량 VLM, AMA 에는 대형 LLM 배치, (c) <span class=\"eng\">Sim2Real Transfer</span> — 시뮬레이션 레이어에서 안전 벤치마킹 후 실환경 배포."}, {"type": "bullet", "text": "<span class=\"term\">화재 탐지 벤치마크</span>: UAV-VLA [14] 벤치마크의 증강 버전. 30 RGB 이미지 × 4 화재 시나리오 (Urban, Industrial, Wildland, Composite) + Vehicle. 모호한 쿼리 (\"I've heard there are fires in our area\") 로 공간 추론·문맥 이해 능력 평가."}, {"type": "bullet", "text": "<span class=\"term\">2D 시뮬레이션 환경</span>: 위성/항공 이미지 위 UAV 비행을 에뮬레이트. (a) waypoint 간 선형 보간으로 연속 궤적 생성, (b) 각 보간 위치에서 UAV 시점 crop + 라벨 주석, (c) 전체 crop 을 animated GIF 로 편집하여 비행 경로 시각적 추적. 물리 엔진 없이 빠른 프로토타이핑·인식 출력 평가·시각적 데모 생성 지원."}]}, "experiment": {"content": [{"type": "bullet", "text": "<span class=\"term\">모델 구성</span>: AMA 와 UAV Agent 의 핵심 의사결정에 Qwen2.5-72B (언어 이해·inter-agent 조율·동적 미션 갱신), 시각 인식 (화재 구역 식별·묘사) 에 Qwen2.5VL-32B (Fireworks API 경유). pixel-pointing 에 fine-tuned Qwen2.5VL-7B."}, {"type": "bullet", "text": "<span class=\"term\">Temperature 비교 — 0.5 vs 0.7</span>: 낮은 temperature (0.5) 가 비행 조율의 안정성·일관성에서 우위. 높은 temperature (0.7) 는 이미지 해석의 유연성·다양성을 허용하나 미션 신뢰성 저하. 두 설정 모두 같은 30 이미지 대상 평가."}, {"type": "bullet", "text": "<span class=\"term\">Time-to-Detection (TTD) 메트릭</span>: 전체 미션의 쿼리-탐지 시간 평균으로 정의. False positive/negative 제외."}, {"type": "formula", "label": "식 (1) — Time-to-Detection", "latex": "\\text{TTD} = \\frac{1}{N} \\sum_{i=1}^{N} \\left( t^{(i)}_{\\text{detect}} - t^{(i)}_{\\text{query}} \\right)", "description": "$N = 30$ test cases 에서 false positive/negative 를 제외한 성공 사례만 포함. $t_{\\text{detect}}$ 는 화재 탐지 시점, $t_{\\text{query}}$ 는 미션 쿼리 시점. Temperature 0.5 에서 평균 96.96초, 0.7 에서 105.29초."}, {"type": "bullet", "text": "<span class=\"term\">Temperature 0.5 결과</span>: 30 이미지 중 28 성공 (93% 성공률), 평균 소요 96.96초. 일관된 계획 생성·이미지 접지 입력의 올바른 해석. <span class=\"term\">미션 크리티컬 시나리오에서 낮은 temperature 가 권장</span>."}, {"type": "bullet", "text": "<span class=\"term\">Temperature 0.7 결과</span>: 30 이미지 중 26 성공 (87%), 평균 105.29초. 샘플 6, 23, 24, 29 에서 실패 — 일관된 계획 생성 불가 또는 이미지 접지 입력 오해석. 추가 무작위성이 UAV 조율의 신뢰성을 저하시킴을 시사."}, {"type": "bullet", "text": "<span class=\"term\">Pixel-pointing SFT 결과 — 범주별 Mean Distance</span>: ponds (76.77 px), road (64.93), pond (54.18), driveways (53.35), farmland (49.80) 등 분산 객체는 높은 거리·높은 coverage (다수 인스턴스 검출). buildings (17.31), sidewalks (8.52), parking lot (14.18), structures (17.58) 등 국소 객체는 낮은 거리·안정 coverage → <span class=\"term\">정밀 국소 감지</span>."}, {"type": "bullet", "text": "<span class=\"term\">Mean Coverage 해석</span>: driveways 3.57, pond 3.08, farmland 2.55 — 모델이 샘플당 다수/광역 인스턴스를 빈번히 검출하여 넓은 맥락 인식 반영. sidewalks 0.86, structures 0.89, parking lot 0.81 — fine-grained·국소 객체 탐지 정밀도 반영."}, {"type": "bullet", "text": "<span class=\"term\">Fine-tuned Qwen2.5VL-7B 종합 평가</span>: sparse (farmland, ponds) 와 dense (buildings, sidewalks) 장면 요소 모두에서 신뢰할 수 있는 pixel-level localization 달성. 맥락 인식 접지가 aerial 이미지 분석·도시 계획·자율 UAV 항법의 downstream 응용에 적합."}]}, "discussion": {"content": [{"type": "bullet", "text": "<span class=\"term\">Temperature 와 미션 신뢰성의 trade-off</span>: 0.5→0.7 로 올리면 2 건 추가 실패 + 8.33초 추가 소요. LLM 기반 UAV 시스템에서 <span class=\"term\">sampling temperature 가 safety-critical 파라미터</span>임을 실증. 미션 크리티컬 시나리오에서는 determinism 이 creativity 보다 우선."}, {"type": "bullet", "text": "<span class=\"term\">ReAct loop 의 장점과 비용</span>: 모호한 입력 (\"fires in our area\") 에서 반복 추론으로 공간 추론 가능 — 기존 rule-based 시스템에 불가능한 능력. 그러나 반복 루프는 LLM API 호출 횟수 증가 → latency·비용 증가의 trade-off. 실시간 재난 대응에서의 latency 허용 범위 검증 필요."}, {"type": "bullet", "text": "<span class=\"term\">Pixel-pointing 의 도메인 특화 가치</span>: 9,000 위성 이미지 SFT 로 일반 Qwen2.5VL-7B 을 aerial 도메인에 적응. 소규모 데이터(9K)·소규모 모델(7B) 로도 효과적 접지 달성 → <span class=\"term\">도메인 특화 VLM fine-tuning 의 비용 효율성</span> 입증."}, {"type": "bullet", "text": "<span class=\"term\">Heterogeneous model 배치 전략</span>: AMA 에 72B 대형 LLM, UAV 에 32B VLM, pixel-pointing 에 7B fine-tuned VLM — 역할별 모델 크기 차별화. 클라우드(AMA)·엣지(UAV) 분할 배치의 현실적 아키텍처 제안이나, <span class=\"term\">실제 onboard 배포 검증은 미실시</span>."}, {"type": "bullet", "text": "<span class=\"term\">주요 한계 1 — 시뮬레이션만 사용</span>: 2D 시뮬레이션 환경으로 물리 엔진·바람·센서 노이즈·통신 지연 미반영. 실제 UAV 비행 검증 부재로 <span class=\"term\">sim2real gap</span> 이 가장 큰 미해결 과제."}, {"type": "bullet", "text": "<span class=\"term\">주요 한계 2 — 화재 탐지 단일 case study</span>: 벤치마크가 화재 시나리오에 국한. 수색 구조·농업 모니터링·인프라 검사 등 다양 미션 유형에서의 일반화 능력 미검증."}, {"type": "bullet", "text": "<span class=\"term\">주요 한계 3 — Latency</span>: 평균 96.96초 미션 생성 시간은 사전 계획에는 적합하나, <span class=\"term\">실시간 동적 재계획에는 과도</span>할 수 있음. 긴급 재난 상황에서의 응답 시간 요구사항과의 괴리 검토 필요."}, {"type": "bullet", "text": "<span class=\"term\">연구 트렌드 관점</span>: LLM/VLM + robotics 통합의 최전선 사례. <span class=\"term\">smolagents 같은 경량 multi-agent 프레임워크</span> 위에 도메인 특화 tool 을 구성하는 패턴이 향후 로봇 자율 시스템 연구의 참조 아키텍처가 될 가능성."}]}, "conclusion": {"content": [{"type": "bullet", "text": "<span class=\"term\">핵심 성과 — 체계적 LLM/VLM UAV 통합</span>: smolagents 기반 decentralized multi-agent 시스템으로, 고수준 지시 따르기 (LLM) 와 저수준 geospatial 실행 (VLM) 의 갭을 pixel-level grounding + ReAct 반복 추론으로 연결."}, {"type": "bullet", "text": "<span class=\"term\">Temperature 0.5 의 실증적 우위</span>: 28/30 성공 (93%), 평균 96.96초 — 0.7 대비 성공률 +6%p, 시간 -8.33초. 미션 크리티컬 UAV 운용에서 <span class=\"term\">낮은 sampling temperature 가 최적</span>임을 정량 검증."}, {"type": "bullet", "text": "<span class=\"term\">Pixel-pointing fine-tuning 기여</span>: Qwen2.5VL-7B + 9,000 위성 이미지 SFT 로 다양 범주 (buildings~farmland) 에서 pixel-level localization 달성. 코드베이스 + 데이터셋 공개 예정으로 재현성 보장."}, {"type": "bullet", "text": "<span class=\"term\">모듈형 확장성</span>: Plug-and-Play agent 추가/제거, 이종 모델 배치 (대형 LLM ↔ 경량 VLM), sim2real transfer layer 의 3 설계 원칙이 다양 미션 규모·계산 예산에 대응."}, {"type": "bullet", "text": "<span class=\"term\">벤치마크 + 데이터셋 공개</span>: 30 이미지 화재 탐지 벤치마크 + 9,000 주석 위성 이미지 pixel-pointing 데이터셋 + 전체 코드베이스 공개 예정. UAV 자율 미션 플래닝 연구의 <span class=\"term\">재현 가능 벤치마크 기반</span> 구축."}, {"type": "bullet", "text": "<span class=\"term\">Future — UAV 군집 확장</span>: 현재 2-agent (AMA + UAV) 에서 swarm 규모로 확장. 실시간 텔레메트리 통합, 추가 센서 (LiDAR, thermal) 지원으로 실환경 재난 대응·환경 모니터링 배포 목표."}, {"type": "bullet", "text": "<span class=\"term\">연구사적 위치</span>: LLM/VLM + UAV 통합 연구의 2025 최신 동향 대표. CognitiveDrone → UAV-VLA → UAV-CodeAgents 의 <span class=\"term\">인지 추론 복잡도 상승 궤적</span> 상에 위치하며, multi-agent ReAct + pixel-level grounding 의 조합이 새로운 기준점."}]}};
+        const FIG_PREFIX = "그림";
+
+        const SECTION_DETAIL = {
+            "introduction": {
+                "content": [
+                    {"type": "bullet", "text": "전통적인 UAV 계획은 사전 정의된 지도, 수작업 휴리스틱, 수동 웨이포인트 구성에 의존하여 동적 환경과 대규모 임무에서의 적응성이 제한된다.", "figure_refs": []},
+                    {"type": "bullet", "text": "LLM(GPT-4) 및 VLM(Qwen2.5VL)의 최근 발전은 비구조적 언어 및 이미지 입력에 대한 추론을 가능하게 하지만, 기존 프레임워크는 <span class=\"term\">폐쇄형 환경 또는 단일 에이전트 설정</span>에서 작동하여 협력적 추론을 활용하지 못한다.", "figure_refs": []},
+                    {"type": "bullet", "text": "UAV-CodeAgents는 위성 영상과 자연어 명령으로부터 협력적 시각-언어 기반 UAV 임무 생성을 위해 <span class=\"term\">ReAct (Reason + Act) 패러다임</span>을 활용한 확장 가능한 다중 에이전트 프레임워크를 제안한다.", "figure_refs": [1]},
+                    {"type": "bullet", "text": "<span class=\"term\">반응적 사고 루프</span>를 통해 에이전트가 모호하거나 불완전한 정보에 대해 반복적으로 성찰하고, 시각적 장면을 재조회하고, 계획을 수정할 수 있어 대규모 추론과 하위 수준 UAV 제어를 연결한다.", "figure_refs": []},
+                    {"type": "bullet", "text": "미세 조정된 VLM을 통한 <span class=\"term\">픽셀 수준 그라운딩</span>은 자연어 참조(예: '숲 근처 창고')를 위성 영상 상의 정밀한 픽셀 좌표로 변환하여 단순 경로 추종을 넘어서는 상위 수준 자율성을 가능하게 한다.", "figure_refs": []},
+                    {"type": "bullet", "text": "6가지 주요 기여: (1) 다중 에이전트 LLM+VLM+ReAct 프레임워크, (2) 의미적 그라운딩 및 협력적 계획 벤치마크, (3) 9,000장 픽셀 포인팅 데이터셋, (4) 반복적 시각 추론을 위한 반응적 사고 루프, (5) 위성 영상 그라운딩을 위한 Qwen2.5VL-7B 미세 조정, (6) 동적 임무 적응 메커니즘.", "figure_refs": []}
+                ]
+            },
+            "related_works": {
+                "content": [
+                    {"type": "bullet", "text": "기초 VLM — <span class=\"term\">ViT</span>, <span class=\"term\">CLIP</span>, <span class=\"term\">GPT-4o</span> — 는 확장 가능한 다중 모달 표현 학습을 확립하여 AerialVLN(자연어 드론 내비게이션) 및 EmbodiedCity(도시 규모 VLN 시뮬레이션) 등 UAV 특화 시스템에 영감을 주었다.", "figure_refs": []},
+                    {"type": "bullet", "text": "<span class=\"term\">CognitiveDrone</span>은 상위 수준 인지(기호 이해, 논리적 추론)와 하위 수준 제어를 분리하는 2계층 VLA 아키텍처를 도입하여 인지적 UAV 과제에서 77.2% 성공률을 달성함으로써 실시간 자율성을 위한 이러한 분리의 중요성을 입증하였다.", "figure_refs": []},
+                    {"type": "bullet", "text": "<span class=\"term\">UAV-VLA / VLPA* / VLRR</span> 계열은 시각-언어 이해를 경로 최적화(A*, TSP 솔버) 및 온보드 NMPC와 결합하여 복잡한 환경에서 실시간 내비게이션을 수행하였다. <span class=\"term\">RaceVLA</span>는 언어 및 시각 입력으로부터 종단간 속도 및 요 예측을 시연하였다.", "figure_refs": []},
+                    {"type": "bullet", "text": "오픈소스 VLA 모델(<span class=\"term\">OpenVLA</span>, MiniVLA)은 커뮤니티 확장성을 지원하며, <span class=\"term\">SwarmGPT</span> 및 <span class=\"term\">FlockGPT</span>는 다중 UAV 군집을 위한 LLM 기반 행동 오케스트레이션과 SDF 기반 공간 전략을 시연하였다.", "figure_refs": []},
+                    {"type": "bullet", "text": "<span class=\"term\">WildfireGPT</span>는 사용자 프로파일링, 메모리, 전략적 계획 모듈을 사용하여 산불 위험 분석을 위한 LLM 에이전트에 <span class=\"term\">RAG 기반 도메인 지식 주입</span>을 예시하였으며, UAV-CodeAgents는 이 패러다임을 UAV에 대한 반복적 ReAct 추론으로 확장한다.", "figure_refs": []},
+                    {"type": "bullet", "text": "격차: 기존 시스템은 (a) 단일 에이전트 인지, (b) 상위 수준 추론만, 또는 (c) 픽셀 수준 그라운딩 없는 다중 에이전트 조정 중 하나만을 다루며, UAV-CodeAgents는 세 가지 기능을 하나의 프레임워크에 통합한다고 주장한다.", "figure_refs": []}
+                ]
+            },
+            "method": {
+                "content": [
+                    {"type": "bullet", "text": "<span class=\"term\">영공관제 에이전트(AMA)</span>: Qwen2.5-72B를 실행하는 중앙 추론 에이전트로, 4가지 기능을 보유한다 — 계층적 작업 분해(사용자 입력을 검색/위치파악/검증 작업으로 분석), 시각적 장면 이해(VLM 기반 장면 요약 및 위험 구역 탐지), 픽셀 수준 그라운딩(언어-좌표 매핑을 위한 미세 조정된 VLM), 경로 최적화(화재 확률 가중 방문 순서 결정).", "figure_refs": [1]},
+                    {"type": "bullet", "text": "<span class=\"term\">UAV 에이전트</span>: 웨이포인트 추종 임무를 실행하는 구현체 모듈로, 비행 중 고해상도 RGB 영상을 캡처하고, 작업 상태 업데이트를 위한 VLM 추론(화재 확인, 객체 위치 파악)을 수행하고, 신뢰도 점수와 함께 관찰 결과를 AMA에 전송하여 반복적 임무 개선을 지원한다.", "figure_refs": []},
+                    {"type": "bullet", "text": "<span class=\"eng\">smolagents</span> 프레임워크를 통한 통신으로, 주기적 상태 보고(위치, 이미지, 의미적 주석)를 포함하는 간단한 메시지 전달 인터페이스를 사용하며, 내결함성과 비동기 다중 에이전트 운영을 지원한다.", "figure_refs": []},
+                    {"type": "bullet", "text": "<span class=\"term\">ReAct 루프</span>: 5단계 순환 — (1) 관찰: UAV 또는 위성을 통해 현재 장면 캡처, (2) 설명: VLM이 높은 토큰 길이의 장면 측셔을 생성, (3) 추론: LLM이 임무 맥락에서 장면을 해석, (4) 결정: 웨이포인트 업데이트, UAV 역할 할당, 우선순위 수정, (5) 행동: 업데이트된 명령을 에이전트에 배포.", "figure_refs": []},
+                    {"type": "bullet", "text": "<span class=\"term\">픽셀 포인팅 그라운딩</span>: 9,000장의 주석된 위성 영상 커스텀 데이터셋에 대해 지도 학습 미세 조정(SFT)을 통해 Qwen2.5VL-7B를 학습시켰으며, 항공 영상에서 언어로 참조된 객체의 픽셀 수준 위치 파악을 목표로 한다.", "figure_refs": []},
+                    {"type": "bullet", "text": "확장성 특성: 임무 중 플러그 앤 플레이 방식의 에이전트 추가/제거, 이기종 모델 배포(드론에는 경량 VLM, AMA에는 고성능 LLM), 그리고 실제 배포 전 안전한 벤치마킹을 위한 sim2real 전환 레이어.", "figure_refs": []}
+                ]
+            },
+            "experiment": {
+                "content": [
+                    {"type": "bullet", "text": "화재 탐지 벤치마크: 도시 화재, 산업 화재, 산림 화재, 복합 이벤트, 차량 화재를 포함하는 30장의 RGB 이미지로 구성. 공간적 추론 능력을 평가하기 위해 모호한 자연어 질의('우리 지역에 화재가 발생했다고 들었습니다')로 테스트.", "figure_refs": [2]},
+                    {"type": "bullet", "text": "모델: AMA 및 UAV 에이전트 추론(작업 계획, 에이전트 간 조정, 동적 임무 업데이트)에 Qwen2.5-72B; 시각적 인지 작업(위성 영상에서 화재 구역 식별 및 설명)에 Fireworks API를 통한 Qwen2.5VL-32B.", "figure_refs": []},
+                    {"type": "bullet", "text": "<span class=\"term\">온도 비교</span>: T=0.5는 30개 샘플 중 28개 성공(93%), 평균 96.96초 소요; T=0.7은 30개 중 26개 성공(87%), 105.29초 소요 — 낮은 온도가 임무 핵심적 UAV 조정에서 더 안정적이고 빠른 결과를 낳는다.", "figure_refs": [4]},
+                    {"type": "bullet", "text": "성능 지표: <span class=\"term\">탐지 소요 시간(TTD)</span>을 N=30 테스트 케이스에 걸쳐 평균화하며, 오탐지 및 미탐지를 제외한다.", "figure_refs": []},
+                    {"type": "formula", "label": "식 (1) — 탐지 소요 시간", "latex": "\\text{TTD} = \\frac{1}{N} \\sum_{i=1}^{N} (t^{(i)}_{\\text{detect}} - t^{(i)}_{\\text{query}})", "description": "$N=30$ 테스트 케이스에 걸쳐 질의 제출부터 화재 탐지까지의 평균 시간으로, 종단간 임무 응답성을 측정하는 데 사용된다."},
+                    {"type": "bullet", "text": "Qwen2.5VL-7B의 SFT 결과는 다양한 시각적 범주에 걸쳐 강력한 의미적 그라운딩을 보여준다 — 분산된 범주(연못, 진입로, 농지)는 높은 커버리지 값(2.55–3.57)을 보이며, 국소적 범주(보도, 구조물)는 낮은 커버리지(0.8–0.9)와 세밀한 탐지를 보인다.", "figure_refs": [5]},
+                    {"type": "bullet", "text": "2D 시뮬레이션 환경: 웨이포인트 간 궤적 보간, 각 위치에서의 뷰 크롭핑, 물리 기반 시뮬레이션 오버헤드 없이 내비게이션 행동의 빠른 프로토타이핑을 위한 애니메이션 GIF 생성.", "figure_refs": [3]}
+                ]
+            },
+            "discussion": {
+                "content": [
+                    {"type": "bullet", "text": "<span class=\"term\">온도 민감도</span>: T=0.7은 샘플 6, 23, 24, 29에서 특히 실패하여 비일관적인 계획을 생성하거나 이미지 기반 입력을 잘못 해석하였다 — 추가된 무작위성이 임무 핵심적 시나리오에서 UAV 조정의 신뢰성에 부정적 영향을 미칠 수 있다.", "figure_refs": []},
+                    {"type": "bullet", "text": "SFT 픽셀 포인팅은 범주별 성능 차이를 보여준다: 높은 커버리지의 분산 범주(연못 3.08, 진입로 3.57) vs. 국소적 세밀 범주(보도 0.86, 주차장 0.81) — 모델의 맥락 인지 그라운딩은 항공 영상 분석에 적합하지만 성능은 다양하다.", "figure_refs": [5]},
+                    {"type": "bullet", "text": "아키텍처의 모듈성은 유연한 UAV 통합과 이기종 모델 배포를 지원하지만, 모든 실험은 2D 시뮬레이션에 머물러 있으며 — sim2real 격차는 실험적 다리 없이 향후 방향으로 인정된다.", "figure_refs": []},
+                    {"type": "bullet", "text": "5가지 시나리오에 걸친 30장 이미지의 벤치마크 규모는 포괄적 평가에 제한적이며 — 시각-언어 UAV 계획에 대한 일반화 주장을 뒷받침하려면 더 광범위하고 다양한 데이터셋이 필요하다.", "figure_refs": []},
+                    {"type": "bullet", "text": "독점 API 접근(Qwen2.5VL-32B를 위한 Fireworks API) 및 특정 모델 계열(Qwen2.5 시리즈)에 대한 의존성은 재현성과 다른 연구 그룹으로의 이식성을 제한할 수 있다.", "figure_refs": []},
+                    {"type": "bullet", "text": "FWAV 연구를 위한 탐색적 궤적: LLM/VLM 에이전트가 지리공간 임무에 대해 추론할 수 있음을 보여주는 초기 시연 — 현재 SOTA는 고정익/회전익 UAV를 사용하지만, 동역학 모델이 계획 루프에 통합되면 날개치는 플랫폼으로 확장될 수 있다.", "figure_refs": []}
+                ]
+            },
+            "conclusion": {
+                "content": [
+                    {"type": "bullet", "text": "UAV-CodeAgents는 LLM/VLM 기반 다중 에이전트 조정이 모호한 자연어 명령을 효과적으로 해석하고 ReAct 추론 패러다임을 통해 실행 가능한 UAV 임무를 생성할 수 있음을 시연한다.", "figure_refs": []},
+                    {"type": "bullet", "text": "T=0.5에서 93% 성공률, 평균 96.96초 완료 시간으로 통제된 시뮬레이션 조건에서 시스템 신뢰성을 확인하였으며, LLM 기반 UAV 계획의 신흥 패러다임에 대한 벤치마크 결과를 제시한다.", "figure_refs": []},
+                    {"type": "bullet", "text": "아키텍처의 모듈성은 확장 가능한 배포, 유연한 에이전트 통합, 이기종 모델 구성을 가능하게 하며 — 향후 다중 에이전트 항공 로봇 프레임워크에 정보를 제공할 수 있는 설계 원칙이다.", "figure_refs": []},
+                    {"type": "bullet", "text": "향후 방향: UAV 군집으로의 확장, 실시간 텔레메트리 통합, 추가 센서 지원(열화상, LiDAR, 다중분광), 그리고 재난 대응 및 환경 모니터링을 위한 sim2real 전환.", "figure_refs": []},
+                    {"type": "bullet", "text": "코드베이스와 벤치마크 데이터셋의 공개 배포가 계획되어 있으며, 시각-언어 기반 UAV 계획 연구의 재현성을 위한 중요한 단계이다.", "figure_refs": []},
+                    {"type": "bullet", "text": "맥락적 의의: 2025년 다중 에이전트 지리공간 UAV 임무에 파운데이션 모델 추론 체인을 적용한 초기 시연 — LLM을 임무 계획자로, VLM을 인지 엔진으로 활용하는 개념적 패러다임이 플랫폼 유형에 관계없이 향후 자율 항공 시스템을 형성할 수 있다.", "figure_refs": []}
+                ]
+            }
+        };
+
+        const INSIGHTS_DATA = {
+            "limitations": [
+                "모든 실험은 2D 시뮬레이션에서 수행되었으며, 실제 UAV 배포는 시연되지 않았다.",
+                "벤치마크는 5가지 화재 시나리오에 걸친 30장의 RGB 이미지로 제한되어 광범위한 일반화 주장에 불충분하다.",
+                "픽셀 포인팅 미세 조정은 9,000장의 위성 영상만 사용하여 실제 위성 영상의 다양성을 충분히 포착하지 못할 수 있다.",
+                "2D 시뮬레이션 환경에는 물리 기반 동역학, 바람 효과, 현실적 센서 노이즈가 부족하다.",
+                "시스템이 독점 API 접근(Qwen2.5VL-32B를 위한 Fireworks API)에 의존하여 완전한 재현성이 제한된다."
+            ],
+            "future_works": [
+                "협력적 다중 에이전트 비행 계획을 통해 조정된 UAV 군집을 지원하도록 프레임워크를 확장.",
+                "실제 비행 중 동적 임무 업데이트를 위해 온보드 센서의 실시간 텔레메트리 통합.",
+                "RGB 영상 이외의 추가 센서 모달리티 지원 추가(열화상, LiDAR, 다중분광).",
+                "실제 재난 대응 및 환경 모니터링 시나리오에서 프레임워크를 검증하기 위한 sim2real 전환 추진.",
+                "복잡한 실제 다중 에이전트 배포를 위한 견고한 군집 조정 메커니즘 개발.",
+                "시각-언어 기반 UAV 계획의 재현 가능한 연구를 위해 전체 코드베이스와 신규 벤치마크 데이터셋 공개."
+            ],
+            "motivation_resolution": {
+                "motivating_problems": [
+                    "전통적 UAV 계획은 사전 정의된 지도, 수작업 휴리스틱, 수동 웨이포인트 구성에 의존하여 동적 환경에서의 적응성과 확장성이 제한된다.",
+                    "기존 LLM/VLM 프레임워크는 폐쇄형 환경 또는 단일 에이전트 설정에서 작동하여 협력적 추론 또는 그라운딩된 공간 계획을 활용하지 못한다.",
+                    "현재 시스템은 자연어 참조를 항공 영상의 정밀한 지리공간 좌표로 변환하기 위한 픽셀 수준 공간 그라운딩이 부족하다."
+                ],
+                "addressed_by_this_work": [
+                    "UAV-CodeAgents는 ReAct 기반 반복적 추론과 동적 임무 적응을 갖춘 다중 에이전트 프레임워크를 도입하여 단일 에이전트 폐쇄환경 한계를 극복한다.",
+                    "미세 조정된 Qwen2.5VL-7B를 활용한 픽셀 포인팅 메커니즘은 위성 영상에서 정밀한 언어-픽셀 좌표 매핑을 가능하게 하여 그라운딩 격차를 해소한다."
+                ],
+                "remaining_unresolved": [
+                    "실제 배포 및 sim2real 전환은 시연되지 않았으며 — 모든 검증은 시뮬레이션 전용으로, LLM 기반 UAV 계획의 실용성은 미해결 과제로 남아 있다.",
+                    "더 많은 에이전트로의 확장과 진정한 분산 군집 조정은 제안되었지만 구현되거나 평가되지 않았다.",
+                    "견고한 현장 운영을 위한 실시간 텔레메트리 및 비시각적 센서 모달리티 통합은 전적으로 향후 연구로 남겨져 있다.",
+                    "적대적, 분포 외, 또는 열화된 입력(비일상적 시나리오, 낮은 위성 영상 품질)에 대한 견고성은 평가되지 않았다.",
+                    "비회전익 플랫폼(예: 근본적으로 다른 동역학을 가진 날개치는 MAV)에 대한 적용성은 고려되지 않았으며 — FWAV 연구에 대한 미해결 문제로 남아 있다."
+                ]
+            }
+        };
+
+        const INSIGHTS_LABELS = {
+            panel_title:    "핵심 인사이트",
+            limitations:    "한계",
+            future_works:   "향후 연구",
+            motivation:     "동기 vs 해결도",
+            mot_problems:   "동기 (해결 대상)",
+            mot_addressed:  "본 연구가 해결",
+            mot_remaining:  "미해결"
+        };
+
+        function escapeHtml(s) { return s; } // bullet text already pre-sanitised by analyser
+
+        function renderBullet(item) {
+            let chipHtml = "";
+            if (item.figure_refs && item.figure_refs.length > 0) {
+                chipHtml = `<span class="fig-ref">[그림 ${item.figure_refs.join(", ")}]</span>`;
+            }
+            return `<div class="bullet">${item.text}${chipHtml}</div>`;
+        }
 
         function openModal(key) {
             const detail = SECTION_DETAIL[key];
             if (!detail) return;
             document.getElementById('modal-title').innerText = SECTION_TITLES[key] || key;
 
-            let html = '';
-            html += (detail.content || []).map(item => {
+            let html = (detail.content || []).map(item => {
                 if (item.type === 'bullet') {
-                    return `<div class="bullet">${item.text}</div>`;
+                    return renderBullet(item);
                 } else if (item.type === 'formula') {
                     return `<div class="formula-block">
                         <div class="formula-label">${item.label}</div>
@@ -287,7 +517,6 @@
             body.scrollTop = 0;
             document.getElementById('modal-overlay').classList.add('active');
 
-            // Re-render KaTeX in the new content
             if (window.renderMathInElement) {
                 renderMathInElement(body, {
                     delimiters: [
@@ -300,6 +529,48 @@
                 });
             }
         }
+
+        function openInsights() {
+            const d = INSIGHTS_DATA;
+            const L = INSIGHTS_LABELS;
+            document.getElementById('modal-title').innerText = L.panel_title;
+
+            const limItems = (d.limitations || []).map(s => `<li>${s}</li>`).join('');
+            const futItems = (d.future_works || []).map(s => `<li>${s}</li>`).join('');
+            const mr = d.motivation_resolution || {};
+            const motProb  = (mr.motivating_problems   || []).map(s => `<li>${s}</li>`).join('');
+            const motAddr  = (mr.addressed_by_this_work|| []).map(s => `<li>${s}</li>`).join('');
+            const motRem   = (mr.remaining_unresolved  || []).map(s => `<li>${s}</li>`).join('');
+
+            const html = `
+                <h4 class="insights-section-title">${L.limitations}</h4>
+                <ul class="lim-list">${limItems}</ul>
+
+                <h4 class="insights-section-title">${L.future_works}</h4>
+                <ul class="future-list">${futItems}</ul>
+
+                <h4 class="insights-section-title">${L.motivation}</h4>
+                <div class="motivation-block">
+                    <div class="mot-problems">
+                        <h5>${L.mot_problems}</h5>
+                        <ul>${motProb}</ul>
+                    </div>
+                    <div class="mot-addressed">
+                        <h5>${L.mot_addressed}</h5>
+                        <ul>${motAddr}</ul>
+                    </div>
+                    <div class="mot-remaining">
+                        <h5>${L.mot_remaining}</h5>
+                        <ul>${motRem}</ul>
+                    </div>
+                </div>
+            `;
+            const body = document.getElementById('modal-body');
+            body.innerHTML = html;
+            body.scrollTop = 0;
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
         function closeModal() {
             document.getElementById('modal-overlay').classList.remove('active');
         }
