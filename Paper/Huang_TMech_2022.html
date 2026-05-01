@@ -6,6 +6,7 @@
     <meta name="keywords" content="servo-driven flapping-wing, bird-like aerial robot, decoupled attitude control, flapping gait optimization, autonomous takeoff, GPS-based patrol, aerobatic maneuver, USTBird, PAN/TILT camera stabilization">
     <meta name="paper-authors" content="Haifeng Huang, Wei He, Jiubin Wang, Liang Zhang, Qiang Fu">
     <meta name="paper-journal" content="IEEE/ASME Transactions on Mechatronics, Vol. 27, No. 6, December 2022, pp. 5484–5494 · DOI: 10.1109/TMECH.2022.3182418">
+    <meta name="paper-tier" content="1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -116,6 +117,112 @@
         .term { font-weight: bold; color: #005b96; }
         .eng { color: #666; font-style: italic; }
 
+        /* Tier badge */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 10px;
+        }
+        .tier-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: white;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+        }
+        .tier-0 { background: #d32f2f; color: white; }
+        .tier-1 { background: #f57c00; color: white; }
+        .tier-2 { background: #fbc02d; color: black; }
+        .tier-3 { background: #757575; color: white; }
+
+        /* Critical Insights modal */
+        .insights-trigger {
+            margin-top: 8px;
+            display: inline-block;
+            padding: 4px 12px;
+            border: 1px solid white;
+            border-radius: 14px;
+            font-size: 12px;
+            color: white;
+            background: rgba(255,255,255,0.08);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .insights-trigger:hover { background: rgba(255,255,255,0.22); }
+
+        .modal-body .lim-list,
+        .modal-body .future-list {
+            padding-left: 20px;
+            margin: 0 0 16px;
+        }
+        .modal-body .lim-list li,
+        .modal-body .future-list li {
+            margin-bottom: 6px;
+            line-height: 1.6;
+        }
+        .motivation-block {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin-top: 8px;
+        }
+        @media (min-width: 900px) {
+            .motivation-block { grid-template-columns: repeat(3, 1fr); }
+        }
+        .mot-problems h5,
+        .mot-addressed h5,
+        .mot-remaining h5 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .mot-problems h5  { color: #c62828; }
+        .mot-addressed h5 { color: #2e7d32; }
+        .mot-remaining h5 { color: #ef6c00; }
+        .mot-problems ul,
+        .mot-addressed ul,
+        .mot-remaining ul {
+            padding-left: 18px;
+            margin: 0;
+        }
+        .mot-problems li,
+        .mot-addressed li,
+        .mot-remaining li {
+            margin-bottom: 6px;
+            line-height: 1.55;
+            font-size: 14.5px;
+        }
+        .insights-section-title {
+            color: #005b96;
+            margin: 20px 0 10px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 4px;
+            font-size: 17px;
+        }
+        .insights-section-title:first-child { margin-top: 0; }
+
+        /* Figure-ref chip */
+        .fig-ref {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1px 8px;
+            font-size: 11px;
+            font-variant: small-caps;
+            color: #555;
+            background: #eef2f7;
+            border: 1px solid #d0d8e0;
+            border-radius: 999px;
+            vertical-align: middle;
+        }
+
         /* Modal */
         .modal-overlay {
             position: fixed; inset: 0;
@@ -201,9 +308,13 @@
 <body>
     <div class="slide">
         <div class="header">
-            <div class="title">An All Servo-Driven Bird-Like Flapping-Wing Aerial Robot Capable of Autonomous Flight</div>
+            <div class="header-row">
+                <div class="title">An All Servo-Driven Bird-Like Flapping-Wing Aerial Robot Capable of Autonomous Flight</div>
+                <span class="tier-badge tier-1">Tier 1 — 중요</span>
+            </div>
             <div class="authors">Haifeng Huang, Wei He, Jiubin Wang, Liang Zhang, Qiang Fu</div>
             <div class="journal">IEEE/ASME Transactions on Mechatronics, Vol. 27, No. 6, December 2022, pp. 5484–5494 · DOI: 10.1109/TMECH.2022.3182418</div>
+            <div class="insights-trigger" onclick="openInsights()">핵심 인사이트 ▸</div>
         </div>
 
         <div class="summary-container">
@@ -253,25 +364,46 @@
 
     <script>
         const SECTION_TITLES = {
-            introduction: "Introduction — 연구 동기",
-            related_works: "Related Works — 관련 연구",
-            method: "Method — 새로운 접근 방법",
-            experiment: "Experiment — 실험 방법과 결과",
-            discussion: "Discussion — 결과의 해석",
-            conclusion: "Conclusion — 최종 요약"
+            introduction:  "Introduction: 연구 동기",
+            related_works: "Related Works: 관련 연구",
+            method:        "Method: 새로운 접근 방법",
+            experiment:    "Experiment: 실험 방법과 결과",
+            discussion:    "Discussion: 결과의 해석",
+            conclusion:    "Conclusion: 최종 요약"
         };
 
+        const FIG_PREFIX = "그림";
+
         const SECTION_DETAIL = {"introduction": {"content": [{"type": "bullet", "text": "<span class=\"term\">FWAR (Flapping-Wing Aerial Robot)</span>은 양력과 추력을 동시에 생성하는 날갯짓 추진으로, 고정익 대비 저속·저고도 비행에 유리하고, 회전익 대비 에너지 효율이 높으며 소형화에 적합하다. 자연스러운 외형과 저주파 날갯짓으로 소음이 적어 정찰·환경 모니터링 등 특수 분야에 응용 가능성이 크다."}, {"type": "bullet", "text": "FWAR 개발의 핵심 도전은 크게 두 가지다. 첫째, <span class=\"term\">날갯짓 공기역학의 이론적 미성숙</span> — 비정상(unsteady) 유동 메커니즘이 완전히 규명되지 않아 설계 최적화가 경험적 반복에 의존한다. 둘째, <span class=\"term\">기계·제어 시스템 설계의 복잡성</span> — 구조 강도·무게·전력의 삼중 제약 하에서 충분한 비행 성능과 자율 제어를 구현해야 한다."}, {"type": "bullet", "text": "기존 micro FWAR (RoboBee, DelFly Nimble, KUBeetle-S) 은 <span class=\"term\">높은 기동성</span>을 보이지만 전원 공급·적재 용량의 한계로 장거리 야외 임무에 부적합하다. Bird-scale FWAR (Smartbird, Dove, Robird, E-Flap) 은 크기와 적재 용량은 충분하나 <span class=\"term\">단일 모터 대칭 날갯짓</span>으로 3축 독립 제어가 불가능해 기동성이 부족하다."}, {"type": "bullet", "text": "Purdue 의 hummingbird robot 과 DelFly Nimble 은 두 모터로 양 날개를 독립 구동하여 3축 제어를 시도했으나, gear 전동으로 인한 <span class=\"term\">가변 진폭 불가</span>(DelFly) 또는 <span class=\"term\">날개 고정 불가</span>(Purdue)라는 제약이 있다. RoboRaven 은 서보를 사용하지만 3축 독립 제어를 논의·구현하지 않았고 꼬리 액추에이터에 의존한다."}, {"type": "bullet", "text": "Bird-scale FWAR 의 또 다른 미해결 과제는 <span class=\"term\">자율 이륙</span>이다. 대부분 사람이 손으로 던져 이륙하므로, 유해 가스 탐지처럼 사람 접근이 불가능한 시나리오에서 활용이 제한된다. 13.2 g micro FWAR 의 hexapedal robot 탑재 발사 사례는 있으나, bird-scale 에서의 협동 발사 플랫폼은 전무했다."}, {"type": "bullet", "text": "본 논문은 wingspan 80 cm, 무게 83.2 g 의 USTBird 를 개발한다. 두 개의 독립 서보로 양 날개의 <span class=\"term\">주파수·진폭·오프셋 각도</span>를 모두 개별 제어하여, 꼬리 액추에이터 없이도 roll·pitch·yaw 디커플링 제어를 달성하고 dive·glide·tumble recovery·소반경 선회 등 aerobatic maneuver 를 시연한다."}, {"type": "bullet", "text": "USTBird 의 세 가지 핵심 기여: (1) 자체 완결형 시스템으로 야외 자율 순찰·정찰 임무를 실증, (2) 서보 직접 구동으로 다양한 날갯짓 운동학을 가능케 해 birds 의 공격적 기동을 모사, (3) RoboRaven 과 달리 꼬리 없이 날개만으로 제어력을 생성하며 gait 최적화와 자율 이륙을 함께 구현."}]}, "related_works": {"content": [{"type": "bullet", "text": "<span class=\"term\">RoboBee (Harvard)</span>: 80 mg, 3 cm 의 초소형 곤충 모방 FWAR. 압전 구동·유선 전원으로 비행하며, 태양전지 버전은 약 3배 태양광 세기가 필요해 실용 자율비행에는 거리가 멀다."}, {"type": "bullet", "text": "<span class=\"term\">DelFly Nimble (TU Delft)</span>: 두 개의 독립 모터로 양 날개를 구동하여 빠른 banked turn 등 우수한 기동성을 보인다. 하지만 gear 전동 구조상 <span class=\"term\">가변 진폭 날갯짓이 불가</span>하여 glide·dive 같은 날개 잠금 기동을 수행할 수 없다."}, {"type": "bullet", "text": "<span class=\"term\">KUBeetle-S (Konkuk Univ.)</span>: 곤충형·무미익·호버 가능 로봇이지만 비행 시간이 10분 이내로 제한되어 야외 임무 지속에 한계가 있다."}, {"type": "bullet", "text": "<span class=\"term\">Smartbird (Festo)</span>: 갈매기를 모방한 2 m wingspan FWAR 로 높은 생체 모방도를 자랑하지만, 단일 모터 대칭 구동으로 기동성이 제한되며 자율비행 시스템이 결여되어 있다."}, {"type": "bullet", "text": "<span class=\"term\">Dove</span>: 220 g, wingspan 50 cm, 맞춤 비행 제어 시스템으로 waypoint tracking 을 달성한 FWAR. <span class=\"term\">Robird</span>: 최대 16 m/s 비행 속도의 falcon 모방 FWAR 로 공항 조류 퇴치에 설계되었다. <span class=\"term\">E-Flap</span>: 높은 적재 용량의 bird-like FWAR. 세 로봇 모두 모터 직접 구동으로 날개 대칭 운동 → 기동성 제약."}, {"type": "bullet", "text": "<span class=\"term\">Purdue hummingbird robot</span>: 모터 commutation logic 으로 가변 진폭 날갯짓을 구현했으나, 날개를 특정 위치에 고정할 수 없어 glide·dive 불가. 적재 용량도 소형 크기로 인해 부족하다."}, {"type": "bullet", "text": "<span class=\"term\">RoboRaven (Univ. of Maryland)</span>: 서보로 양 날개를 구동하여 가변 주파수·진폭·날개 고정이 가능한 유일한 선행 연구. 그러나 <span class=\"term\">3축 독립 제어를 논의·구현하지 않았고</span>, 제어력 생성을 꼬리 러더 또는 프로펠러에 의존한다. 자율 비행 시뮬레이션만 수행했고 실제 실험과의 괴리가 크다."}, {"type": "bullet", "text": "<span class=\"term\">USTBird 의 차별점</span>: (1) 서보 구동 + 3축 독립 제어를 날개만으로 달성 (꼬리 액추에이터 제거), (2) gait 최적화 실험적 검증, (3) 협동 발사 플랫폼으로 자율 이륙, (4) GPS 기반 야외 자율 순찰 임무 실증 — 이 네 요소를 동시에 갖춘 bird-scale FWAR 은 전무."}]}, "method": {"content": [{"type": "bullet", "text": "<span class=\"term\">기체 구조</span>: 날개 골격은 직경 2.5 mm leading edge 탄소봉 + 직경 1 mm wing rib 3개로 구성. 내측은 rigid, 외측은 flexible 하게 rib 배치하여 추진 효율을 최적화한 biomimetic 구조다. 두께 0.02 mm CPE 필름이 날개막 역할을 하며, aspect ratio 약 3.23, wing loading 약 0.51 kg/m² 이다."}, {"type": "bullet", "text": "<span class=\"term\">구동 시스템</span>: KST 215MG 서보 2개가 좌·우 날개를 독립 구동한다. PWM 신호로 목표 각도를 지정하면 서보가 해당 위치로 회전·유지한다. 이로써 기존 motor+gear 방식에서 불가능했던 <span class=\"term\">가변 주파수·가변 진폭·날개 고정</span>이 모두 가능해진다."}, {"type": "bullet", "text": "날갯짓 운동의 일반 모델: 좌·우 날개의 flapping angle 을 offset angle $U$, amplitude $A$, 주기 함수 $f(\\omega, t)$ 로 매개변수화한다. 좌우가 거울 대칭이므로 부호가 반대이고, 제조 편차에 의한 소량 오차항 $\\Delta(t)$ 를 포함한다."}, {"type": "formula", "label": "식 (2)–(3) — 좌·우 날개 flapping angle 모델", "latex": "\\phi_L(t) = -[U_L + A_L f_L(\\omega_L, t) + \\Delta_L(t)], \\quad \\phi_R(t) = U_R + A_R f_R(\\omega_R, t) + \\Delta_R(t)", "description": "$U$: offset angle (날개 중심면 이동), $A$: 진폭, $f(\\omega,t)$: 주기 함수(gait), $\\Delta(t)$: 서보 정밀도·제조 편차에 의한 오차. 좌·우 날개의 4개 매개변수($U, A, f, \\omega$)를 독립 제어함으로써 다양한 토크 생성 메커니즘이 가능해진다."}, {"type": "bullet", "text": "<span class=\"term\">Pitch 제어</span>: 좌우 대칭 날갯짓($A_L = A_R$, $U_L = U_R$, $f_L = f_R$) 상태에서 <span class=\"term\">flapping frequency 를 증감</span>하면 순 양력이 변하여 pitch 토크가 발생한다. 양력의 작용점(공기역학 중심)과 무게중심 사이 거리 $a$ 가 토크 모멘트 팔 역할을 한다."}, {"type": "formula", "label": "식 (6) — Pitch 토크", "latex": "M_{\\text{pitch}} = 2a[F_R(f_1) - F_R(f_2)]", "description": "$f_1, f_2$: 주파수 변경 전후의 flapping frequency. 주파수가 높을수록 양력이 증가하므로 $f_1 > f_2$ 이면 양(+) pitch-up 토크 발생. 공기역학 중심과 무게중심 사이 거리 $a$ 가 클수록 같은 양력 변화에서 더 큰 pitch 토크를 얻는다."}, {"type": "bullet", "text": "<span class=\"term\">Yaw 제어 — stroke plane tilt</span>: 좌우 offset angle 을 반대 방향으로 설정 ($U_L = -U_R$) 하면 각 날개의 순 양력이 pitch·yaw 방향으로 분해되어 횡방향 순 힘이 yaw 토크를 생성한다. Drosophila 에서 관찰된 stroke plane 기울임 기동과 동일한 원리이다."}, {"type": "formula", "label": "식 (7) — Yaw 토크 (offset angle 기반)", "latex": "M_{\\text{yaw}} = 2a F_R \\sin U_R", "description": "$U_R$: 우측 날개 offset angle. $F_R \\sin U_R$: 횡방향 분력. $U_R$ 증가 시 yaw 토크 증가하나, 종방향 분력 $2F_R \\cos U_R$ 이 감소하여 중력 극복이 어려워지는 trade-off 가 존재한다."}, {"type": "bullet", "text": "<span class=\"term\">Roll 제어 — 비대칭 진폭</span>: 좌우 진폭을 다르게 설정 ($A_L \\neq A_R$) 하면 좌우 순 양력 크기 차이가 roll 토크를 생성한다. 이는 fly·pigeon 이 장애물 회피나 포식자 도주 시 사용하는 비대칭 날갯짓 전략과 동일하다."}, {"type": "formula", "label": "식 (8) — Roll 토크 (비대칭 진폭)", "latex": "M_{\\text{roll}} = \\frac{b}{2}(F_R - F_L)", "description": "$b$: wingspan. 좌우 양력 차 $(F_R - F_L)$ 에 반 wingspan 을 곱한 roll moment. 진폭 차이가 클수록 roll 토크가 커지며, 빠른 lateral 기동에 활용된다."}, {"type": "bullet", "text": "<span class=\"term\">Gait 최적화</span>: 서보 목표 궤적으로 sine·square·triangular wave 를 설정하고 동일 진폭 40° 에서 비교한다. 6축 힘/토크 센서(ATI NANO17) + 고속 카메라(Photron FASTCAM Mini UX50) 로 양력·추력·실제 flapping angle 을 계측. <span class=\"term\">Square wave</span> 가 서보 overshoot 로 인해 실제 stroke 가 가장 크고, 평균 추력·결합력 모두 최대를 기록했다. 야외 비행 시험에서도 square wave 의 상승 성능·체공 시간이 최우수 — 최종 gait 로 채택."}, {"type": "bullet", "text": "<span class=\"term\">Combined roll-yaw (주파수 비대칭)</span>: 좌우 주파수를 다르게 설정($f_L \\neq f_R$) 하면 양력의 크기 차 + 시간 비대칭으로 roll·yaw 토크가 동시 발생한다. Drosophila 의 biased wingbeat 전략에서 영감. 단, 개방루프 시험에서 비행 불안정이 관찰되어 현 단계에서는 제한적 사용이며, 향후 폐루프 제어로 안정화 계획."}]}, "experiment": {"content": [{"type": "bullet", "text": "<span class=\"term\">Dive maneuver</span>: 양 날개를 offset angle 40° 로 올려 고정 ($A_L = A_R = 0$). 수직 가속도는 중력 + 수직 항력 − 양력 분력의 합으로 결정되며, offset angle 조절로 하강 가속도를 제어한다. 실제 시연에서 2.4 초 동안 급강하를 수행 — gyrfalcon 의 공격 급강하와 유사한 기동."}, {"type": "formula", "label": "식 (12) — Dive 수직 가속도", "latex": "a = g + \\frac{D_v}{m} - \\frac{2 F_L \\cos\\theta_p \\cos U_L}{m}", "description": "$g$: 중력 가속도, $D_v$: 수직 항력, $m$: 기체 질량, $\\theta_p$: pitch angle, $F_L$: 날개 양력, $U_L$: offset angle. Offset angle 을 크게 하면 $\\cos U_L$ 이 작아져 양력의 수직 분력이 감소하고 하강 가속도가 증가한다."}, {"type": "bullet", "text": "<span class=\"term\">Glide maneuver</span>: 양 날개를 작은 offset angle (5°) 로 펼쳐 고정. 날갯짓 없이 활공하여 에너지 소비를 최소화한다. 자연 조류의 날개를 살짝 올려 활공하는 행동을 모사. 크로스윈드 등 외란에 민감하며, 초기 상태(받음각·속도)에 따라 활공 궤적이 크게 달라진다."}, {"type": "bullet", "text": "<span class=\"term\">Aerial tumble recovery</span>: 실속(post-stall) 받음각에서 양 날개를 중심면에 고정하면 꼬리 항력 $D_t$ 에 의해 힘 불균형이 발생하여 공중회전이 시작된다. 날갯짓을 재개하면 정상 비행으로 복귀 — 비둘기의 포식자 긴급 회피 행동에서 영감. 2.7 초 소요."}, {"type": "bullet", "text": "<span class=\"term\">소반경 선회</span>: yaw 토크 생성 메커니즘 (stroke plane tilt, $U_L = -U_R < 0$) 을 이용. Pitch angle 을 높여 전진 속도를 줄이면 고정익 대비 매우 작은 선회 반경을 달성한다. 9.2 초 동안 저고도 소반경 선회를 시연. 최소 선회 반경과 비행 안정성 사이에 trade-off 존재."}, {"type": "bullet", "text": "<span class=\"term\">협동 자율 이륙 플랫폼</span>: 속도 제어 가능 수레 + 각도 제어 T형 브래킷으로 구성. 수레가 초기 전진 속도, 브래킷이 초기 pitch angle 을 제공한다. 피에조 센서로 수평력을 계측하고 $F_{\\text{lift}} = F \\tan\\theta$ 로 양력을 산출하여, pitch angle 10°·20°·30° 에서 속도-양력 관계를 least squares fitting 으로 수치화. 1.8 초 만에 자율 이륙 성공."}, {"type": "bullet", "text": "<span class=\"term\">GPS 기반 자율 순찰 유도 전략</span>: 중심점(CP) 에서의 거리 $r$ 에 따라 3가지 모드로 분기 — $r > r_{\\max}$ 이면 CP 직행, $r < r_{\\min}$ 이면 CP 이탈, $r_{\\min} \\le r \\le r_{\\max}$ 이면 중간 원(median circle) 의 접선 방향으로 비행. Desired heading 은 $r$ 의 선형 함수로 설정하여 매끄러운 전환을 보장한다."}, {"type": "formula", "label": "식 (15) — 순찰 유도 법칙: desired heading angle", "latex": "\\phi_d = \\psi + f(r) = \\begin{cases} \\psi + f(r_{\\min}) & r < r_{\\min} \\\\ \\psi + ar + b & r_{\\min} \\le r \\le r_{\\max} \\\\ \\psi + f(r_{\\max}) & r > r_{\\max} \\end{cases}", "description": "$\\psi$: 방향각 (CP 기준), $f(r)$: heading 보정 함수로 $|f(r_{\\max}) - f(r_{\\min})| = \\pi$. 순찰 영역 안에서는 $r$ 의 선형 함수로 heading 을 부드럽게 조절하고, 영역 밖에서는 고정된 극한값을 사용하여 CP 방향 복귀 또는 이탈을 제어한다."}, {"type": "bullet", "text": "<span class=\"term\">Double closed-loop PD 제어기</span>: 내부 루프 = yaw angular velocity, 외부 루프 = yaw angle. 외부 루프에 $[-10°, +10°]$ dead zone 을 적용하여 과도한 제어 진동을 방지. 제어 출력은 좌우 offset angle ($U_L = -U_R$) 로 전달되며, $U_R \\in [0°, 20°]$ 로 클리핑. 실험에서 $r_{\\min} = 10$ m, $r_{\\max} = 40$ m 설정, 야외 풍 외란 하에서도 순찰 영역 내 안정 비행을 달성."}, {"type": "bullet", "text": "<span class=\"term\">2-DOF PAN/TILT 카메라 안정화</span>: 조류의 head-neck 보상 메커니즘에서 영감, 17 g 무게의 pitch·roll 2축 서보 짐벌을 개발. 카메라에 IMU 를 부착하여 보상 효과를 정량 평가 — pitch 평균값 59.8%, roll 평균값 23.9% 감소, pitch 표준편차 41.6%, roll 표준편차 73.3% 감소. 경량 서보의 응답 지연과 기체의 대진폭 주기 변동이 잔여 jitter 의 원인."}]}, "discussion": {"content": [{"type": "bullet", "text": "<span class=\"term\">서보 구동의 강점</span>: motor+gear 방식은 전동 메커니즘 설계가 완료되면 gait 가 고정되는 반면, 서보는 PWM 신호만으로 주파수·진폭·오프셋을 실시간 변경할 수 있어 <span class=\"term\">소프트웨어 수준의 gait 최적화</span>가 가능하다. 또한 날개를 임의 위치에 고정할 수 있어 glide·dive 같은 non-flapping 기동이 자연스럽게 구현된다."}, {"type": "bullet", "text": "<span class=\"term\">서보 토크 한계</span>: 사용된 KST 215MG 서보의 토크 한계로 flapping frequency 가 4 Hz, amplitude 가 120° 이하로 제한된다. 이는 공기역학적 힘 생성의 상한을 설정하며, 더 무거운 payload 를 탑재하거나 더 빠른 기동이 필요한 시나리오에서 bottleneck 이 된다."}, {"type": "bullet", "text": "<span class=\"term\">Gait 최적화의 한계</span>: 힘 측정은 USTBird 를 고정한 상태에서 수행되어 유입류(incoming airflow)와 받음각 변화가 반영되지 않았다. 저자들도 풍동 실험과의 결합이 향후 필요함을 인정하며, 현 결과는 정성적 분석과 최적화에 한정된다."}, {"type": "bullet", "text": "<span class=\"term\">Decoupled 제어의 실질적 한계</span>: 이론적으로는 4가지 토크 생성 메커니즘이 존재하나, 주파수 비대칭 모드(roll+yaw 동시)는 개방루프에서 불안정하여 현 단계에서 미사용. 이는 ornithopter 의 underactuated 동역학 특성에 기인하며, 폐루프 제어 설계가 필요하다."}, {"type": "bullet", "text": "<span class=\"term\">자율 비행의 현 수준</span>: GPS 기반 수평면 순찰은 달성했으나 <span class=\"term\">고도 제어가 미통합</span>되어 있다. Unscented Kalman Filter 로 위치·자세를 추정하지만, 고도의 정밀 추종은 향후 과제이다. 또한 장애물 감지·회피(sense-and-avoid) 기능이 없어 복잡한 환경에서의 자율 비행은 제한적이다."}, {"type": "bullet", "text": "<span class=\"term\">Aerobatic maneuver 의 정밀 제어 부재</span>: dive·glide·tumble recovery 는 모두 non-flapping 기동으로, 실행 중 제어력 생성이 제한된다. 외란에 매우 민감하며 정확한 궤적 추종은 달성되지 않았다. 이 기동들의 폐루프 정밀 제어가 중요한 향후 연구 주제이다."}, {"type": "bullet", "text": "<span class=\"term\">PAN/TILT 의 잔여 jitter</span>: 경량 서보의 응답 지연과 날갯짓에 의한 대진폭 기체 변동이 카메라 안정화의 완전한 해결을 방해한다. 더 빠른 응답의 하드웨어와 진보된 제어 알고리즘이 필요하다."}, {"type": "bullet", "text": "<span class=\"term\">자율 이륙 플랫폼의 범용성</span>: 현재 플랫폼은 USTBird 의 무게·속도 범위에 맞춰 설계되어 있다. 다른 bird-scale FWAR 로의 확장 시 speed-lift 관계 재측정과 브래킷 재설계가 필요하다."}, {"type": "bullet", "text": "<span class=\"term\">향후 연구 방향</span>: (1) 자율성 향상 — 고도 제어, 장애물 회피, 비행 경로 계획 통합, (2) 비행 메커니즘 규명 — USTBird 의 다양한 날갯짓 데이터를 자연 조류와 비교하여 flapping flight 의 기저 원리를 해석하는 역방향 생체 모방 연구."}]}, "conclusion": {"content": [{"type": "bullet", "text": "<span class=\"term\">All servo-driven 설계의 핵심 가치</span>: 서보 직접 구동은 motor+gear 대비 날개 운동 자유도를 극대화하여, 꼬리 없이 날개만으로 roll·pitch·yaw 독립 제어를 가능케 한다. 이는 payload 제약을 완화하고 기동성을 동시에 확보하는 설계적 혁신이다."}, {"type": "bullet", "text": "<span class=\"term\">Gait 최적화 실증</span>: sine·square·triangular wave 비교에서 square wave 가 서보 overshoot 를 활용해 가장 큰 effective stroke 를 생성하고, 양력·추력 모두에서 최대를 기록. 이 결과는 bird-scale servo-driven FWAR 의 gait 선택에 직접 활용 가능한 설계 지침을 제공한다."}, {"type": "bullet", "text": "<span class=\"term\">5종 aerobatic maneuver</span> — dive (2.4 s), glide (2.7/5.67 s), aerial tumble recovery (2.7 s), 소반경 선회 (9.2 s), 정상 날갯짓 비행 — 를 야외에서 시연. 특히 glide·dive 는 날개 고정 기능 덕분에 가능해진 기동으로, DelFly Nimble 이나 Purdue hummingbird 에서는 수행 불가."}, {"type": "bullet", "text": "<span class=\"term\">협동 자율 이륙</span>: 속도 제어 수레 + 각도 제어 브래킷으로 구성된 발사 플랫폼에서 1.8 초 만에 자율 이륙 성공. Bird-scale FWAR 에서 사람의 손 던지기를 대체하는 최초의 협동 발사 시스템."}, {"type": "bullet", "text": "<span class=\"term\">GPS 기반 야외 자율 순찰</span>: $r_{\\min} = 10$ m, $r_{\\max} = 40$ m 범위에서 건물 주변 순찰 임무를 풍 외란 하에 안정적으로 수행. Double closed-loop PD 제어기와 유도 법칙의 유효성을 야외 환경에서 검증."}, {"type": "bullet", "text": "<span class=\"term\">PAN/TILT 카메라 안정화</span>: 17 g 의 2-DOF 짐벌로 날갯짓 진동의 pitch·roll 을 대폭 저감하여 항공 영상 품질을 실용 수준으로 향상. Avian head-neck stabilization 메커니즘의 공학적 모사."}, {"type": "bullet", "text": "<span class=\"term\">Onboard 완결형 시스템</span>: 자체 설계 3.9 g 제어보드 + IMU + GPS + 카메라 + Bluetooth 통신이 83.2 g (무부하) 기체에 통합. 최대 이륙 무게 101.2 g, flapping frequency 2–4 Hz 로 자연 비행체의 scaling law 와 일치."}, {"type": "bullet", "text": "<span class=\"term\">향후 연구</span>: (1) 고도 제어·장애물 회피 통합으로 자율성 향상 및 복잡 시나리오 대응, (2) USTBird 의 다양한 날갯짓 데이터를 활용한 자연 조류 비행 메커니즘의 역방향 해석."}]}};
+        const INSIGHTS_DATA = {"limitations": ["Servo torque limits flapping frequency to 4 Hz and amplitude to 120 degrees, capping aerodynamic force generation.", "Gait optimization was performed with the robot fixed; incoming airflow and angle-of-attack changes during forward flight were not accounted for.", "The combined roll-yaw mode (asymmetric frequency) was unstable in open-loop tests and is currently unused.", "Altitude control is not integrated; only horizontal GPS-based patrol was demonstrated.", "Aerobatic maneuvers (dive, glide, tumble recovery) are all non-flapping and open-loop, with no closed-loop trajectory tracking.", "PAN/TILT camera stabilization has residual jitter due to servo response delay and large-amplitude body oscillations."], "future_works": ["Integrate altitude control, obstacle avoidance, and flight path planning for full 3-D autonomous missions.", "Combine wind tunnel testing with fixed-body force measurements for more representative gait optimization.", "Design closed-loop control for the roll-yaw combined mode to stabilize asymmetric-frequency flight.", "Develop precision trajectory tracking for aerobatic maneuvers under disturbance.", "Use USTBird's diverse flapping data for reverse biomimicry — comparing engineered gaits with natural bird flight to elucidate underlying principles."], "motivation_resolution": {"motivating_problems": ["Bird-scale FWARs with single-motor symmetric flapping cannot achieve 3-axis independent attitude control.", "Autonomous takeoff for bird-scale FWARs without human hand-launch has not been demonstrated.", "Gait optimization for servo-driven FWARs (sine vs square vs triangular waveforms) lacks experimental comparison.", "Existing servo-driven designs (RoboRaven) depend on tail actuators for yaw control, adding weight and complexity.", "No bird-scale FWAR has demonstrated GPS-based outdoor autonomous patrol with onboard processing."], "addressed_by_this_work": ["USTBird achieves roll, pitch, and yaw independent control using only two wing servos — no tail actuator required.", "A cooperative launch platform (speed-controlled cart + angle-controlled bracket) enables autonomous takeoff in 1.8 seconds.", "Square wave gait produces the largest effective stroke and maximum thrust/lift due to servo overshoot, experimentally validated.", "GPS-based patrol with a double closed-loop PD controller is demonstrated outdoors with wind disturbance."], "remaining_unresolved": ["Altitude control is not integrated into the autonomous patrol system.", "The combined roll-yaw mode remains unstable without closed-loop control.", "Wind tunnel validation of gait optimization under realistic forward-flight conditions is pending."]}};
+        const INSIGHTS_LABELS = {
+            panel_title:    "핵심 인사이트",
+            limitations:    "한계",
+            future_works:   "향후 연구",
+            motivation:     "동기 vs 해결도",
+            mot_problems:   "동기 (해결 대상)",
+            mot_addressed:  "본 연구가 해결",
+            mot_remaining:  "미해결"
+        };
+
+        function escapeHtml(s) { return s; } // bullet text already pre-sanitised by analyser
+
+        function renderBullet(item) {
+            let chipHtml = "";
+            if (item.figure_refs && item.figure_refs.length > 0) {
+                chipHtml = `<span class="fig-ref">[${FIG_PREFIX} ${item.figure_refs.join(", ")}]</span>`;
+            }
+            return `<div class="bullet">${item.text}${chipHtml}</div>`;
+        }
 
         function openModal(key) {
             const detail = SECTION_DETAIL[key];
             if (!detail) return;
             document.getElementById('modal-title').innerText = SECTION_TITLES[key] || key;
 
-            let html = '';
-            html += (detail.content || []).map(item => {
+            let html = (detail.content || []).map(item => {
                 if (item.type === 'bullet') {
-                    return `<div class="bullet">${item.text}</div>`;
+                    return renderBullet(item);
                 } else if (item.type === 'formula') {
                     return `<div class="formula-block">
                         <div class="formula-label">${item.label}</div>
@@ -287,7 +419,6 @@
             body.scrollTop = 0;
             document.getElementById('modal-overlay').classList.add('active');
 
-            // Re-render KaTeX in the new content
             if (window.renderMathInElement) {
                 renderMathInElement(body, {
                     delimiters: [
@@ -300,6 +431,48 @@
                 });
             }
         }
+
+        function openInsights() {
+            const d = INSIGHTS_DATA;
+            const L = INSIGHTS_LABELS;
+            document.getElementById('modal-title').innerText = L.panel_title;
+
+            const limItems = (d.limitations || []).map(s => `<li>${s}</li>`).join('');
+            const futItems = (d.future_works || []).map(s => `<li>${s}</li>`).join('');
+            const mr = d.motivation_resolution || {};
+            const motProb  = (mr.motivating_problems   || []).map(s => `<li>${s}</li>`).join('');
+            const motAddr  = (mr.addressed_by_this_work|| []).map(s => `<li>${s}</li>`).join('');
+            const motRem   = (mr.remaining_unresolved  || []).map(s => `<li>${s}</li>`).join('');
+
+            const html = `
+                <h4 class="insights-section-title">${L.limitations}</h4>
+                <ul class="lim-list">${limItems}</ul>
+
+                <h4 class="insights-section-title">${L.future_works}</h4>
+                <ul class="future-list">${futItems}</ul>
+
+                <h4 class="insights-section-title">${L.motivation}</h4>
+                <div class="motivation-block">
+                    <div class="mot-problems">
+                        <h5>${L.mot_problems}</h5>
+                        <ul>${motProb}</ul>
+                    </div>
+                    <div class="mot-addressed">
+                        <h5>${L.mot_addressed}</h5>
+                        <ul>${motAddr}</ul>
+                    </div>
+                    <div class="mot-remaining">
+                        <h5>${L.mot_remaining}</h5>
+                        <ul>${motRem}</ul>
+                    </div>
+                </div>
+            `;
+            const body = document.getElementById('modal-body');
+            body.innerHTML = html;
+            body.scrollTop = 0;
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
         function closeModal() {
             document.getElementById('modal-overlay').classList.remove('active');
         }
