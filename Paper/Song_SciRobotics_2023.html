@@ -6,6 +6,7 @@
     <meta name="keywords" content="autonomous drone racing, reinforcement learning, optimal control, model predictive control, sim-to-real transfer, domain randomization, gate progress reward, superhuman performance, agile quadrotor flight, policy gradient">
     <meta name="paper-authors" content="Yunlong Song, Angel Romero, Matthias Müller, Vladlen Koltun, Davide Scaramuzza">
     <meta name="paper-journal" content="Science Robotics, Vol. 8, eadg1462 (2023) · DOI: 10.1126/scirobotics.adg1462">
+    <meta name="paper-tier" content="2">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -34,7 +35,7 @@
             background: white;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             display: grid;
-            grid-template-rows: auto auto 1fr;
+            grid-template-rows: auto auto 1fr auto;
             overflow: hidden;
         }
         .header {
@@ -42,7 +43,7 @@
             color: white;
             padding: 26px 38px;
         }
-        .title { font-size: 32px; font-weight: bold; margin-bottom: 10px; line-height: 1.3; }
+        .title { font-size: 32px; font-weight: bold; margin-bottom: 10px; line-height: 1.3; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .authors { font-size: 17px; margin-bottom: 5px; }
         .journal { font-size: 15px; opacity: 0.9; }
 
@@ -115,6 +116,16 @@
         }
         .term { font-weight: bold; color: #005b96; }
         .eng { color: #666; font-style: italic; }
+        .tier-badge { display: inline-block; }
+
+        /* Critical insights panel */
+        .slide > div:last-of-type ul {
+            margin: 4px 0;
+            padding-left: 18px;
+        }
+        .slide > div:last-of-type li {
+            margin-bottom: 3px;
+        }
 
         /* Modal */
         .modal-overlay {
@@ -201,14 +212,17 @@
 <body>
     <div class="slide">
         <div class="header">
-            <div class="title">Reaching the limit in autonomous racing: Optimal control versus reinforcement learning</div>
+            <div class="title">
+                Reaching the limit in autonomous racing: Optimal control versus reinforcement learning
+                <span class="tier-badge" style="background:#fbc02d;color:#000;padding:4px 12px;border-radius:12px;font-weight:600;font-size:14px;margin-left:16px;">Tier 2 — 비교 baseline</span>
+            </div>
             <div class="authors">Yunlong Song, Angel Romero, Matthias Müller, Vladlen Koltun, Davide Scaramuzza</div>
             <div class="journal">Science Robotics, Vol. 8, eadg1462 (2023) · DOI: 10.1126/scirobotics.adg1462</div>
         </div>
 
         <div class="summary-container">
             <div class="summary-title">논문 요약</div>
-            <div class="summary">이 논문은 <span class="term">자율 드론 레이싱</span>에서 <span class="term">강화학습(RL)이 최적 제어(OC)를 능가</span>하는 근본 원인을 체계적으로 분석한 ETH Zurich/UZH Scaramuzza 그룹의 Science Robotics 발표. 핵심 발견은 RL 이 OC 보다 나은 이유가 "더 잘 최적화해서"가 아니라 "<span class="term">더 나은 목적함수를 최적화</span>"하기 때문 — OC 의 trajectory tracking 분해(planning + control) 가 intermediate representation 에 의해 표현 가능한 행동 범위를 제한하는 반면, RL 의 <span class="term">gate progress objective</span> 는 task-level 목표를 직접 최적화하여 unmodeled dynamics 에 더 강건한 정책을 발견. <span class="term">TWR 12 드론</span>으로 peak 가속도 12g 이상 · peak 속도 108 km/h 달성, 시뮬레이션 순수 학습 후 zero-shot 실기체 전이, 세 명의 프로 파일럿을 능가하는 <span class="term">superhuman 성능</span> 시연.</div>
+            <div class="summary">이 논문은 <span class="term">자율 드론 레이싱</span>에서 <span class="term">강화학습(RL)이 최적 제어(OC)를 능가</span>하는 근본 원인을 체계적으로 분석한 ETH Zurich/UZH Scaramuzza 그룹의 Science Robotics 발표. 핵심 발견은 RL 이 OC 보다 나은 이유가 "더 잘 최적화해서"가 아니라 "<span class="term">더 나은 목적함수를 최적화</span>"하기 때문 — OC 의 trajectory tracking 분해(planning + control) 가 intermediate representation 에 의해 표현 가능한 행동 범위를 제한하는 반면, RL 의 <span class="term">gate progress objective</span> 는 task-level 목표를 직접 최적화하여 unmodeled dynamics 에 더 강건한 정책을 발견. <span class="term">TWR 12 드론</span>으로 peak 가속도 12g 이상 · peak 속도 108 km/h 달성, 시뮬레이션 순수 학습 후 zero-shot 실기체 전이, 세 명의 프로 파일럿을 능가하는 <span class="term">superhuman 성능</span> 시연. <span class="term">Tier 2 비교 관점</span>: quadrotor RL 제어의 현 수준을 FWAV agility benchmark 로 참조 — FWAV 는 unsteady aerodynamics · 낮은 TWR · hover 불가로 본 논문의 기법 직접 이식이 제한적이나, task-level objective 설계와 domain randomization 전략은 cross-domain 참고 가능.</div>
             <div class="keywords"><span class="keyword-chip">autonomous drone racing</span><span class="keyword-chip">reinforcement learning</span><span class="keyword-chip">optimal control</span><span class="keyword-chip">model predictive control</span><span class="keyword-chip">sim-to-real transfer</span><span class="keyword-chip">domain randomization</span><span class="keyword-chip">gate progress reward</span><span class="keyword-chip">superhuman performance</span><span class="keyword-chip">agile quadrotor flight</span><span class="keyword-chip">policy gradient</span></div>
         </div>
 
@@ -223,7 +237,7 @@
             </div>
             <div class="section" onclick="openModal('method')">
                 <div class="section-title">Method: 새로운 접근 방법 <span class="click-hint">클릭하여 자세히 ▸</span></div>
-                <div class="section-summary">방법론은 3개 optimization objective (trajectory tracking · contouring control · gate progress) 와 2개 optimization method (MPC · policy gradient) 의 조합 실험. <span class="term">Trajectory tracking</span>: offline time-optimal trajectory + quadratic cost MPC. <span class="term">Contouring control</span>: path 기반 progress 최대화 + deviation 최소화. <span class="term">Gate progress</span>: intermediate representation 없이 다음 gate center 로의 progress 직접 최대화 — nonlinear · nonconvex 이므로 OC 로 풀 수 없고 RL 전용. RL 은 PPO + Flightmare simulator + domain randomization 으로 학습, 100 Hz feedback control, zero-shot sim-to-real transfer.</div>
+                <div class="section-summary">방법론은 3개 optimization objective (trajectory tracking · contouring control · gate progress) 와 2개 optimization method (MPC · policy gradient) 의 조합 실험. <span class="term">Trajectory tracking</span>: offline time-optimal trajectory + quadratic cost MPC. <span class="term">Contouring control</span>: path 기반 progress 최대화 + deviation 최소화. <span class="term">Gate progress</span>: intermediate representation 없이 다음 gate center 로의 progress 직접 최대화 — nonlinear · nonconvex 이므로 OC 로 풀 수 없고 RL 전용. RL 은 PPO + Flightmare simulator + domain randomization 으로 학습, 100 Hz feedback control, zero-shot sim-to-real transfer. <span class="term">FWAV 관점</span>: gate progress 같은 task-level objective 설계 원리는 FWAV mission(perching, navigation)에 참고 가능하나, quadrotor-specific dynamics assumption 이 곳곳에 내재되어 있어 직접 이식은 불가.</div>
             </div>
             <div class="section" onclick="openModal('experiment')">
                 <div class="section-title">Experiment: 실험 방법과 결과 <span class="click-hint">클릭하여 자세히 ▸</span></div>
@@ -238,6 +252,31 @@
                 <div class="section-summary">본 연구는 자율 드론 레이싱에서 <span class="term">RL 이 OC 를 능가하는 근본 원인이 optimization objective 의 차이</span>임을 체계적으로 입증. RL 의 task-level objective (gate progress) 가 OC 의 trajectory-based decomposition 보다 넓은 범위의 adaptive behavior 를 가능케 하며 unmodeled dynamics 에 robust. <span class="term">TWR 12 드론으로 108 km/h · 12.58g</span> 달성, 시뮬레이션 수 분 학습 → zero-shot 전이, 세 명의 프로 파일럿을 능가하는 superhuman 성능 시연 — agile robotics 의 milestone.</div>
             </div>
         </div>
+
+        <div style="grid-column: 1 / -1; background: #fffde7; border: 2px solid #fbc02d; border-radius: 8px; padding: 16px 22px; margin-top: 2px;">
+            <div style="font-size: 18px; font-weight: bold; color: #f57f17; margin-bottom: 12px; border-bottom: 2px solid #fbc02d; padding-bottom: 6px;">
+                Critical Insights — Tier 2 비교 baseline 분석
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; font-size: 14px; line-height: 1.65;">
+                <div>
+                    <h4 style="color: #e65100; margin: 0 0 6px 0; font-size: 15px;">Limitations (저자 기술)</h4>
+                    <ul><li>All experiments conducted indoors with a VICON motion capture system providing perfect state estimation at 400 Hz — outdoor or GPS-denied environments remain untested.</li><li>The superhuman comparison relies on structural advantages for the RL agent including motion-capture-based state estimation and lower sensorimotor latency than human pilots.</li><li>Sim-to-real transfer depends on careful system identification of the physical platform; sensitivity to identification errors is not systematically characterized.</li><li>Only single-drone time-trial scenarios are evaluated — multi-agent racing with opponent interaction or dynamic obstacles is not addressed.</li><li>The approach assumes known gate positions provided externally; onboard perception-based gate detection and its associated latency are outside the scope.</li></ul>
+                </div>
+                <div>
+                    <h4 style="color: #e65100; margin: 0 0 6px 0; font-size: 15px;">Future Works (저자 기술)</h4>
+                    <ul><li>Extend RL-based agile flight to outdoor environments with GPS-denied navigation and wind disturbances.</li><li>Replace motion capture with onboard sensing (cameras, IMUs) for fully autonomous state estimation during agile maneuvers.</li><li>Investigate multi-drone competitive racing where opponent modeling and collision avoidance add complexity.</li><li>Explore hybrid OC+RL architectures that combine OC's interpretability with RL's task-level objective flexibility.</li><li>Apply the task-level objective design principle to other agile robotic platforms beyond quadrotors.</li></ul>
+                    <h4 style="color: #e65100; margin: 12px 0 6px 0; font-size: 15px;">Motivating Problems</h4>
+                    <ul><li>OC and RL have both achieved impressive agile flight results, but no systematic analysis exists explaining WHY one outperforms the other in extreme regimes.</li><li>The planning-control decomposition in OC creates an information bottleneck through intermediate trajectory representations, but this structural limitation has not been formally identified or quantified.</li><li>Sim-to-real transfer for agile quadrotor flight at the physical limits (>10g, >100 km/h) has not been demonstrated with zero-shot deployment.</li><li>Whether autonomous systems can match or exceed expert human pilots in physical agile tasks remains an open question.</li></ul>
+                </div>
+                <div>
+                    <h4 style="color: #e65100; margin: 0 0 6px 0; font-size: 15px;">Addressed by This Work</h4>
+                    <ul><li>Provided a controlled 2-axis experimental framework (optimization method x optimization objective) isolating the core factor — optimization objective, not method, drives RL's advantage.</li><li>Demonstrated that trajectory tracking's intermediate representation restricts the policy's behavioral range, causing catastrophic failure under model mismatch (0% success in realistic sim).</li><li>Achieved zero-shot sim-to-real transfer on a TWR-12 drone reaching 108 km/h and 12.58g using PPO + domain randomization + system delay modeling.</li><li>Demonstrated superhuman performance against three professional pilots including a DRL world champion.</li></ul>
+                    <h4 style="color: #c62828; margin: 12px 0 6px 0; font-size: 15px;">Remaining Unresolved (incl. FWAV gaps)</h4>
+                    <ul><li>Outdoor agile flight under wind disturbances and without external motion-capture state estimation remains unaddressed.</li><li>Multi-agent competitive scenarios with dynamic obstacle avoidance and opponent interaction are unexplored.</li><li>RL-based agile control has not been demonstrated on flapping-wing platforms where unsteady aerodynamics and low thrust-to-weight ratios pose fundamentally different challenges than quadrotor dynamics.</li><li>The sim-to-real gap for FWAV is substantially larger than for quadrotors due to wing flexibility, stroke-cycle-dependent force generation, and clap-and-fling effects — whether domain randomization alone can bridge this gap is an open question.</li><li>Task-level objective design (analogous to gate progress) for FWAV-specific missions such as perching, obstacle navigation in confined spaces, or sustained forward flight has not been formulated.</li></ul>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Modal -->
@@ -261,7 +300,206 @@
             conclusion: "Conclusion — 최종 요약"
         };
 
-        const SECTION_DETAIL = {"introduction": {"content": [{"type": "bullet", "text": "<span class=\"term\">연구 동기 — 두 패러다임의 체계적 비교</span>: OC 와 RL 은 모두 관측에서 제어 명령으로의 최적 매핑을 찾지만, OC 는 explicit model + online optimization, RL 은 sampled data + offline policy optimization 으로 접근. 드론 레이싱은 error tolerance 가 극히 낮고 physical limit 에서 작동하여 suboptimal 정책이 즉시 드러나는 이상적 testbed."}, {"type": "bullet", "text": "<span class=\"term\">OC 의 구조적 한계</span>: 대부분의 OC 는 task 를 planning (time-optimal trajectory 생성) + control (trajectory tracking) 로 분해. 이 분해는 해석 가능성과 실시간 제어를 단순화하지만, <span class=\"term\">intermediate representation (trajectory)</span> 이 controller 가 표현할 수 있는 행동 범위를 제한 — unmodeled dynamics 존재 시 erratic 행동 유발."}, {"type": "bullet", "text": "<span class=\"term\">RL 의 구조적 장점</span>: (1) offline optimization 으로 deployment 시 빠른 연산, (2) task objective 직접 최적화 (intermediate representation 불필요), (3) <span class=\"term\">domain randomization</span> 으로 stochastic environment 대처 — 다양한 dynamics 변이에서 학습하여 robust 정책 발견."}, {"type": "bullet", "text": "<span class=\"term\">주요 기여</span>: (1) RL vs OC 의 2축 분석 (optimization method vs optimization objective), (2) RL 이 OC 를 능가하는 핵심 요인은 objective 차이임을 실험적 입증, (3) TWR 12 agile 드론으로 108 km/h · >12g 달성, (4) 시뮬레이션 학습 → zero-shot 실세계 전이, (5) 프로 파일럿 3명 대상 superhuman 시연."}, {"type": "bullet", "text": "<span class=\"term\">드론 레이싱의 적합성</span>: gate 통과 순서 · 최소 시간 · 물리 한계에서의 비행 — 작은 실수가 crash 또는 큰 lap time 페널티. OC 와 RL 의 성능 차이가 가장 극적으로 드러나는 세팅."}]}, "related_works": {"content": [{"type": "bullet", "text": "<span class=\"term\">OC — trajectory tracking (Foehn et al. 2021)</span>: offline 에서 full quadrotor dynamics 로 time-optimal trajectory 계산 (수 시간 소요), online MPC 로 tracking. 장점: 이론적 최적. 한계: 계산 비용, model mismatch 시 crash 위험, 실세계에서 thrust threshold 를 낮춰야 안정 (6.12 s lap, 최적 대비 느림)."}, {"type": "bullet", "text": "<span class=\"term\">OC — contouring control (Romero et al. 2022)</span>: path 를 reference 로 사용, online 에서 path progress 최대화 + contouring error 최소화 동시 수행. trajectory tracking 보다 유연하지만 여전히 expert tuning 필요, 실세계에서 보수적 파라미터 조정 필수 → 5.8 s lap."}, {"type": "bullet", "text": "<span class=\"term\">RL — drone racing 의 선행 연구</span>: Loquercio et al. (2020) domain randomization 기반 sim-to-real, Hwangbo et al. (2017) quadrotor RL control, Koch et al. (2019) attitude control RL, Song et al. (2021) IROS — 대부분 시뮬레이션 성능 또는 제한된 실세계 데모."}, {"type": "bullet", "text": "<span class=\"term\">RL — superhuman 성과</span>: Kaufmann et al. (2023, Nature) 가 드론 레이싱에서 인간 챔피언을 처음으로 이김. 본 논문은 같은 그룹에서 그 성공의 <span class=\"term\">근본 원인</span>을 optimization method vs objective 축으로 분석한 체계적 연구."}, {"type": "bullet", "text": "<span class=\"term\">RL 의 타 분야 성공</span>: AlphaGo/AlphaZero (Silver et al.), StarCraft II (Vinyals et al.), quadrupedal locomotion (Lee, Miki et al.), tokamak plasma control (Degrave et al.) — 대부분 empirical 성공, 근본 원인 분석은 부족. 본 연구가 체계적 분석의 첫 사례."}, {"type": "bullet", "text": "<span class=\"term\">본 연구의 위치</span>: 기존 연구가 \"RL 이 OC 보다 낫다\" 를 실증적으로만 보여준 반면, 본 논문은 controlled experiment 를 통해 <span class=\"term\">왜 RL 이 더 나은지</span>를 optimization method 와 objective 차원에서 분리하여 분석 — 로보틱스 제어 설계의 근본 질문에 답변."}]}, "method": {"content": [{"type": "bullet", "text": "<span class=\"term\">문제 정의 — minimum-time drone racing</span>: quadrotor state $x_k \\in \\mathcal{X}$, control $u_k \\in \\mathcal{U}$, dynamics $x_{k+1} = x_k + \\Delta t \\cdot f(x_k, u_k)$. 목표: gate 통과 순서를 지키며 총 비행 시간 $t_N$ 최소화, 충돌 방지 + thrust 범위 제약."}, {"type": "formula", "label": "식 — Minimum-time optimization", "latex": "\\min_{\\tau} t_N \\quad \\text{s.t.} \\quad x_0 = x_{\\text{init}}, \\; x_{k+1} = x_k + \\Delta t \\cdot f(x_k, u_k), \\; g(x_k, u_k)=0, \\; h(x_k, u_k) \\le 0", "description": "자율 드론 레이싱의 constrained optimization 공식화. 출력은 time-optimal trajectory $\\tau = (u_0, \\ldots, u_{N-1}, x_0, \\ldots, x_N)$. 실시간 해법이 불가능하여 3가지 proxy objective 로 근사."}, {"type": "bullet", "text": "<span class=\"term\">Objective 1 — Trajectory tracking</span>: offline 에서 time-optimal trajectory 를 먼저 계획한 후, online MPC 가 quadratic cost $J(x) = \\sum_{k=0}^{N} \\| x_k - x_{\\text{ref},k} \\|_Q + \\| u_k - u_{\\text{ref},k} \\|_R$ 를 최소화하여 tracking. 장점: convex 하여 실시간 해법 가능. 한계: reference trajectory 와의 불일치 시 catastrophic crash."}, {"type": "formula", "label": "식 — Trajectory tracking cost", "latex": "J(x) = \\sum_{k=0}^{N} \\| x_k - x_{\\text{ref},k} \\|_Q + \\| u_k - u_{\\text{ref},k} \\|_R", "description": "State 와 reference trajectory 간 quadratic deviation 의 합. Q, R 은 state/action cost matrix. OC 의 전형적 접근 — convex 이므로 MPC 로 실시간 해법 가능하지만 task-level objective 와 분리됨."}, {"type": "bullet", "text": "<span class=\"term\">Objective 2 — Contouring control</span>: reference 를 trajectory 가 아닌 path 로 취급, 각 timestep 에서 path progress $\\theta_N$ 최대화 + contouring error $e_k$ 최소화 + body rate 패널티. trajectory tracking 보다 자유도 1 추가 (time allocation 을 online 에서 조정) → model uncertainty 에 더 적응적."}, {"type": "bullet", "text": "<span class=\"term\">Objective 3 — Gate progress</span>: intermediate representation (trajectory/path) 없이, 현재 gate center 로의 distance 변화를 직접 보상. 충돌 시 penalty $r(k) = -10.0$, 레이스 완주 시 bonus $r(k) = +10.0$. Nonlinear · nonconvex → <span class=\"term\">classic OC 로 풀 수 없음</span>, RL 전용 objective."}, {"type": "formula", "label": "식 — Gate progress reward", "latex": "r(k) = \\| g_k - p_{k-1} \\| - \\| g_k - p_k \\| - b \\| \\omega_k \\|", "description": "Gate center $g_k$ 와 이전/현재 위치 $p_{k-1}, p_k$ 의 거리 변화로 progress 측정, body rate $\\omega_k$ 에 소폭 패널티. Dense reward 로 credit assignment 용이 — sparse lap time 보상의 한계 극복."}, {"type": "bullet", "text": "<span class=\"term\">RL 학습 — PPO + Flightmare</span>: Proximal Policy Optimization (PPO) 사용, Flightmare simulator 에서 수백 환경 병렬 rollout. 2-layer MLP (256 nodes), tanh activation. 관측: quadrotor velocity + rotation matrix + 다음 2개 gate 의 4 corner relative position. Action: mass-normalized thrust + body rates 4D."}, {"type": "formula", "label": "식 — Policy gradient", "latex": "\\nabla_{\\theta} J(\\theta) = \\mathbb{E}_{p_{\\theta}(\\tau)} \\left[ \\sum_{t=0}^{T-1} \\nabla_{\\theta} \\log \\pi_{\\theta}(u_t | x_t) R(\\tau) \\right]", "description": "Policy gradient theorem. 핵심 인사이트: transition model $p(x_{k+1} | x_k, u_k)$ 에 의존하지 않으므로 sampled trajectories 만으로 gradient 추정 가능 — explicit system dynamics modeling 불필요, model uncertainty 에 본질적으로 강건."}, {"type": "bullet", "text": "<span class=\"term\">Domain randomization</span>: thrust mapping coefficient + drag coefficient 를 학습 중 무작위화. 결과: 다양한 dynamics 변이에서 학습한 정책이 unseen 환경에 robust. System delay 도 40 ms 로 시뮬레이션하여 현실 반영."}, {"type": "bullet", "text": "<span class=\"term\">Sim-to-real transfer</span>: (1) physical drone 의 정밀 system identification, (2) system delay 시뮬레이션, (3) mass-normalized thrust + body rates 출력 → low-level controller 가 high-freq tracking, (4) domain randomization 으로 aerodynamic effects · battery voltage drops 대처. <span class=\"term\">Fine-tuning 없이 zero-shot transfer</span>."}, {"type": "bullet", "text": "<span class=\"term\">드론 플랫폼</span>: 4S 드론 (OC vs RL 비교용) + 6S 드론 (TWR 12, 총 중량 0.52 kg, max thrust 63 N). Agilicious control framework 사용, VICON motion capture (400 Hz). 6S 드론은 기존 최고 TWR (DJI FPV ~4) 의 3배."}]}, "experiment": {"content": [{"type": "bullet", "text": "<span class=\"term\">RL vs OC — simulation (nominal model)</span>: 50 random initial positions, 40 ms system delay. Trajectory tracking: 4.92 s avg lap, <span class=\"term\">44% success</span>. Contouring control: 5.03 s, 76%. RL (gate progress): 5.14 s, <span class=\"term\">100% success</span>. Trajectory tracking 이 최적 시간에 가깝지만 crash 율 극히 높음."}, {"type": "bullet", "text": "<span class=\"term\">RL vs OC — simulation (realistic model)</span>: Blade Element Momentum Theory 기반 realistic dynamics. Trajectory tracking: <span class=\"term\">0% success</span> (전부 crash). Contouring control: 20%. RL: <span class=\"term\">100% success</span>. Model mismatch 가 OC 에 치명적, RL 은 robust."}, {"type": "bullet", "text": "<span class=\"term\">RL vs OC — real world</span>: 추가 요인 (aerodynamic effects, variable delay, battery voltage fluctuation). Trajectory tracking: launch 직후 crash. Contouring control: 전문가 tuning 후 5.8 s (보수적). RL: <span class=\"term\">5.35 s, zero-shot transfer, no fine-tuning</span>."}, {"type": "bullet", "text": "<span class=\"term\">Hypothesis 1 — Optimization method</span>: 같은 trajectory tracking objective 로 MPC vs RL 비교. Nominal model: 둘 다 optimal lap time (4.9 s) 달성. Realistic model: 둘 다 성능 저하, MPC 가 tracking loss 에서 약간 우세. <span class=\"term\">결론: RL 이 MPC 보다 더 잘 최적화하는 것은 아님</span> — optimization method 차이는 핵심이 아님."}, {"type": "bullet", "text": "<span class=\"term\">Hypothesis 2 — Optimization objective</span>: 같은 RL method 로 trajectory tracking vs gate progress 비교 (domain randomization 없이). Gate progress: nominal + realistic 모두 성공. Trajectory tracking: nominal 성공, realistic 실패. <span class=\"term\">결론: objective 차이가 핵심</span> — task-level objective 가 더 넓은 행동 범위를 표현 가능."}, {"type": "bullet", "text": "<span class=\"term\">Value function 분석</span>: trajectory tracking 의 value function 은 reference state 근처에서만 높은 값 → deviation 시 회복 어려움. Gate progress 의 value function 은 gate center 방향의 넓은 영역에서 높은 값 + gate 경계 근처에서 낮은 값 → task-aware behavior (gate 중심 + 안전 margin 유지)."}, {"type": "bullet", "text": "<span class=\"term\">극한 성능 — TWR 12 드론</span>: 0.52 kg, max thrust 63 N, TWR 12 (기존 최고 DJI FPV ~4 의 3배). RL 정책으로 peak velocity <span class=\"term\">108 km/h</span>, peak acceleration <span class=\"term\">12.58g</span>. Throttle 100% 도달 — 물리적 한계에서 비행."}, {"type": "bullet", "text": "<span class=\"term\">Robustness under extreme conditions</span>: Trial 3 에서 오래된 배터리 사용 → 큰 voltage drop. 그럼에도 RL 정책이 control 유지하며 모든 lap 성공 완주 — domain randomization 효과."}, {"type": "bullet", "text": "<span class=\"term\">Superhuman 대결</span>: A. Vanover (2019 DRL 세계 챔피언), T. Bitmatta (2회 MultiGP World Cup), M. Schaepper (3회 Swiss 챔피언). Marv Track 에서 time trial. RL 이 <span class=\"term\">모든 파일럿을 능가</span> — 더 짧은 경로, tighter gate margin, 낮은 분산. 단, motion capture + 낮은 latency 의 구조적 이점 존재."}, {"type": "bullet", "text": "<span class=\"term\">학습 효율</span>: 표준 워크스테이션에서 <span class=\"term\">수 분 안에 학습 완료</span>. Flightmare 의 수백 환경 병렬화 + initial state buffer 전략으로 sample efficiency 극대화."}]}, "discussion": {"content": [{"type": "bullet", "text": "<span class=\"term\">핵심 발견 — Objective 가 핵심</span>: Controlled experiment 를 통해 optimization method (MPC vs policy gradient) 가 아닌 <span class=\"term\">optimization objective (trajectory tracking vs gate progress)</span> 가 RL 우위의 핵심 요인임을 입증. 같은 objective 에서는 MPC 가 RL 과 동등하거나 우수."}, {"type": "bullet", "text": "<span class=\"term\">Planning-control decomposition 의 구조적 한계</span>: OC 의 trajectory/path 기반 분해는 (a) intermediate representation 이 표현 가능한 행동을 제한, (b) 계획된 reference 가 model mismatch 를 반영하지 못해 downstream controller 가 실패 → <span class=\"term\">information bottleneck</span>."}, {"type": "bullet", "text": "<span class=\"term\">Task-level objective 의 장점</span>: gate progress 는 reference trajectory 없이 gate center 방향 progress 를 직접 보상 → 정책이 deployment 중 자유롭게 행동 적응 가능. Value function 이 task-aware (gate 중심 높은 값, 경계 낮은 값) → risk-aware 행동 자동 발현."}, {"type": "bullet", "text": "<span class=\"term\">Domain randomization 의 역할</span>: MDP 의 stochastic transition model + probability formulation 이 다양한 환경 변이 (thrust mapping, drag, delay) 에서 학습 가능케 함 → overfitting 방지, sim-to-real gap 축소. OC 는 deterministic 가정이 기본."}, {"type": "bullet", "text": "<span class=\"term\">Superhuman 의 의미와 한계</span>: RL 이 motion capture (perfect state estimation) + lower latency 의 구조적 이점 보유. 공정 비교는 아니지만, RL 이 vehicle 의 <span class=\"term\">full performance envelope 를 활용</span>하는 반면 human pilot 은 안전 margin 을 남김 — 이 차이가 본질적."}, {"type": "bullet", "text": "<span class=\"term\">실용적 시사점 — OC 의 보수성</span>: trajectory tracking 은 thrust threshold 를 낮춰야 crash 방지 (6.12 s), contouring control 은 전문가 수동 tuning 필요 (5.8 s). RL 은 <span class=\"term\">full thrust range 사용 + no real-world tuning</span> (5.35 s) — 실용적 이점 명확."}, {"type": "bullet", "text": "<span class=\"term\">한계 — Indoor motion capture 의존</span>: VICON 400 Hz 가 perfect state estimation 제공. Outdoor, GPS-denied, onboard sensing 환경에서의 RL 성능은 미검증. Sim-to-real 이 state estimation 품질에 민감할 가능성."}, {"type": "bullet", "text": "<span class=\"term\">FWAV 비교 관점 — 본질적 차이</span>: Quadrotor 는 (a) hover 가능, (b) dynamics 가 비교적 잘 이해됨, (c) TWR 이 높아 control authority 풍부. FWAV 는 (a) hover 불가, (b) unsteady aerodynamics 가 본질적으로 hard-to-model, (c) TWR 이 낮아 control authority 제한적. 따라서 OC 의 model-dependent 한계가 FWAV 에서 <span class=\"term\">더 심각</span>."}, {"type": "bullet", "text": "<span class=\"term\">FWAV 비교 관점 — RL 적용 잠재력</span>: FWAV 의 unsteady aerodynamics 는 정확한 수학 모델링이 극히 어렵다 — 이는 RL 의 model-free 접근이 특히 유리한 조건. 본 논문의 gate progress 같은 task-level objective 를 FWAV perching 이나 navigation 에 적용 가능. 단, FWAV 의 sim-to-real gap 이 quadrotor 보다 훨씬 크므로 domain randomization 범위 설계가 critical challenge."}, {"type": "bullet", "text": "<span class=\"term\">Drone SOTA baseline 으로서의 가치</span>: 본 논문은 quadrotor 제어의 현 수준 (108 km/h, >12g, superhuman) 을 제시. FWAV 연구의 benchmark — FWAV 가 이 수준의 agility 에 도달하기까지의 gap 을 정량적으로 측정하는 baseline 자료."}]}, "conclusion": {"content": [{"type": "bullet", "text": "<span class=\"term\">핵심 결론 — Optimization objective 가 핵심</span>: RL 이 OC 를 능가하는 이유는 \"더 잘 최적화해서\" 가 아니라 \"더 나은 objective 를 최적화\" — task-level objective 가 intermediate representation 없이 정책 자유도를 극대화."}, {"type": "bullet", "text": "<span class=\"term\">OC 의 구조적 한계 정량화</span>: trajectory tracking 은 nominal model 에서도 44% 성공률, realistic model 에서 0%. Contouring control 은 76% → 20%. Planning-control 분해의 information bottleneck 이 근본 원인."}, {"type": "bullet", "text": "<span class=\"term\">RL 의 robustness</span>: nominal · realistic · real-world 모든 조건에서 100% 성공률. Gate progress objective + domain randomization + stochastic policy 의 3중 robustness."}, {"type": "bullet", "text": "<span class=\"term\">극한 성능</span>: TWR 12 (기존 최고의 3배), peak 108 km/h, peak 12.58g, throttle 100% — 물리적 한계에서 비행. Full performance envelope 활용은 RL 의 고유 강점."}, {"type": "bullet", "text": "<span class=\"term\">Sim-to-real efficiency</span>: 표준 워크스테이션에서 수 분 학습, zero-shot real-world transfer. System identification + delay simulation + domain randomization + mass-normalized thrust interface 의 4요소."}, {"type": "bullet", "text": "<span class=\"term\">Superhuman milestone</span>: 2019 DRL 세계 챔피언 포함 3명의 프로 파일럿을 능가. RL 이 더 짧은 경로, tighter gate margin, 낮은 분산으로 일관된 우위. Agile mobile robot 제어의 새 표준."}, {"type": "bullet", "text": "<span class=\"term\">로보틱스 제어 설계 시사점</span>: task-level objective 직접 최적화 + domain randomization 의 조합이 agile robot control 의 유력한 패러다임. OC 의 해석 가능성 장점은 유지하되, objective 설계에서 intermediate representation 의존을 줄여야 — hybrid OC+RL 접근도 유망."}, {"type": "bullet", "text": "<span class=\"term\">미래 방향</span>: outdoor 환경 (GPS-denied, wind disturbance), onboard sensing (no motion capture), multi-drone racing, 더 복잡한 obstacle 환경. FWAV 등 다른 robot morphology 로의 RL 확장도 자연스러운 다음 단계."}]}};
+        const SECTION_DETAIL = {
+  "introduction": {
+    "content": [
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">연구 동기 — 두 패러다임의 체계적 비교</span>: OC 와 RL 은 모두 관측에서 제어 명령으로의 최적 매핑을 찾지만, OC 는 explicit model + online optimization, RL 은 sampled data + offline policy optimization 으로 접근. 드론 레이싱은 error tolerance 가 극히 낮고 physical limit 에서 작동하여 suboptimal 정책이 즉시 드러나는 이상적 testbed."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">OC 의 구조적 한계</span>: 대부분의 OC 는 task 를 planning (time-optimal trajectory 생성) + control (trajectory tracking) 로 분해. 이 분해는 해석 가능성과 실시간 제어를 단순화하지만, <span class=\"term\">intermediate representation (trajectory)</span> 이 controller 가 표현할 수 있는 행동 범위를 제한 — unmodeled dynamics 존재 시 erratic 행동 유발."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">RL 의 구조적 장점</span>: (1) offline optimization 으로 deployment 시 빠른 연산, (2) task objective 직접 최적화 (intermediate representation 불필요), (3) <span class=\"term\">domain randomization</span> 으로 stochastic environment 대처 — 다양한 dynamics 변이에서 학습하여 robust 정책 발견."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">주요 기여</span>: (1) RL vs OC 의 2축 분석 (optimization method vs optimization objective), (2) RL 이 OC 를 능가하는 핵심 요인은 objective 차이임을 실험적 입증, (3) TWR 12 agile 드론으로 108 km/h · >12g 달성, (4) 시뮬레이션 학습 → zero-shot 실세계 전이, (5) 프로 파일럿 3명 대상 superhuman 시연."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">드론 레이싱의 적합성</span>: gate 통과 순서 · 최소 시간 · 물리 한계에서의 비행 — 작은 실수가 crash 또는 큰 lap time 페널티. OC 와 RL 의 성능 차이가 가장 극적으로 드러나는 세팅."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">Tier 2 비교 관점</span>: 본 논문이 제시하는 quadrotor agility frontier (108 km/h, 12g+, superhuman) 는 FWAV 연구자에게 drone-domain SOTA 가 어디까지 왔는지를 정량적으로 보여주는 benchmark. FWAV 의 현재 최고 비행 속도(~5-10 m/s)·가속도와의 gap 이 어디서 발생하는지 — TWR, actuator bandwidth, aerodynamic modeling 정확도 — 를 이해하는 데 핵심 참조."
+      }
+    ]
+  },
+  "related_works": {
+    "content": [
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">OC — trajectory tracking (Foehn et al. 2021)</span>: offline 에서 full quadrotor dynamics 로 time-optimal trajectory 계산 (수 시간 소요), online MPC 로 tracking. 장점: 이론적 최적. 한계: 계산 비용, model mismatch 시 crash 위험, 실세계에서 thrust threshold 를 낮춰야 안정 (6.12 s lap, 최적 대비 느림)."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">OC — contouring control (Romero et al. 2022)</span>: path 를 reference 로 사용, online 에서 path progress 최대화 + contouring error 최소화 동시 수행. trajectory tracking 보다 유연하지만 여전히 expert tuning 필요, 실세계에서 보수적 파라미터 조정 필수 → 5.8 s lap."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">RL — drone racing 의 선행 연구</span>: Loquercio et al. (2020) domain randomization 기반 sim-to-real, Hwangbo et al. (2017) quadrotor RL control, Koch et al. (2019) attitude control RL, Song et al. (2021) IROS — 대부분 시뮬레이션 성능 또는 제한된 실세계 데모."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">RL — superhuman 성과</span>: Kaufmann et al. (2023, Nature) 가 드론 레이싱에서 인간 챔피언을 처음으로 이김. 본 논문은 같은 그룹에서 그 성공의 <span class=\"term\">근본 원인</span>을 optimization method vs objective 축으로 분석한 체계적 연구."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">RL 의 타 분야 성공</span>: AlphaGo/AlphaZero (Silver et al.), StarCraft II (Vinyals et al.), quadrupedal locomotion (Lee, Miki et al.), tokamak plasma control (Degrave et al.) — 대부분 empirical 성공, 근본 원인 분석은 부족. 본 연구가 체계적 분석의 첫 사례."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">본 연구의 위치</span>: 기존 연구가 \"RL 이 OC 보다 낫다\" 를 실증적으로만 보여준 반면, 본 논문은 controlled experiment 를 통해 <span class=\"term\">왜 RL 이 더 나은지</span>를 optimization method 와 objective 차원에서 분리하여 분석 — 로보틱스 제어 설계의 근본 질문에 답변."
+      }
+    ]
+  },
+  "method": {
+    "content": [
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">문제 정의 — minimum-time drone racing</span>: quadrotor state $x_k \\in \\mathcal{X}$, control $u_k \\in \\mathcal{U}$, dynamics $x_{k+1} = x_k + \\Delta t \\cdot f(x_k, u_k)$. 목표: gate 통과 순서를 지키며 총 비행 시간 $t_N$ 최소화, 충돌 방지 + thrust 범위 제약."
+      },
+      {
+        "type": "formula",
+        "label": "식 — Minimum-time optimization",
+        "latex": "\\min_{\\tau} t_N \\quad \\text{s.t.} \\quad x_0 = x_{\\text{init}}, \\; x_{k+1} = x_k + \\Delta t \\cdot f(x_k, u_k), \\; g(x_k, u_k)=0, \\; h(x_k, u_k) \\le 0",
+        "description": "자율 드론 레이싱의 constrained optimization 공식화. 출력은 time-optimal trajectory. 실시간 해법이 불가능하여 3가지 proxy objective 로 근사."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">Objective 1 — Trajectory tracking</span>: offline 에서 time-optimal trajectory 를 먼저 계획한 후, online MPC 가 quadratic cost 를 최소화하여 tracking. 장점: convex 하여 실시간 해법 가능. 한계: reference trajectory 와의 불일치 시 catastrophic crash. FWAV 이식성: trajectory tracking 자체는 FWAV 에서도 사용 가능하나, FWAV 의 unsteady aerodynamics 로 인한 model mismatch 가 quadrotor 대비 훨씬 크므로 본 논문이 보여준 trajectory tracking 의 취약성이 FWAV 에서 더 심각할 것으로 예상."
+      },
+      {
+        "type": "formula",
+        "label": "식 — Trajectory tracking cost",
+        "latex": "J(x) = \\sum_{k=0}^{N} \\| x_k - x_{\\text{ref},k} \\|_Q + \\| u_k - u_{\\text{ref},k} \\|_R",
+        "description": "State 와 reference trajectory 간 quadratic deviation 의 합. OC 의 전형적 접근 — convex 이므로 MPC 로 실시간 해법 가능하지만 task-level objective 와 분리됨."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">Objective 3 — Gate progress (RL 전용)</span>: intermediate representation (trajectory/path) 없이, 현재 gate center 로의 distance 변화를 직접 보상. 충돌 시 penalty $r(k) = -10.0$, 레이스 완주 시 bonus $r(k) = +10.0$. Nonlinear · nonconvex → classic OC 로 풀 수 없음. <span class=\"term\">FWAV 이식성</span>: gate progress reward 설계는 FWAV perching/navigation task 에도 적용 가능하나, FWAV 의 낮은 TWR + hover 불가 특성으로 reward shaping 이 크게 달라져야 함 — 예컨대 속도 유지 필수 조건, wing stroke phase 와 연동된 보상 등이 추가 필요."
+      },
+      {
+        "type": "formula",
+        "label": "식 — Gate progress reward",
+        "latex": "r(k) = \\| g_k - p_{k-1} \\| - \\| g_k - p_k \\| - b \\| \\omega_k \\|",
+        "description": "Gate center $g_k$ 와 이전/현재 위치 $p_{k-1}, p_k$ 의 거리 변화로 progress 측정, body rate $\\omega_k$ 에 소폭 패널티. Dense reward 로 credit assignment 용이."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">RL 학습 — PPO + Flightmare</span>: Proximal Policy Optimization (PPO) 사용, Flightmare simulator 에서 수백 환경 병렬 rollout. 2-layer MLP (256 nodes), tanh activation. 관측: quadrotor velocity + rotation matrix + 다음 2개 gate 의 4 corner relative position. Action: mass-normalized thrust + body rates 4D. <span class=\"term\">FWAV 이식성</span>: PPO 알고리즘 자체는 platform-agnostic 이나, FWAV 용 simulator(wing deformation, unsteady aero)가 Flightmare 수준으로 성숙하지 않아 sample-efficient 학습의 bottleneck 이 될 수 있음."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">Domain randomization + Sim-to-real</span>: thrust mapping coefficient + drag coefficient 를 학습 중 무작위화, 40 ms system delay 시뮬레이션. 정밀 system identification + mass-normalized thrust interface 로 zero-shot transfer 달성. <span class=\"term\">FWAV 이식성</span>: domain randomization 전략은 FWAV 에 특히 유망 (unsteady aero 모델 불확실성이 크므로), 단 randomization 해야 할 파라미터 공간(wing flexibility, stroke kinematics, clap-and-fling coefficients)이 quadrotor 대비 훨씬 고차원 — 학습 수렴 속도가 critical concern."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">드론 플랫폼 — TWR 12 extreme</span>: 4S 드론 (OC vs RL 비교용) + 6S 드론 (TWR 12, 총 중량 0.52 kg, max thrust 63 N). Agilicious control framework 사용, VICON 400 Hz. 6S 드론은 기존 최고 TWR (DJI FPV ~4) 의 3배. Drone-domain SOTA: TWR 12 → FWAV 현재 TWR ~1.2-2.0 — <span class=\"term\">약 6-10배 gap</span>이 agility 차이의 근본 원인."
+      }
+    ]
+  },
+  "experiment": {
+    "content": [
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">RL vs OC — simulation (nominal model)</span>: 50 random initial positions, 40 ms system delay. Trajectory tracking: 4.92 s avg lap, <span class=\"term\">44% success</span>. Contouring control: 5.03 s, 76%. RL (gate progress): 5.14 s, <span class=\"term\">100% success</span>. Trajectory tracking 이 최적 시간에 가깝지만 crash 율 극히 높음."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">RL vs OC — simulation (realistic model)</span>: Blade Element Momentum Theory 기반 realistic dynamics. Trajectory tracking: <span class=\"term\">0% success</span> (전부 crash). Contouring control: 20%. RL: <span class=\"term\">100% success</span>. Model mismatch 가 OC 에 치명적, RL 은 robust. Tier 2 시사점: FWAV 의 model mismatch 는 quadrotor 대비 훨씬 큼 — OC 기반 FWAV 제어의 한계를 정량적으로 예측하는 참고 데이터."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">RL vs OC — real world</span>: 추가 요인 (aerodynamic effects, variable delay, battery voltage fluctuation). Trajectory tracking: launch 직후 crash. Contouring control: 전문가 tuning 후 5.8 s (보수적). RL: <span class=\"term\">5.35 s, zero-shot transfer, no fine-tuning</span>."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">Hypothesis testing — Optimization objective 가 핵심</span>: 같은 RL method 로 trajectory tracking vs gate progress 비교 — gate progress 가 nominal + realistic 모두 성공, trajectory tracking 은 realistic 실패. 같은 trajectory tracking objective 로 MPC vs RL 비교 — MPC 가 tracking loss 에서 약간 우세. <span class=\"term\">결론: objective 차이가 핵심</span>, method 차이는 아님."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">Value function 분석</span>: trajectory tracking 의 value function 은 reference state 근처에서만 높은 값 → deviation 시 회복 어려움. Gate progress 의 value function 은 gate center 방향의 넓은 영역에서 높은 값 + gate 경계 근처에서 낮은 값 → task-aware behavior (gate 중심 + 안전 margin 유지)."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">극한 성능 — TWR 12 드론</span>: 0.52 kg, max thrust 63 N, TWR 12. RL 정책으로 peak velocity <span class=\"term\">108 km/h</span>, peak acceleration <span class=\"term\">12.58g</span>. Throttle 100% 도달 — 물리적 한계에서 비행. Drone-domain SOTA achieves 108 km/h — FWAV currently at ~5-10 m/s — gap of ~3-6x in velocity, ~30-60x in acceleration."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">Superhuman 대결</span>: A. Vanover (2019 DRL 세계 챔피언), T. Bitmatta (2회 MultiGP World Cup), M. Schaepper (3회 Swiss 챔피언). RL 이 <span class=\"term\">모든 파일럿을 능가</span> — 더 짧은 경로, tighter gate margin, 낮은 분산. 단, motion capture + 낮은 latency 의 구조적 이점 존재."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">학습 효율</span>: 표준 워크스테이션에서 <span class=\"term\">수 분 안에 학습 완료</span>. Flightmare 의 수백 환경 병렬화 + initial state buffer 전략으로 sample efficiency 극대화. FWAV 에서는 simulator fidelity 부족으로 동일한 학습 효율 기대 어려움."
+      }
+    ]
+  },
+  "discussion": {
+    "content": [
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">핵심 발견 — Objective 가 핵심</span>: Controlled experiment 를 통해 optimization method (MPC vs policy gradient) 가 아닌 <span class=\"term\">optimization objective (trajectory tracking vs gate progress)</span> 가 RL 우위의 핵심 요인임을 입증. 같은 objective 에서는 MPC 가 RL 과 동등하거나 우수."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">Planning-control decomposition 의 구조적 한계</span>: OC 의 trajectory/path 기반 분해는 (a) intermediate representation 이 표현 가능한 행동을 제한, (b) 계획된 reference 가 model mismatch 를 반영하지 못해 downstream controller 가 실패 → <span class=\"term\">information bottleneck</span>."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">Task-level objective 의 장점</span>: gate progress 는 reference trajectory 없이 gate center 방향 progress 를 직접 보상 → 정책이 deployment 중 자유롭게 행동 적응 가능. Value function 이 task-aware (gate 중심 높은 값, 경계 낮은 값) → risk-aware 행동 자동 발현."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">Superhuman 의 의미와 한계</span>: RL 이 motion capture (perfect state estimation) + lower latency 의 구조적 이점 보유. 공정 비교는 아니지만, RL 이 vehicle 의 <span class=\"term\">full performance envelope 를 활용</span>하는 반면 human pilot 은 안전 margin 을 남김 — 이 차이가 본질적."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">한계 — Indoor motion capture 의존</span>: VICON 400 Hz 가 perfect state estimation 제공. Outdoor, GPS-denied, onboard sensing 환경에서의 RL 성능은 미검증. Sim-to-real 이 state estimation 품질에 민감할 가능성."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">FWAV 비교 관점 — 본질적 차이와 이식 가능성</span>: Quadrotor 는 (a) hover 가능, (b) dynamics 가 비교적 잘 이해됨, (c) TWR 이 높아 control authority 풍부. FWAV 는 (a) hover 불가, (b) unsteady aerodynamics 가 본질적으로 hard-to-model, (c) TWR 이 낮아 control authority 제한적. 따라서 OC 의 model-dependent 한계가 FWAV 에서 <span class=\"term\">더 심각</span> — 역으로 RL 의 model-free 접근이 FWAV 에서 특히 유리할 가능성이 높음. 단, FWAV 의 sim-to-real gap 이 quadrotor 보다 훨씬 크므로 domain randomization 범위 설계가 critical challenge."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">Drone SOTA baseline 으로서의 가치</span>: 본 논문은 quadrotor 제어의 현 수준 (108 km/h, >12g, superhuman) 을 제시. FWAV 연구의 benchmark — FWAV 가 이 수준의 agility 에 도달하기까지의 gap 을 정량적으로 측정하는 baseline 자료. Drone-domain SOTA 가 여기까지 왔다 — FWAV 는 현재 이 수준의 1/10 미만."
+      }
+    ]
+  },
+  "conclusion": {
+    "content": [
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">핵심 결론 — Optimization objective 가 핵심</span>: RL 이 OC 를 능가하는 이유는 \"더 잘 최적화해서\" 가 아니라 \"더 나은 objective 를 최적화\" — task-level objective 가 intermediate representation 없이 정책 자유도를 극대화."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">OC 의 구조적 한계 정량화</span>: trajectory tracking 은 nominal model 에서도 44% 성공률, realistic model 에서 0%. Contouring control 은 76% → 20%. Planning-control 분해의 information bottleneck 이 근본 원인."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">RL 의 robustness</span>: nominal · realistic · real-world 모든 조건에서 100% 성공률. Gate progress objective + domain randomization + stochastic policy 의 3중 robustness."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">극한 성능 + Superhuman</span>: TWR 12 (기존 최고의 3배), peak 108 km/h, peak 12.58g. 프로 파일럿 3명 (DRL 세계 챔피언 포함) 을 능가. Full performance envelope 활용은 RL 의 고유 강점."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">Sim-to-real efficiency</span>: 표준 워크스테이션에서 수 분 학습, zero-shot real-world transfer. System identification + delay simulation + domain randomization + mass-normalized thrust interface 의 4요소."
+      },
+      {
+        "type": "bullet",
+        "text": "<span class=\"term\">로보틱스 제어 설계 시사점 + FWAV 전망</span>: task-level objective 직접 최적화 + domain randomization 의 조합이 agile robot control 의 유력한 패러다임. FWAV 연구에 대한 시사: (1) OC 의 한계가 FWAV 에서 더 심각 → RL 접근의 잠재적 이점이 더 큼, (2) 단 sim-to-real gap 과 simulator fidelity 가 선결 과제, (3) quadrotor 의 108 km/h / 12g+ 가 FWAV agility 의 장기 비교 baseline."
+      }
+    ]
+  }
+};
 
         function openModal(key) {
             const detail = SECTION_DETAIL[key];
@@ -287,7 +525,6 @@
             body.scrollTop = 0;
             document.getElementById('modal-overlay').classList.add('active');
 
-            // Re-render KaTeX in the new content
             if (window.renderMathInElement) {
                 renderMathInElement(body, {
                     delimiters: [
