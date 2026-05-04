@@ -35,7 +35,7 @@
             background: white;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             display: grid;
-            grid-template-rows: auto auto auto 1fr;
+            grid-template-rows: auto auto 1fr;
             overflow: hidden;
         }
         .header {
@@ -254,6 +254,27 @@
             font-size: 17px;
         }
         .insights-section-title:first-child { margin-top: 0; }
+
+        /* Tier badge */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 10px;
+        }
+        .tier-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: white;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+        }
     </style>
 </head>
 <body>
@@ -269,7 +290,7 @@
 
         <div class="summary-container">
             <div class="summary-title">논문 요약</div>
-            <div class="summary">이 논문은 <span class="term">다수 MAV (소형 무인 항공기) 를 위한 중앙집중식 협력 단안 SLAM 프레임워크 CCM-SLAM</span>을 제시한 ETH Zurich Vision for Robotics Lab 의 Journal of Field Robotics 발표. 각 에이전트는 제한된 연산 자원으로 <span class="term">실시간 Visual Odometry 를 onboard 수행</span>하여 자율성을 보장하고, 중앙 서버가 <span class="term">place recognition · map fusion · global Bundle Adjustment · redundancy detection</span> 등 계산 집약적 작업을 담당. 핵심은 <span class="term">양방향 통신</span> — 서버가 에이전트에게 다른 에이전트의 경험을 전달하여 local map 을 보강하고, 통신 지연·메시지 손실에도 robust 하게 작동하며 연결 완전 끊김 시에도 에이전트 자율성 유지. EuRoC · Irchel 데이터셋 분석과 <span class="term">이종 센서·연산 장비의 3대 UAV 동시 비행 실험</span>으로 실용성 입증. <span class="eng">[Tier 2 비교 baseline]</span> Drone collaborative SLAM 의 현재 수준을 보여주는 프레임워크로, FWAV 스웜 자율 항법 연구 시 아키텍처·통신·확장성 설계의 참조점.</div>
+            <div class="summary">이 논문은 <span class="term">다수 MAV (소형 무인 항공기) 를 위한 중앙집중식 협력 단안 SLAM 프레임워크 CCM-SLAM</span>을 제시한 ETH Zurich Vision for Robotics Lab 의 Journal of Field Robotics 발표. 각 에이전트는 제한된 연산 자원으로 <span class="term">실시간 Visual Odometry 를 onboard 수행</span>하여 자율성을 보장하고, 중앙 서버가 <span class="term">place recognition · map fusion · global Bundle Adjustment · redundancy detection</span> 등 계산 집약적 작업을 담당. 핵심은 <span class="term">양방향 통신</span> — 서버가 에이전트에게 다른 에이전트의 경험을 전달하여 local map 을 보강하고, 통신 지연·메시지 손실에도 robust 하게 작동하며 연결 완전 끊김 시에도 에이전트 자율성 유지. EuRoC · Irchel 데이터셋 분석과 <span class="term">이종 센서·연산 장비의 3대 UAV 동시 비행 실험</span>으로 실용성 입증. Drone collaborative SLAM 의 현재 수준을 보여주는 프레임워크로, FWAV 스웜 자율 항법 연구 시 아키텍처·통신·확장성 설계의 참조점.</div>
             <div class="keywords"><span class="keyword-chip">collaborative slam</span><span class="keyword-chip">multi-robot slam</span><span class="keyword-chip">centralized architecture</span><span class="keyword-chip">monocular visual odometry</span><span class="keyword-chip">map fusion</span><span class="keyword-chip">place recognition</span><span class="keyword-chip">keyframe management</span><span class="keyword-chip">bundle adjustment</span><span class="keyword-chip">communication robustness</span><span class="keyword-chip">micro aerial vehicle</span></div>
         </div>
         <div class="content">

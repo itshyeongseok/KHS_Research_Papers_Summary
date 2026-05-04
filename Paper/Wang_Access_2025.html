@@ -35,7 +35,7 @@
             background: white;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             display: grid;
-            grid-template-rows: auto auto auto 1fr;
+            grid-template-rows: auto auto 1fr;
             overflow: hidden;
         }
         .header {
@@ -254,6 +254,27 @@
             font-size: 17px;
         }
         .insights-section-title:first-child { margin-top: 0; }
+
+        /* Tier badge */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 10px;
+        }
+        .tier-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: white;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+        }
     </style>
 </head>
 <body>
@@ -269,7 +290,7 @@
 
         <div class="summary-container">
             <div class="summary-title">논문 요약</div>
-            <div class="summary">본 논문은 <span class="term">GPS-Denied Environment (GDE)</span> 에서 <span class="term">Dynamic Target Localization (DTL)</span> 을 위한 <span class="term">multi-sensor fusion 기술의 포괄적 서베이</span>. PRISMA 가이드라인에 따른 체계적 문헌 리뷰로, 2015–2024 발표된 185편의 핵심 논문을 선별·분석하여 4대 fusion 카테고리 — <span class="term">Odometry Fusion (VIO/LIO/VLIO)</span>, <span class="term">SLAM Fusion (VI-SLAM, LiDAR-IMU-SLAM, LV-SLAM, LVI-SLAM)</span>, <span class="term">Wi-Fi Fusion</span>, <span class="term">UWB-IMU/BLE Fusion</span> — 를 체계적으로 정리. <span class="eng">Tier 2 — FWAV 비교 baseline</span>: 본 서베이의 sensor fusion 전략은 drone 분야의 GPS-denied navigation frontier 를 보여주며, FWAV 로의 기술 이식 가능성과 scale·dynamics·hardware 제약에 의한 porting 장벽을 평가하는 비교 기준을 제공.</div>
+            <div class="summary">본 논문은 <span class="term">GPS-Denied Environment (GDE)</span> 에서 <span class="term">Dynamic Target Localization (DTL)</span> 을 위한 <span class="term">multi-sensor fusion 기술의 포괄적 서베이</span>. PRISMA 가이드라인에 따른 체계적 문헌 리뷰로, 2015–2024 발표된 185편의 핵심 논문을 선별·분석하여 4대 fusion 카테고리 — <span class="term">Odometry Fusion (VIO/LIO/VLIO)</span>, <span class="term">SLAM Fusion (VI-SLAM, LiDAR-IMU-SLAM, LV-SLAM, LVI-SLAM)</span>, <span class="term">Wi-Fi Fusion</span>, <span class="term">UWB-IMU/BLE Fusion</span> — 를 체계적으로 정리. : 본 서베이의 sensor fusion 전략은 drone 분야의 GPS-denied navigation frontier 를 보여주며, FWAV 로의 기술 이식 가능성과 scale·dynamics·hardware 제약에 의한 porting 장벽을 평가하는 비교 기준을 제공.</div>
             <div class="keywords"><span class="keyword-chip">sensor fusion</span><span class="keyword-chip">GPS-denied environment</span><span class="keyword-chip">dynamic target localization</span><span class="keyword-chip">SLAM</span><span class="keyword-chip">visual-inertial odometry</span><span class="keyword-chip">UWB-IMU fusion</span><span class="keyword-chip">indoor positioning</span><span class="keyword-chip">multi-sensor integration</span><span class="keyword-chip">Kalman filter</span><span class="keyword-chip">deep learning navigation</span><span class="keyword-chip">LiDAR-inertial odometry</span><span class="keyword-chip">Wi-Fi fusion</span></div>
         </div>
         <div class="content">

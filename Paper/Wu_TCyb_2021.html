@@ -35,7 +35,7 @@
             background: white;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             display: grid;
-            grid-template-rows: auto auto auto 1fr;
+            grid-template-rows: auto auto 1fr;
             overflow: hidden;
         }
         .header {
@@ -46,19 +46,6 @@
         .title { font-size: 32px; font-weight: bold; margin-bottom: 10px; line-height: 1.3; }
         .authors { font-size: 17px; margin-bottom: 5px; }
         .journal { font-size: 15px; opacity: 0.9; }
-        .tier-badge {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 14px;
-            margin-left: 16px;
-            vertical-align: middle;
-        }
-        .tier-2 {
-            background: #fbc02d;
-            color: #000;
-        }
-
         .summary-container {
             background: #f0f5fa;
             padding: 18px 38px;
@@ -81,10 +68,6 @@
             border-radius: 999px;
             font-weight: 500;
         }
-        .mot-problems { color: #c62828; }
-        .mot-addressed { color: #2e7d32; }
-        .mot-remaining { color: #e65100; }
-
         .content {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -284,6 +267,27 @@
             font-size: 17px;
         }
         .insights-section-title:first-child { margin-top: 0; }
+
+        /* Tier badge */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 10px;
+        }
+        .tier-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: white;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+        }
     </style>
 </head>
 <body>
@@ -299,7 +303,7 @@
 
         <div class="summary-container">
             <div class="summary-title">논문 요약</div>
-            <div class="summary">이 논문은 <span class="term">다수 UAV 의 formation flight 와 swarm collision avoidance 를 하나의 분산 제어 프레임워크로 통합</span>한 IEEE Transactions on Cybernetics 발표. <span class="term">Formation controller</span> 는 consensus 기반으로 각 UAV 가 이웃의 상대 위치·속도만으로 의도된 대형 (V-shape 등) 에 수렴 — fixed topology 와 <span class="term">switching topology</span> (통신 단절 포함) 모두에서 수렴 증명 및 convergence rate function 도출. <span class="term">Collision avoidance controller</span> 는 starling bird 의 shadow-projection 메커니즘에서 영감 — 미지의 동적 장애물 회피 + 군집 내 충돌 방지를 3개 가속도 항 ($a_{i1}, a_{i2}, a_{i3}$) 으로 구현. 두 컨트롤러 간 <span class="term">분산 전환</span> (각 UAV 가 독립적으로 장애물 감지 시 전환) 으로 전체 시스템 안정성 보장. 11대 UAV 시뮬레이션으로 효과성 입증. <span class="term">Drone SOTA baseline</span>: multirotor 전용 설계로 FWAV 에 직접 적용 불가하나, consensus formation 이론과 convergence rate analysis 는 FWAV multi-agent 연구의 이론적 참조점.</div>
+            <div class="summary">이 논문은 <span class="term">다수 UAV 의 formation flight 와 swarm collision avoidance 를 하나의 분산 제어 프레임워크로 통합</span>한 IEEE Transactions on Cybernetics 발표. <span class="term">Formation controller</span> 는 consensus 기반으로 각 UAV 가 이웃의 상대 위치·속도만으로 의도된 대형 (V-shape 등) 에 수렴 — fixed topology 와 <span class="term">switching topology</span> (통신 단절 포함) 모두에서 수렴 증명 및 convergence rate function 도출. <span class="term">Collision avoidance controller</span> 는 starling bird 의 shadow-projection 메커니즘에서 영감 — 미지의 동적 장애물 회피 + 군집 내 충돌 방지를 3개 가속도 항 ($a_{i1}, a_{i2}, a_{i3}$) 으로 구현. 두 컨트롤러 간 <span class="term">분산 전환</span> (각 UAV 가 독립적으로 장애물 감지 시 전환) 으로 전체 시스템 안정성 보장. 11대 UAV 시뮬레이션으로 효과성 입증.</div>
             <div class="keywords"><span class="keyword-chip">uav swarm formation</span><span class="keyword-chip">collision avoidance</span><span class="keyword-chip">distributed control</span><span class="keyword-chip">switching topology</span><span class="keyword-chip">consensus algorithm</span><span class="keyword-chip">starling-inspired swarm</span><span class="keyword-chip">second-order multiagent system</span><span class="keyword-chip">convergence rate</span><span class="keyword-chip">formation-swarm integration</span><span class="keyword-chip">bio-inspired robotics</span></div>
         </div>
 
